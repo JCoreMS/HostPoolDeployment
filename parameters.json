@@ -1,0 +1,122 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocation": {
+      "value": "https://raw.githubusercontent.com/JCoreMS/AVDAlerts/main/"
+    },
+    "_artifactsLocationSasToken": {
+      "value": ""
+    },
+    "AppGroupName": {
+      "value": "ag-general-office-users"
+    },
+    "AppGroupType": {
+      "value": "Desktop"
+    },
+    "Availability": {
+      "value": "None"
+    },
+    "ComputeGalleryName": {
+      "value": "cgvaavdimages"
+    },
+    "ComputeGalleryRG": {
+      "value": "rg-va-images"
+    },
+    "CustomRdpProperty": {
+      "value": "audiocapturemode:i:1;camerastoredirect:s:*;use multimon:i:0;drivestoredirect:s:;"
+    },
+    "DiskSku":{
+      "value": "Standard_LRS"
+    },
+    "DomainName": {
+      "value": "corefamily.gov"
+    },
+    "DomainUser": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
+        },
+        "secretName": "VM-Login-Admin-DomainUser"
+      }
+    },
+    "DomainPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
+        },
+        "secretName": "VM-Login-Admin-Domain"
+      }
+    },
+    "HostPoolType": {
+      "value": "Pooled DepthFirst"
+    },
+    "HPResourceGroup": {
+      "value": "aaa-hpresources-testautodeploy"
+    },
+    "HostPoolName": {
+      "value": "hp-testautodeploy"
+    },
+    "HPVMsRG": {
+      "value": "aaa-vms-testautodeploy"
+    },
+    "ImageName": {
+      "value": "win10office22h2"
+    },
+    "WorkspaceName": {
+      "value": "ws-testautodeploy"
+    },
+    "Location": {
+      "value": "usgovvirginia"
+    },
+    "NumSessionHosts": {
+      "value": 3
+    },
+    "NumUsersPerHost": {
+      "value": 2
+    },
+    "Subnet": {
+      "value": "sub-Tier2-AVD_Wkstns"
+    },
+    "Tags": {
+      "value": {}
+    },
+    "StartVmOnConnect": {
+      "value": true
+    },
+    "OUPath": {
+      "value": "OU=Workstations,DC=corefamily,DC=gov"
+    },
+    "ValidationEnvironment": {
+      "value": false
+    },
+    "VmIndexStart": {
+      "value": 0
+    },
+    "VmPrefix": {
+      "value": "vmavdlabeu2"
+    },
+    "VirtualNetwork": {
+      "value": "vnet-va"
+    },
+    "VirtualNetworkResourceGroup": {
+      "value": "rg-va-identity"
+    },
+    "VmPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
+        },
+        "secretName": "VM-Login-Admin-Domain"
+      }
+    },
+    "VmUsername": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
+        },
+        "secretName": "VM-Login-Admin-LocalUser"
+      }
+    }
+  }
+}
