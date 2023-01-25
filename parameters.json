@@ -48,7 +48,7 @@
         "secretName": "VM-Login-Admin-Domain"
       }
     },
-    "HostPoolType": {
+    "HostPoolType":{
       "value": "Pooled DepthFirst"
     },
     "HPResourceGroup": {

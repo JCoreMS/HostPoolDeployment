@@ -114,7 +114,7 @@ resource resourceGroupAVD 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: Location
 }
 
-resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (HPResourceGroup != HPVMsRG) {
   name: HPVMsRG
   location: Location
 }
