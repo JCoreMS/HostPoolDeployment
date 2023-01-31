@@ -6,6 +6,9 @@ param _artifactsLocationSasToken string
 param Availability string
 param AvailabilitySetPrefix string
 param ComputeGalleryImageId string
+param CrossTenantRegister bool
+@secure()
+param CrossTenantRegisterToken string
 param DomainName string
 param DomainUser string
 @secure()
@@ -26,7 +29,6 @@ param VmSize string
 param VmUsername string
 @secure()
 param VmPassword string
-
 
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = [for i in range(0, NumSessionHosts): {
@@ -135,7 +137,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
       timestamp: Timestamp
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool.ps1 -HostPoolRegistration ${HostPoolRegistrationToken}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool.ps1 -HostPoolRegistration ${HostPoolRegistrationToken} -XTenantRegister ${CrossTenantRegister} -XTenantRegToken ${CrossTenantRegisterToken}'
     }
   }
   dependsOn: [
@@ -169,3 +171,5 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
     extension_CustomScriptExtension
   ]
 }]
+
+output TrustedLaunch string = TrustedLaunch

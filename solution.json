@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.11.1.770",
-      "templateHash": "14533407112385130620"
+      "templateHash": "15162881544358169157"
     }
   },
   "parameters": {
@@ -40,6 +40,15 @@
     "ComputeGalleryRG": {
       "type": "string"
     },
+    "CrossTenantRegister": {
+      "type": "bool",
+      "metadata": {
+        "description": "If TRUE, Resource Group for Host Pool resources not required."
+      }
+    },
+    "CrossTenantRegisterToken": {
+      "type": "secureString"
+    },
     "CustomRdpProperty": {
       "type": "string"
     },
@@ -72,7 +81,6 @@
     },
     "HostPoolType": {
       "type": "string",
-      "defaultValue": "Pooled DepthFirst",
       "metadata": {
         "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
       },
@@ -181,6 +189,7 @@
   },
   "resources": [
     {
+      "condition": "[parameters('CrossTenantRegister')]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
       "name": "[parameters('HPResourceGroup')]",
@@ -194,7 +203,7 @@
       "location": "[parameters('Location')]"
     },
     {
-      "condition": "[and(variables('PooledHostPool'), equals(parameters('Availability'), 'AvailabilitySet'))]",
+      "condition": "[and(and(variables('PooledHostPool'), equals(parameters('Availability'), 'AvailabilitySet')), not(parameters('CrossTenantRegister')))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "[format('AvailabilitySets_{0}', parameters('Timestamp'))]",
@@ -270,6 +279,7 @@
       ]
     },
     {
+      "condition": "[not(parameters('CrossTenantRegister'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "HostPoolDeployment",
@@ -492,6 +502,12 @@
           "ComputeGalleryImageId": {
             "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[1])]"
           },
+          "CrossTenantRegister": {
+            "value": "[parameters('CrossTenantRegister')]"
+          },
+          "CrossTenantRegisterToken": {
+            "value": "[parameters('CrossTenantRegisterToken')]"
+          },
           "DomainUser": {
             "value": "[parameters('DomainUser')]"
           },
@@ -502,7 +518,7 @@
             "value": "[parameters('DomainName')]"
           },
           "HostPoolRegistrationToken": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('HPResourceGroup')), 'Microsoft.Resources/deployments', 'HostPoolDeployment')).outputs.HostPoolRegistrationToken.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('HPResourceGroup')), 'Microsoft.Resources/deployments', 'HostPoolDeployment'), '2020-10-01').outputs.HostPoolRegistrationToken.value]"
           },
           "OUPath": {
             "value": "[parameters('OUPath')]"
@@ -554,7 +570,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.11.1.770",
-              "templateHash": "6873715867653535690"
+              "templateHash": "8762079748048781368"
             }
           },
           "parameters": {
@@ -572,6 +588,12 @@
             },
             "ComputeGalleryImageId": {
               "type": "string"
+            },
+            "CrossTenantRegister": {
+              "type": "bool"
+            },
+            "CrossTenantRegisterToken": {
+              "type": "secureString"
             },
             "DomainName": {
               "type": "string"
@@ -744,7 +766,7 @@
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Register-HostPool.ps1 -HostPoolRegistration {0}', parameters('HostPoolRegistrationToken'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Register-HostPool.ps1 -HostPoolRegistration {0} -XTenantRegister {1} -XTenantRegToken {2}', parameters('HostPoolRegistrationToken'), parameters('CrossTenantRegister'), parameters('CrossTenantRegisterToken'))]"
                 }
               },
               "dependsOn": [

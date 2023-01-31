@@ -21,7 +21,17 @@ param AppGroupType string
 @description('Set the desired availability / SLA with a pooled host pool.  Choose "None" if deploying a personal host pool.')
 param Availability string = 'None'
 
+param ComputeGalleryName string
+param ComputeGallerySubId string
 param ComputeGalleryRG string
+param ComputeGalleryImage string
+param TrustedLaunch string
+
+@description('If TRUE, Resource Group for Host Pool resources not required.')
+param CrossTenantRegister bool
+
+@secure()
+param CrossTenantRegisterToken string
 
 param CustomRdpProperty string
 
@@ -50,7 +60,7 @@ param HostPoolName string
   'Personal Direct'
 ])
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
-param HostPoolType string = 'Pooled DepthFirst'
+param HostPoolType string
 
 param HPVMsRG string
 param WorkspaceName string
@@ -62,8 +72,7 @@ param Tags object
 param Timestamp string = utcNow('u')
 param StartVmOnConnect bool
 param OUPath string
-param ComputeGalleryName string
-param ImageName string
+
 @maxValue(99)
 param VmIndexStart int
 
@@ -114,32 +123,24 @@ resource resourceGroupAVD 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: Location
 }
 
-resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (HPResourceGroup != HPVMsRG) {
-  name: HPVMsRG
-  location: Location
-}
-
 resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing = {
-  name: '${ComputeGalleryName}/${ImageName}'
-  scope: resourceGroup(ComputeGalleryRG)
+  name: '${ComputeGalleryName}/${ComputeGalleryImage}'
+  scope: resourceGroup(ComputeGallerySubId, ComputeGalleryRG)             //scope to alternate subscription
+  //scope: resourceGroup(ComputeGalleryRG)
 }
 
-module availabilitySets 'modules/availabilitySets.bicep' = if (PooledHostPool && Availability == 'AvailabilitySet') {
+module availabilitySets 'modules/availabilitySets.bicep' = if ((PooledHostPool && Availability == 'AvailabilitySet') && !CrossTenantRegister) {
   name: 'AvailabilitySets_${Timestamp}'
-  scope: resourceGroup(HPVMsRG) // Hosts Resource Group
+  scope: resourceGroupAVD
   params: {
     AvailabilitySetCount: AvailabilitySetCount
     AvailabilitySetPrefix: AvailabilitySetPrefix
     Location: Location
     Tags: Tags
   }
-  dependsOn: [
-    resourceGroupAVD
-    resourceGroupVMs
-  ]
 }
 
-module hostPool 'modules/hostpool.bicep' = {
+module hostPool 'modules/hostpool.bicep' = if (!CrossTenantRegister) {
   name: 'HostPoolDeployment'
   scope: resourceGroup(HPResourceGroup)
   params: {
@@ -162,7 +163,6 @@ module hostPool 'modules/hostpool.bicep' = {
   }
   dependsOn: [
     resourceGroupAVD
-    resourceGroupVMs
   ]
 }
 
@@ -176,6 +176,8 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Availability: Availability
     AvailabilitySetPrefix: AvailabilitySetPrefix
     ComputeGalleryImageId: computeGalleryImage.id
+    CrossTenantRegister: CrossTenantRegister
+    CrossTenantRegisterToken: CrossTenantRegisterToken
     DomainUser: DomainUser
     DomainPassword: DomainPassword
     DomainName: DomainName
@@ -186,7 +188,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Subnet: Subnet
     Tags: Tags
     Timestamp: Timestamp
-    TrustedLaunch: computeGalleryImage.properties.features[0].value  //first array item is Security Type: Value
+    TrustedLaunch: TrustedLaunch
     VirtualNetwork: VirtualNetwork
     VirtualNetworkResourceGroup: VirtualNetworkResourceGroup
     VmIndexStart: VmIndexStart
@@ -195,9 +197,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     VmPassword: VmPassword
     VmPrefix: VmPrefix
   }
-  dependsOn: [
+  dependsOn: (!CrossTenantRegister) ? [
     hostPool
-  ]
+  ] : []
 }]
-
-

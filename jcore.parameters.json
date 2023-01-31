@@ -17,11 +17,23 @@
     "Availability": {
       "value": "None"
     },
+    "ComputeGalleryImage": {
+      "value": "win10multiOfficeTest"
+    },
     "ComputeGalleryName": {
-      "value": "cgvaavdimages"
+      "value": "agceus2visstudiotest"
     },
     "ComputeGalleryRG": {
-      "value": "rg-va-images"
+      "value": "rg-eastus2-AVDTest"
+    },
+    "ComputeGallerySubId": {
+      "value": "d21af581-3282-4f7d-ba7f-c1e021c29ff0"
+    },
+    "CrossTenantRegister": {
+      "value": false
+    },
+    "CrossTenantRegisterToken": {
+      "value": ""
     },
     "CustomRdpProperty": {
       "value": "audiocapturemode:i:1;camerastoredirect:s:*;use multimon:i:0;drivestoredirect:s:;"
@@ -30,44 +42,28 @@
       "value": "Standard_LRS"
     },
     "DomainName": {
-      "value": "corefamily.gov"
+      "value": "corefamily.net"
     },
     "DomainUser": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
-        },
-        "secretName": "VM-Login-Admin-DomainUser"
-      }
-    },
-    "DomainPassword": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
-        },
-        "secretName": "VM-Login-Admin-Domain"
-      }
+      "value": "jcore@corefamily.net"
     },
     "HostPoolType":{
       "value": "Pooled DepthFirst"
     },
     "HPResourceGroup": {
-      "value": "aaa-hpresources-testautodeploy"
+      "value": "rg-hp-eus2-avdtest"
     },
     "HostPoolName": {
-      "value": "hp-testautodeploy"
+      "value": "hp-eus2-AutoDeployTest"
     },
     "HPVMsRG": {
-      "value": "aaa-vms-testautodeploy"
-    },
-    "ImageName": {
-      "value": "win10office22h2"
+      "value": "rg-hp-eus2-avdtest"
     },
     "WorkspaceName": {
-      "value": "ws-testautodeploy"
+      "value": "ws-eus2-AutoDeployTest"
     },
     "Location": {
-      "value": "usgovvirginia"
+      "value": "eastus2"
     },
     "NumSessionHosts": {
       "value": 3
@@ -94,29 +90,16 @@
       "value": 0
     },
     "VmPrefix": {
-      "value": "vmavdlabeu2"
+      "value": "vmavdlabeus2"
     },
     "VirtualNetwork": {
-      "value": "vnet-va"
+      "value": "vnet-EastUS2-AVDLab"
     },
     "VirtualNetworkResourceGroup": {
-      "value": "rg-va-identity"
-    },
-    "VmPassword": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
-        },
-        "secretName": "VM-Login-Admin-Domain"
-      }
+      "value": "rg-eastus2-LandingZone"
     },
     "VmUsername": {
-      "reference": {
-        "keyVault": {
-          "id": "/subscriptions/d5a3b431-5ad0-4a0d-bf86-8fffd2f84554/resourceGroups/rg-va-Security/providers/Microsoft.KeyVault/vaults/kv-va-AVDLab"
-        },
-        "secretName": "VM-Login-Admin-LocalUser"
-      }
+      "value": "jcore"
     }
   }
 }

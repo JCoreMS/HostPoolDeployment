@@ -67,4 +67,6 @@ resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-03-09-previe
   ]
 }
 
-output HostPoolRegistrationToken string = hostPool.properties.registrationInfo.token
+// output HostPoolRegistrationToken string = hostPool.properties.registrationInfo.token
+output HostPoolRegistrationToken string = reference(hostPool.id).registrationInfo.token
+output ComputeImageGalleryID string = ComputeGalleryImageId
