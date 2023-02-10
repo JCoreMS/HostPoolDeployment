@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "_artifactsLocation": {
-      "value": "https://raw.githubusercontent.com/JCoreMS/AVDAlerts/main/"
+      "value": "https://storavdlabeus2.blob.core.windows.net/postdeployscripts/"
     },
     "_artifactsLocationSasToken": {
-      "value": ""
+      "value": "?sp=r&st=2023-02-02T14:10:24Z&se=2023-02-23T22:10:24Z&spr=https&sv=2021-06-08&sr=c&sig=zZNTCdYvO0limz5zljkoXsogDKS50XIVR%2BK3MUxCPH8%3D"
     },
     "AppGroupName": {
       "value": "ag-general-office-users"
@@ -18,22 +18,22 @@
       "value": "None"
     },
     "ComputeGalleryImage": {
-      "value": "win10multiOfficeTest"
+      "value": "testFeaturesG2std"
     },
     "ComputeGalleryName": {
-      "value": "agceus2visstudiotest"
+      "value": "aig_windows_desktops"
     },
     "ComputeGalleryRG": {
-      "value": "rg-eastus2-AVDTest"
+      "value": "rg-eastus2-aib-imaging"
     },
     "ComputeGallerySubId": {
-      "value": "d21af581-3282-4f7d-ba7f-c1e021c29ff0"
+      "value": "8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9"
     },
     "CrossTenantRegister": {
       "value": false
     },
     "CrossTenantRegisterToken": {
-      "value": ""
+      "value": "null"
     },
     "CustomRdpProperty": {
       "value": "audiocapturemode:i:1;camerastoredirect:s:*;use multimon:i:0;drivestoredirect:s:;"
@@ -50,14 +50,14 @@
     "HostPoolType":{
       "value": "Pooled DepthFirst"
     },
-    "HPResourceGroup": {
-      "value": "rg-hp-eus2-avdtest"
+    "ResourceGroupHP": {
+      "value": "rg-a-a-a-a-a-AVDTEST"
+    },
+    "ResourceGroupVMs":{
+      "value": ""
     },
     "HostPoolName": {
       "value": "hp-eus2-AutoDeployTest"
-    },
-    "HPVMsRG": {
-      "value": "rg-hp-eus2-avdtest"
     },
     "WorkspaceName": {
       "value": "ws-eus2-AutoDeployTest"
@@ -66,13 +66,13 @@
       "value": "eastus2"
     },
     "NumSessionHosts": {
-      "value": 3
+      "value": 1
     },
     "NumUsersPerHost": {
       "value": 2
     },
     "Subnet": {
-      "value": "sub-Tier2-AVD_Wkstns"
+      "value": "subnet-eastus2-AVDLab-HostPoolVMs"
     },
     "Tags": {
       "value": {}
@@ -81,13 +81,13 @@
       "value": true
     },
     "OUPath": {
-      "value": "OU=Workstations,DC=corefamily,DC=gov"
+      "value": "OU=Workstations,DC=corefamily,DC=net"
     },
     "ValidationEnvironment": {
       "value": false
     },
     "VmIndexStart": {
-      "value": 0
+      "value": 5
     },
     "VmPrefix": {
       "value": "vmavdlabeus2"

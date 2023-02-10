@@ -6,6 +6,7 @@ param _artifactsLocationSasToken string
 param Availability string
 param AvailabilitySetPrefix string
 param ComputeGalleryImageId string
+param ComputeGalleryProperties object
 param CrossTenantRegister bool
 @secure()
 param CrossTenantRegisterToken string
@@ -19,7 +20,6 @@ param NumSessionHosts int
 param Subnet string
 param Tags object
 param Timestamp string
-param TrustedLaunch string
 param OUPath string
 param VirtualNetwork string
 param VirtualNetworkResourceGroup string
@@ -29,6 +29,10 @@ param VmSize string
 param VmUsername string
 @secure()
 param VmPassword string
+
+var HyperVGen = ComputeGalleryProperties.hyperVGeneration
+var Architecture = ComputeGalleryProperties.architecture
+var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
 
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = [for i in range(0, NumSessionHosts): {
@@ -103,11 +107,11 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
       ]
     }
     securityProfile: {
-      uefiSettings: TrustedLaunch == 'TrustedLaunch' ? {
+      uefiSettings: SecurityFeature == 'Standard' ? null : {
         secureBootEnabled: true
         vTpmEnabled: true
-      } : null
-      securityType: TrustedLaunch == 'TrustedLaunch' ? 'TrustedLaunch' : null
+      }
+      securityType: SecurityFeature == 'Standard' ? null : SecurityFeature
     }
     diagnosticsProfile: {
       bootDiagnostics: {
@@ -172,4 +176,10 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
   ]
 }]
 
-output TrustedLaunch string = TrustedLaunch
+
+output RegistrationToken string = HostPoolRegistrationToken
+output HyperVGen string = HyperVGen
+output Architecture string = Architecture
+output ComputeGalProp object = ComputeGalleryProperties
+output SecurityFeatureValue string = SecurityFeature
+

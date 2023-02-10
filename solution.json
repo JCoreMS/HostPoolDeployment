@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.11.1.770",
-      "templateHash": "15162881544358169157"
+      "templateHash": "3338727373570583316"
     }
   },
   "parameters": {
@@ -37,7 +37,19 @@
         "None"
       ]
     },
+    "ComputeGalleryName": {
+      "type": "string"
+    },
+    "ComputeGallerySubId": {
+      "type": "string"
+    },
     "ComputeGalleryRG": {
+      "type": "string"
+    },
+    "ComputeGalleryImage": {
+      "type": "string"
+    },
+    "TrustedLaunch": {
       "type": "string"
     },
     "CrossTenantRegister": {
@@ -73,11 +85,15 @@
     "DomainPassword": {
       "type": "secureString"
     },
-    "HPResourceGroup": {
+    "ResourceGroupHP": {
       "type": "string"
     },
     "HostPoolName": {
       "type": "string"
+    },
+    "ResourceGroupVMs": {
+      "type": "string",
+      "defaultValue": ""
     },
     "HostPoolType": {
       "type": "string",
@@ -90,9 +106,6 @@
         "Personal Automatic",
         "Personal Direct"
       ]
-    },
-    "HPVMsRG": {
-      "type": "string"
     },
     "WorkspaceName": {
       "type": "string"
@@ -120,12 +133,6 @@
       "type": "bool"
     },
     "OUPath": {
-      "type": "string"
-    },
-    "ComputeGalleryName": {
-      "type": "string"
-    },
-    "ImageName": {
       "type": "string"
     },
     "VmIndexStart": {
@@ -189,17 +196,16 @@
   },
   "resources": [
     {
-      "condition": "[parameters('CrossTenantRegister')]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
-      "name": "[parameters('HPResourceGroup')]",
+      "name": "[parameters('ResourceGroupHP')]",
       "location": "[parameters('Location')]"
     },
     {
-      "condition": "[not(equals(parameters('HPResourceGroup'), parameters('HPVMsRG')))]",
+      "condition": "[not(empty(parameters('ResourceGroupVMs')))]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
-      "name": "[parameters('HPVMsRG')]",
+      "name": "[parameters('ResourceGroupVMs')]",
       "location": "[parameters('Location')]"
     },
     {
@@ -207,7 +213,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "[format('AvailabilitySets_{0}', parameters('Timestamp'))]",
-      "resourceGroup": "[parameters('HPVMsRG')]",
+      "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -274,16 +280,15 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('HPResourceGroup'))]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('HPVMsRG'))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]"
       ]
     },
     {
       "condition": "[not(parameters('CrossTenantRegister'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "HostPoolDeployment",
-      "resourceGroup": "[parameters('HPResourceGroup')]",
+      "name": "HostPool_linkedDeployment",
+      "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -297,7 +302,7 @@
             "value": "[parameters('AppGroupType')]"
           },
           "ComputeGalleryImageId": {
-            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[1])]"
+            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1])]"
           },
           "CustomRdpProperty": {
             "value": "[parameters('CustomRdpProperty')]"
@@ -346,7 +351,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.11.1.770",
-              "templateHash": "12021172590208656134"
+              "templateHash": "8005123379711237360"
             }
           },
           "parameters": {
@@ -461,13 +466,16 @@
             "HostPoolRegistrationToken": {
               "type": "string",
               "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token]"
+            },
+            "ComputeImageGalleryID": {
+              "type": "string",
+              "value": "[parameters('ComputeGalleryImageId')]"
             }
           }
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('HPResourceGroup'))]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('HPVMsRG'))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]"
       ]
     },
     {
@@ -480,7 +488,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "[format('VirtualMachines_{0}_{1}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1), guid(parameters('Timestamp')))]",
-      "resourceGroup": "[parameters('HPVMsRG')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -500,7 +508,7 @@
             "value": "[variables('AvailabilitySetPrefix')]"
           },
           "ComputeGalleryImageId": {
-            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[1])]"
+            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1])]"
           },
           "CrossTenantRegister": {
             "value": "[parameters('CrossTenantRegister')]"
@@ -518,7 +526,7 @@
             "value": "[parameters('DomainName')]"
           },
           "HostPoolRegistrationToken": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('HPResourceGroup')), 'Microsoft.Resources/deployments', 'HostPoolDeployment'), '2020-10-01').outputs.HostPoolRegistrationToken.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment'), '2020-10-01').outputs.HostPoolRegistrationToken.value]"
           },
           "OUPath": {
             "value": "[parameters('OUPath')]"
@@ -539,7 +547,7 @@
             "value": "[parameters('Timestamp')]"
           },
           "TrustedLaunch": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ImageName')), '/')[1]), '2022-03-03').features[0].value]"
+            "value": "[parameters('TrustedLaunch')]"
           },
           "VirtualNetwork": {
             "value": "[parameters('VirtualNetwork')]"
@@ -570,7 +578,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.11.1.770",
-              "templateHash": "8762079748048781368"
+              "templateHash": "14533433464030707948"
             }
           },
           "parameters": {
@@ -805,11 +813,17 @@
                 "virtualMachine"
               ]
             }
-          ]
+          ],
+          "outputs": {
+            "RegistrationToken": {
+              "type": "string",
+              "value": "[parameters('HostPoolRegistrationToken')]"
+            }
+          }
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('HPResourceGroup')), 'Microsoft.Resources/deployments', 'HostPoolDeployment')]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment')]"
       ]
     }
   ]

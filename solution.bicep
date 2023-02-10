@@ -25,7 +25,6 @@ param ComputeGalleryName string
 param ComputeGallerySubId string
 param ComputeGalleryRG string
 param ComputeGalleryImage string
-param TrustedLaunch string
 
 @description('If TRUE, Resource Group for Host Pool resources not required.')
 param CrossTenantRegister bool
@@ -50,8 +49,10 @@ param DomainUser string
 @secure()
 param DomainPassword string
 
-param HPResourceGroup string
+param ResourceGroupHP string
 param HostPoolName string
+
+param ResourceGroupVMs string
 
 @allowed([
   'Pooled DepthFirst'
@@ -62,7 +63,6 @@ param HostPoolName string
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
 param HostPoolType string
 
-param HPVMsRG string
 param WorkspaceName string
 param Location string
 param NumSessionHosts int
@@ -118,9 +118,14 @@ var PooledHostPool = split(HostPoolType, ' ')[0] == 'Pooled' ? true : false
 var AvailabilitySetPrefix = 'as-'
 
 
-resource resourceGroupAVD 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: HPResourceGroup
+resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: ResourceGroupHP
   location: Location
+}
+
+resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (!empty(ResourceGroupVMs)) {
+  name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none'
+  location: !empty(Location) ? Location : 'none'
 }
 
 resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing = {
@@ -131,7 +136,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 
 module availabilitySets 'modules/availabilitySets.bicep' = if ((PooledHostPool && Availability == 'AvailabilitySet') && !CrossTenantRegister) {
   name: 'AvailabilitySets_${Timestamp}'
-  scope: resourceGroupAVD
+  scope: resourceGroupHP
   params: {
     AvailabilitySetCount: AvailabilitySetCount
     AvailabilitySetPrefix: AvailabilitySetPrefix
@@ -141,8 +146,8 @@ module availabilitySets 'modules/availabilitySets.bicep' = if ((PooledHostPool &
 }
 
 module hostPool 'modules/hostpool.bicep' = if (!CrossTenantRegister) {
-  name: 'HostPoolDeployment'
-  scope: resourceGroup(HPResourceGroup)
+  name: 'HostPool_linkedDeployment'
+  scope: resourceGroup(ResourceGroupHP)
   params: {
     AppGroupName: AppGroupName
     AppGroupType: AppGroupType
@@ -162,20 +167,21 @@ module hostPool 'modules/hostpool.bicep' = if (!CrossTenantRegister) {
     WorkspaceName: WorkspaceName 
   }
   dependsOn: [
-    resourceGroupAVD
+    resourceGroupHP
   ]
 }
 
 @batchSize(1)
 module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
   name: 'VirtualMachines_${i-1}_${guid(Timestamp)}'
-  scope: resourceGroup(HPVMsRG)
+  scope: resourceGroup(ResourceGroupHP)
   params: {
     _artifactsLocation: _artifactsLocation
     _artifactsLocationSasToken: _artifactsLocationSasToken
     Availability: Availability
     AvailabilitySetPrefix: AvailabilitySetPrefix
     ComputeGalleryImageId: computeGalleryImage.id
+    ComputeGalleryProperties: computeGalleryImage.properties
     CrossTenantRegister: CrossTenantRegister
     CrossTenantRegisterToken: CrossTenantRegisterToken
     DomainUser: DomainUser
@@ -188,7 +194,6 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Subnet: Subnet
     Tags: Tags
     Timestamp: Timestamp
-    TrustedLaunch: TrustedLaunch
     VirtualNetwork: VirtualNetwork
     VirtualNetworkResourceGroup: VirtualNetworkResourceGroup
     VmIndexStart: VmIndexStart
@@ -201,3 +206,6 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     hostPool
   ] : []
 }]
+
+output AzComputeGalleryInfo object = computeGalleryImage.properties
+
