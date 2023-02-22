@@ -16,10 +16,15 @@ param DomainUser string
 param DomainPassword string
 param HostPoolRegistrationToken string
 param Location string
+param LogAnalyticsWorkspaceName string
+param ManagementResourceGroup string
+param Monitoring bool
 param NumSessionHosts int
 param Subnet string
 param Tags object
 param Timestamp string
+param UpdateWindows bool
+param UpdateApps bool
 param OUPath string
 param VirtualNetwork string
 param VirtualNetworkResourceGroup string
@@ -125,6 +130,26 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   ]
 }]
 
+resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): if(Monitoring) {
+  name: '${VmPrefix}${padLeft((i + NumSessionHosts), 3, '0')}/MicrosoftMonitoringAgent'
+  location: Location
+  properties: {
+    publisher: 'Microsoft.EnterpriseCloud.Monitoring'
+    type: 'MicrosoftMonitoringAgent'
+    typeHandlerVersion: '1.0'
+    autoUpgradeMinorVersion: true
+    settings: {
+      workspaceId: Monitoring ? reference(resourceId(ManagementResourceGroup, 'Microsoft.OperationalInsights/workspaces', LogAnalyticsWorkspaceName), '2015-03-20').customerId : null
+    }
+    protectedSettings: {
+      workspaceKey: Monitoring ? listKeys(resourceId(ManagementResourceGroup, 'Microsoft.OperationalInsights/workspaces', LogAnalyticsWorkspaceName), '2015-03-20').primarySharedKey : null
+    }
+  }
+  dependsOn: [
+    virtualMachine
+  ]
+}]
+
 resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
   location: Location
@@ -142,6 +167,30 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     }
     protectedSettings: {
       commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool.ps1 -HostPoolRegistration ${HostPoolRegistrationToken} -XTenantRegister ${CrossTenantRegister} -XTenantRegToken ${CrossTenantRegisterToken}'
+    }
+  }
+  dependsOn: [
+    virtualMachine
+  ]
+}]
+
+resource extension_PostDeployConfig 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): if (UpdateApps || UpdateWindows) {
+  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
+  location: Location
+  tags: Tags
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [
+        '${_artifactsLocation}PostDeployConfig.ps1${_artifactsLocationSasToken}'
+      ]
+      timestamp: Timestamp
+    }
+    protectedSettings: {
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File PostDeployConfig.ps1 -WindowsUpdate ${UpdateWindows} -AllAppsUpdate ${UpdateApps}'
     }
   }
   dependsOn: [

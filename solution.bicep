@@ -13,6 +13,8 @@ param AppGroupName string
 ])
 param AppGroupType string
 
+param AutomationAccountName string
+
 @allowed([
   'AvailabilitySet'
   'AvailabilityZones'
@@ -65,11 +67,34 @@ param HostPoolType string
 
 param WorkspaceName string
 param Location string
+param LogAnalyticsWorkspaceName string
+
+@maxValue(730)
+@minValue(30)
+@description('The retention for the Log Analytics Workspace to setup the AVD Monitoring solution')
+param LogAnalyticsWorkspaceRetention int = 30
+
+@allowed([
+  'Free'
+  'Standard'
+  'Premium'
+  'PerNode'
+  'PerGB2018'
+  'Standalone'
+  'CapacityReservation'
+])
+@description('The SKU for the Log Analytics Workspace to setup the AVD Monitoring solution')
+param LogAnalyticsWorkspaceSku string = 'PerGB2018'
+
+param ManagementResourceGroup string
+param Monitoring bool
 param NumSessionHosts int
 param NumUsersPerHost int
 param Subnet string
 param Tags object
 param Timestamp string = utcNow('u')
+param UpdateApps bool
+param UpdateWindows bool
 param StartVmOnConnect bool
 param OUPath string
 
@@ -134,6 +159,18 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
   //scope: resourceGroup(ComputeGalleryRG)
 }
 
+module automationAccount 'modules/automationAccount.bicep' = if(PooledHostPool) {
+  name: 'AutomationAccount_${Timestamp}'
+  scope: resourceGroup(ResourceGroupHP) // Management Resource Group
+  params: {
+    AutomationAccountName: AutomationAccountName
+    Location: Location
+  }
+  dependsOn: [
+    resourceGroupHP
+  ]
+}
+
 module availabilitySets 'modules/availabilitySets.bicep' = if ((PooledHostPool && Availability == 'AvailabilitySet') && !CrossTenantRegister) {
   name: 'AvailabilitySets_${Timestamp}'
   scope: resourceGroupHP
@@ -171,6 +208,28 @@ module hostPool 'modules/hostpool.bicep' = if (!CrossTenantRegister) {
   ]
 }
 
+// Monitoring Resources for AVD Insights
+// This module deploys a Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
+module monitoring 'modules/monitoring.bicep' = if(Monitoring) {
+  name: 'Monitoring_${Timestamp}'
+  scope: resourceGroup(ManagementResourceGroup) // Management Resource Group
+  params: {
+    AutomationAccountName: AutomationAccountName
+    HostPoolName: HostPoolName
+    LogAnalyticsWorkspaceName: LogAnalyticsWorkspaceName
+    LogAnalyticsWorkspaceRetention: LogAnalyticsWorkspaceRetention
+    LogAnalyticsWorkspaceSku: LogAnalyticsWorkspaceSku
+    Location: Location
+    PooledHostPool: PooledHostPool
+    Tags: Tags
+    WorkspaceName: WorkspaceName
+  }
+  dependsOn: [
+    resourceGroupHP
+    hostPool
+  ]
+}
+
 @batchSize(1)
 module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
   name: 'VirtualMachines_${i-1}_${guid(Timestamp)}'
@@ -190,10 +249,15 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     HostPoolRegistrationToken: hostPool.outputs.HostPoolRegistrationToken
     OUPath: OUPath
     Location: Location
+    LogAnalyticsWorkspaceName: LogAnalyticsWorkspaceName
+    ManagementResourceGroup: ManagementResourceGroup
+    Monitoring: Monitoring
     NumSessionHosts: NumSessionHosts
     Subnet: Subnet
     Tags: Tags
     Timestamp: Timestamp
+    UpdateApps: UpdateApps
+    UpdateWindows: UpdateWindows
     VirtualNetwork: VirtualNetwork
     VirtualNetworkResourceGroup: VirtualNetworkResourceGroup
     VmIndexStart: VmIndexStart
