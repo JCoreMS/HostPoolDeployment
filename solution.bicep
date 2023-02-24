@@ -160,7 +160,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 }
 
 module automationAccount 'modules/automationAccount.bicep' = if(PooledHostPool) {
-  name: 'AutomationAccount_${Timestamp}'
+  name: 'AutomationAccount_AVDHostPoolDeployment'
   scope: resourceGroup(ResourceGroupHP) // Management Resource Group
   params: {
     AutomationAccountName: AutomationAccountName
