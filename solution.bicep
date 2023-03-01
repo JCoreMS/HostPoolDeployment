@@ -159,8 +159,8 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
   //scope: resourceGroup(ComputeGalleryRG)
 }
 
-module automationAccount 'modules/automationAccount.bicep' = if (PooledHostPool) {
-  name: 'AutomationAccount_AVDAlerts'
+module automationAccount 'modules/automationAccount.bicep' = if(PooledHostPool) {
+  name: 'AutomationAccount_AVDHostPoolDeployment'
   scope: resourceGroup(ResourceGroupHP) // Management Resource Group
   params: {
     AutomationAccountName: AutomationAccountName
