@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.14.46.61228",
-      "templateHash": "14804672178688870618"
+      "version": "0.14.85.62628",
+      "templateHash": "1071457344571213455"
     }
   },
   "parameters": {
@@ -112,6 +112,9 @@
     "Location": {
       "type": "string"
     },
+    "NewLogAnalyticsWS": {
+      "type": "bool"
+    },
     "LogAnalyticsWorkspaceName": {
       "type": "string"
     },
@@ -140,7 +143,10 @@
         "CapacityReservation"
       ]
     },
-    "ManagementResourceGroup": {
+    "LogAnalyticsSubId": {
+      "type": "string"
+    },
+    "LogAnalyticsRG": {
       "type": "string"
     },
     "Monitoring": {
@@ -251,7 +257,7 @@
       "condition": "[variables('PooledHostPool')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('AutomationAccount_{0}', parameters('Timestamp'))]",
+      "name": "AutomationAccount_AVDAlerts",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -272,8 +278,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "2208695272752122589"
+              "version": "0.14.85.62628",
+              "templateHash": "11356458460314992528"
             }
           },
           "parameters": {
@@ -337,8 +343,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "11311653095167662000"
+              "version": "0.14.85.62628",
+              "templateHash": "7188094569970961746"
             }
           },
           "parameters": {
@@ -448,8 +454,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "3817906425731340305"
+              "version": "0.14.85.62628",
+              "templateHash": "11163740222488837395"
             }
           },
           "parameters": {
@@ -580,20 +586,15 @@
       "condition": "[parameters('Monitoring')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('Monitoring_{0}', parameters('Timestamp'))]",
-      "resourceGroup": "[parameters('ManagementResourceGroup')]",
+      "name": "linked_logAnalyticsWorkspace",
+      "subscriptionId": "[parameters('LogAnalyticsSubId')]",
+      "resourceGroup": "[parameters('LogAnalyticsRG')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "AutomationAccountName": {
-            "value": "[parameters('AutomationAccountName')]"
-          },
-          "HostPoolName": {
-            "value": "[parameters('HostPoolName')]"
-          },
           "LogAnalyticsWorkspaceName": {
             "value": "[parameters('LogAnalyticsWorkspaceName')]"
           },
@@ -606,14 +607,11 @@
           "Location": {
             "value": "[parameters('Location')]"
           },
-          "PooledHostPool": {
-            "value": "[variables('PooledHostPool')]"
+          "NewLogAnalyticsWS": {
+            "value": "[parameters('NewLogAnalyticsWS')]"
           },
           "Tags": {
             "value": "[parameters('Tags')]"
-          },
-          "WorkspaceName": {
-            "value": "[parameters('WorkspaceName')]"
           }
         },
         "template": {
@@ -622,17 +620,11 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "827740135533219725"
+              "version": "0.14.85.62628",
+              "templateHash": "3856346944953444143"
             }
           },
           "parameters": {
-            "AutomationAccountName": {
-              "type": "string"
-            },
-            "HostPoolName": {
-              "type": "string"
-            },
             "Location": {
               "type": "string"
             },
@@ -645,43 +637,14 @@
             "LogAnalyticsWorkspaceSku": {
               "type": "string"
             },
-            "PooledHostPool": {
+            "NewLogAnalyticsWS": {
               "type": "bool"
             },
             "Tags": {
               "type": "object"
-            },
-            "WorkspaceName": {
-              "type": "string"
             }
           },
           "variables": {
-            "HostPoolLogs": [
-              {
-                "category": "Checkpoint",
-                "enabled": true
-              },
-              {
-                "category": "Error",
-                "enabled": true
-              },
-              {
-                "category": "Management",
-                "enabled": true
-              },
-              {
-                "category": "Connection",
-                "enabled": true
-              },
-              {
-                "category": "HostRegistration",
-                "enabled": true
-              },
-              {
-                "category": "AgentHealthStatus",
-                "enabled": true
-              }
-            ],
             "WindowsEvents": [
               {
                 "name": "Microsoft-FSLogix-Apps/Operational",
@@ -1067,6 +1030,7 @@
           },
           "resources": [
             {
+              "condition": "[parameters('NewLogAnalyticsWS')]",
               "type": "Microsoft.OperationalInsights/workspaces",
               "apiVersion": "2021-06-01",
               "name": "[parameters('LogAnalyticsWorkspaceName')]",
@@ -1091,9 +1055,10 @@
                 "mode": "serial",
                 "batchSize": 1
               },
+              "condition": "[parameters('NewLogAnalyticsWS')]",
               "type": "Microsoft.OperationalInsights/workspaces/dataSources",
               "apiVersion": "2020-08-01",
-              "name": "[format('{0}/WindowsEvent{1}', parameters('LogAnalyticsWorkspaceName'), copyIndex())]",
+              "name": "[format('{0}/{1}', parameters('LogAnalyticsWorkspaceName'), format('WindowsEvent{0}', copyIndex()))]",
               "tags": "[parameters('Tags')]",
               "kind": "WindowsEvent",
               "properties": {
@@ -1111,9 +1076,10 @@
                 "mode": "serial",
                 "batchSize": 1
               },
+              "condition": "[parameters('NewLogAnalyticsWS')]",
               "type": "Microsoft.OperationalInsights/workspaces/dataSources",
               "apiVersion": "2020-08-01",
-              "name": "[format('{0}/WindowsPerformanceCounter{1}', parameters('LogAnalyticsWorkspaceName'), copyIndex())]",
+              "name": "[format('{0}/{1}', parameters('LogAnalyticsWorkspaceName'), format('WindowsPerformanceCounter{0}', copyIndex()))]",
               "tags": "[parameters('Tags')]",
               "kind": "WindowsPerformanceCounter",
               "properties": {
@@ -1126,7 +1092,101 @@
                 "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]",
                 "windowsEvents"
               ]
+            }
+          ],
+          "outputs": {
+            "logAnalyticsId": {
+              "type": "string",
+              "value": "[if(parameters('NewLogAnalyticsWS'), resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName')), resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName')))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "condition": "[parameters('Monitoring')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "Monitoring_Setup",
+      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AutomationAccountName": {
+            "value": "[parameters('AutomationAccountName')]"
+          },
+          "HostPoolName": {
+            "value": "[parameters('HostPoolName')]"
+          },
+          "LogAnalyticsWorkspaceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2020-10-01').outputs.logAnalyticsId.value]"
+          },
+          "PooledHostPool": {
+            "value": "[variables('PooledHostPool')]"
+          },
+          "WorkspaceName": {
+            "value": "[parameters('WorkspaceName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.14.85.62628",
+              "templateHash": "3551434264374312668"
+            }
+          },
+          "parameters": {
+            "AutomationAccountName": {
+              "type": "string"
             },
+            "HostPoolName": {
+              "type": "string"
+            },
+            "LogAnalyticsWorkspaceId": {
+              "type": "string"
+            },
+            "PooledHostPool": {
+              "type": "bool"
+            },
+            "WorkspaceName": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "HostPoolLogs": [
+              {
+                "category": "Checkpoint",
+                "enabled": true
+              },
+              {
+                "category": "Error",
+                "enabled": true
+              },
+              {
+                "category": "Management",
+                "enabled": true
+              },
+              {
+                "category": "Connection",
+                "enabled": true
+              },
+              {
+                "category": "HostRegistration",
+                "enabled": true
+              },
+              {
+                "category": "AgentHealthStatus",
+                "enabled": true
+              }
+            ]
+          },
+          "resources": [
             {
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2021-05-01-preview",
@@ -1151,7 +1211,7 @@
                     "enabled": true
                   }
                 ],
-                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]"
+                "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
               }
             },
             {
@@ -1161,7 +1221,7 @@
               "name": "[format('diag-{0}', parameters('HostPoolName'))]",
               "properties": {
                 "logs": "[variables('HostPoolLogs')]",
-                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]"
+                "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
               }
             },
             {
@@ -1181,17 +1241,15 @@
                     "enabled": true
                   }
                 ],
-                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]"
-              ]
+                "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
+              }
             }
           ]
         }
       },
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]"
       ]
     },
@@ -1205,7 +1263,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
       "name": "[format('VirtualMachines_{0}_{1}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1), guid(parameters('Timestamp')))]",
-      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1254,11 +1312,8 @@
           "Location": {
             "value": "[parameters('Location')]"
           },
-          "LogAnalyticsWorkspaceName": {
-            "value": "[parameters('LogAnalyticsWorkspaceName')]"
-          },
-          "ManagementResourceGroup": {
-            "value": "[parameters('ManagementResourceGroup')]"
+          "LogAnalyticsWorkspaceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2020-10-01').outputs.logAnalyticsId.value]"
           },
           "Monitoring": {
             "value": "[parameters('Monitoring')]"
@@ -1309,8 +1364,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.46.61228",
-              "templateHash": "2205890541300825694"
+              "version": "0.14.85.62628",
+              "templateHash": "7816461257817631592"
             }
           },
           "parameters": {
@@ -1353,10 +1408,7 @@
             "Location": {
               "type": "string"
             },
-            "LogAnalyticsWorkspaceName": {
-              "type": "string"
-            },
-            "ManagementResourceGroup": {
+            "LogAnalyticsWorkspaceId": {
               "type": "string"
             },
             "Monitoring": {
@@ -1418,7 +1470,7 @@
               },
               "type": "Microsoft.Network/networkInterfaces",
               "apiVersion": "2020-05-01",
-              "name": "[format('nic-{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "name": "[format('nic-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
               "tags": "[parameters('Tags')]",
               "properties": {
@@ -1482,7 +1534,7 @@
                 "networkProfile": {
                   "networkInterfaces": [
                     {
-                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0')))]",
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0')))]",
                       "properties": {
                         "deleteOption": "Delete"
                       }
@@ -1520,10 +1572,10 @@
                 "typeHandlerVersion": "1.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                  "workspaceId": "[if(parameters('Monitoring'), reference(resourceId(parameters('ManagementResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName')), '2015-03-20').customerId, null())]"
+                  "workspaceId": "[if(parameters('Monitoring'), parameters('LogAnalyticsWorkspaceId'), null())]"
                 },
                 "protectedSettings": {
-                  "workspaceKey": "[if(parameters('Monitoring'), listKeys(resourceId(parameters('ManagementResourceGroup'), 'Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName')), '2015-03-20').primarySharedKey, null())]"
+                  "workspaceKey": "[if(parameters('Monitoring'), listKeys(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').primarySharedKey, null())]"
                 }
               },
               "dependsOn": [
@@ -1547,42 +1599,12 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                   "fileUris": [
-                    "[format('{0}Register-HostPool.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]"
+                    "[format('{0}Register-HostPool-PostConfig.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]"
                   ],
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Register-HostPool.ps1 -HostPoolRegistration {0} -XTenantRegister {1} -XTenantRegToken {2}', parameters('HostPoolRegistrationToken'), parameters('CrossTenantRegister'), parameters('CrossTenantRegisterToken'))]"
-                }
-              },
-              "dependsOn": [
-                "virtualMachine"
-              ]
-            },
-            {
-              "copy": {
-                "name": "extension_PostDeployConfig",
-                "count": "[length(range(0, parameters('NumSessionHosts')))]"
-              },
-              "condition": "[or(parameters('UpdateApps'), parameters('UpdateWindows'))]",
-              "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2021-03-01",
-              "name": "[format('{0}{1}/CustomScriptExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
-              "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
-              "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.10",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                  "fileUris": [
-                    "[format('{0}PostDeployConfig.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]"
-                  ],
-                  "timestamp": "[parameters('Timestamp')]"
-                },
-                "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File PostDeployConfig.ps1 -WindowsUpdate {0} -AllAppsUpdate {1}', parameters('UpdateWindows'), parameters('UpdateApps'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -HostPoolRegistration {0} -XTenantRegister {1} -XTenantRegToken {2} -AllAppsUpdate {3} -WindowsUpdate {4}', parameters('HostPoolRegistrationToken'), parameters('CrossTenantRegister'), parameters('CrossTenantRegisterToken'), parameters('UpdateApps'), parameters('UpdateWindows'))]"
                 }
               },
               "dependsOn": [
@@ -1647,14 +1669,10 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment')]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'Monitoring_Setup')]"
       ]
     }
-  ],
-  "outputs": {
-    "AzComputeGalleryInfo": {
-      "type": "object",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')]"
-    }
-  }
+  ]
 }

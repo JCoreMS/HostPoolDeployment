@@ -7,17 +7,14 @@ param Availability string
 param AvailabilitySetPrefix string
 param ComputeGalleryImageId string
 param ComputeGalleryProperties object
-param CrossTenantRegister bool
 @secure()
-param CrossTenantRegisterToken string
 param DomainName string
 param DomainUser string
 @secure()
 param DomainPassword string
 param HostPoolRegistrationToken string
 param Location string
-param LogAnalyticsWorkspaceName string
-param ManagementResourceGroup string
+param LogAnalyticsWorkspaceId string
 param Monitoring bool
 param NumSessionHosts int
 param Subnet string
@@ -41,7 +38,7 @@ var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(Co
 
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = [for i in range(0, NumSessionHosts): {
-  name: 'nic-${VmPrefix}-${padLeft((i + VmIndexStart), 3, '0')}'
+  name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
   tags: Tags
   properties: {
@@ -104,7 +101,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
     networkProfile: {
       networkInterfaces: [
         {
-          id: resourceId('Microsoft.Network/networkInterfaces', 'nic-${VmPrefix}-${padLeft((i + VmIndexStart), 3, '0')}')
+          id: resourceId('Microsoft.Network/networkInterfaces', 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}')
           properties: {
             deleteOption: 'Delete'
           }
@@ -131,7 +128,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
 }]
 
 resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): if(Monitoring) {
-  name: '${VmPrefix}${padLeft((i + NumSessionHosts), 3, '0')}/MicrosoftMonitoringAgent'
+  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/MicrosoftMonitoringAgent'
   location: Location
   properties: {
     publisher: 'Microsoft.EnterpriseCloud.Monitoring'
@@ -139,10 +136,10 @@ resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/e
     typeHandlerVersion: '1.0'
     autoUpgradeMinorVersion: true
     settings: {
-      workspaceId: Monitoring ? reference(resourceId(ManagementResourceGroup, 'Microsoft.OperationalInsights/workspaces', LogAnalyticsWorkspaceName), '2015-03-20').customerId : null
+      workspaceId: Monitoring ? reference(LogAnalyticsWorkspaceId, '2015-03-20').customerId : null
     }
     protectedSettings: {
-      workspaceKey: Monitoring ? listKeys(resourceId(ManagementResourceGroup, 'Microsoft.OperationalInsights/workspaces', LogAnalyticsWorkspaceName), '2015-03-20').primarySharedKey : null
+      workspaceKey: Monitoring ? listKeys(LogAnalyticsWorkspaceId, '2015-03-20').primarySharedKey : null
     }
   }
   dependsOn: [
@@ -161,42 +158,20 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        '${_artifactsLocation}Register-HostPool.ps1${_artifactsLocationSasToken}'
+        '${_artifactsLocation}Register-HostPool-PostConfig.ps1${_artifactsLocationSasToken}'
       ]
       timestamp: Timestamp
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool.ps1 -HostPoolRegistration ${HostPoolRegistrationToken} -XTenantRegister ${CrossTenantRegister} -XTenantRegToken ${CrossTenantRegisterToken}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -HostPoolRegistration ${HostPoolRegistrationToken} -AllAppsUpdate ${UpdateApps} -WindowsUpdate ${UpdateWindows}'
     }
   }
   dependsOn: [
     virtualMachine
+    extension_MicrosoftMonitoringAgent
   ]
 }]
 
-resource extension_PostDeployConfig 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): if (UpdateApps || UpdateWindows) {
-  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
-  location: Location
-  tags: Tags
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'CustomScriptExtension'
-    typeHandlerVersion: '1.10'
-    autoUpgradeMinorVersion: true
-    settings: {
-      fileUris: [
-        '${_artifactsLocation}PostDeployConfig.ps1${_artifactsLocationSasToken}'
-      ]
-      timestamp: Timestamp
-    }
-    protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File PostDeployConfig.ps1 -WindowsUpdate ${UpdateWindows} -AllAppsUpdate ${UpdateApps}'
-    }
-  }
-  dependsOn: [
-    virtualMachine
-  ]
-}]
 
 resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/JsonADDomainExtension'
@@ -222,6 +197,7 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
   dependsOn: [
     virtualMachine
     extension_CustomScriptExtension
+    extension_MicrosoftMonitoringAgent
   ]
 }]
 

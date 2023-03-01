@@ -6,10 +6,10 @@ Param(
     $HostPoolRegistrationToken,
     [parameter(Mandatory)]
     [string]
-    $XTenantRegister,
+    $AllAppsUpdate,
     [parameter(Mandatory)]
     [string]
-    $XTenantRegToken
+    $WindowsUpdate
 )
 ##############################################################
 #  FUNCTIONS
@@ -56,13 +56,6 @@ function Get-WebFile {
 ##############################################################
 #  Install the AVD Agent
 ##############################################################
-# Determine cross Tenant registration 
-If ($XTenantRegister -eq $true) {
-    Write-Log -Message "Cross Tenant Registration Configured" -Type 'INFO'
-    Write-Log -Message $XTenantRegister -Type 'INFO'
-    $HostPoolRegistrationToken = $XTenantRegToken
- }
-
 
 # Disabling this method for installing the AVD agent until AAD Join can completed successfully
 $BootInstaller = 'AVD-Bootloader.msi'
@@ -76,3 +69,21 @@ Get-WebFile -FileName $AgentInstaller -URL 'https://query.prod.cms.rt.microsoft.
 Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $AgentInstaller /quiet /qn /norestart /passive REGISTRATIONTOKEN=$HostPoolRegistrationToken" -Wait -PassThru
 Write-Log -Message 'Installed AVD Agent' -Type 'INFO'
 Start-Sleep -Seconds 5
+
+########################################################################################
+#                    WINDOWS AND APP UPDATES
+########################################################################################
+
+if($AllAppsUpdate){
+    Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.4.10173/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile "C:\temp\WinGet.msixbundle"
+    Add-AppxPackage "C:\temp\WinGet.msixbundle"
+
+    # Winget to update all Apps
+    & winget.exe upgrade -h --all
+}
+if($WindowsUpdate){
+    # Windows Update Exectution
+    Install-Module -Name PSWindowsUpdate -Force -AllowClobber
+    Import-Module -Name PSWindowsUpdate -Force -AllowClobber
+    Get-WindowsUpdate -AcceptAll -Install -IgnoreReboot
+}

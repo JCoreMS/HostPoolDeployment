@@ -1,9 +1,10 @@
 
-param Location string = 'eastu2'
-param LogAnalyticsWorkspaceName string = 'doesnotreallyexist'
-param LogAnalyticsWorkspaceRetention int = 30
-param LogAnalyticsWorkspaceSku string = 'PerGB2018'
-
+param Location string
+param LogAnalyticsWorkspaceName string
+param LogAnalyticsWorkspaceRetention int
+param LogAnalyticsWorkspaceSku string
+param NewLogAnalyticsWS bool
+param Tags object
 
 var WindowsEvents = [
   {
@@ -388,11 +389,11 @@ var WindowsPerformanceCounters = [
   }
 ]
 
-resource existingLogAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
+resource exsitingLogAnlayticsWS 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = if (!NewLogAnalyticsWS) {
   name: LogAnalyticsWorkspaceName
 }
-/*
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = if(NewLogAnalyticsWS) {
   name: LogAnalyticsWorkspaceName
   location: Location
   tags: Tags
@@ -409,9 +410,8 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06
   }
 }
 
-
 @batchSize(1)
-resource windowsEvents 'Microsoft.OperationalInsights/workspaces/dataSources@2020-08-01' = [for (item, i) in WindowsEvents: {
+resource windowsEvents 'Microsoft.OperationalInsights/workspaces/dataSources@2020-08-01' = [for (item, i) in WindowsEvents: if(NewLogAnalyticsWS) {
   parent: logAnalyticsWorkspace
   name: 'WindowsEvent${i}'
   tags: Tags
@@ -423,7 +423,7 @@ resource windowsEvents 'Microsoft.OperationalInsights/workspaces/dataSources@202
 }]
 
 @batchSize(1)
-resource windowsPerformanceCounters 'Microsoft.OperationalInsights/workspaces/dataSources@2020-08-01' = [for (item, i) in WindowsPerformanceCounters: {
+resource windowsPerformanceCounters 'Microsoft.OperationalInsights/workspaces/dataSources@2020-08-01' = [for (item, i) in WindowsPerformanceCounters: if(NewLogAnalyticsWS) {
   parent: logAnalyticsWorkspace
   name: 'WindowsPerformanceCounter${i}'
   tags: Tags
@@ -438,6 +438,4 @@ resource windowsPerformanceCounters 'Microsoft.OperationalInsights/workspaces/da
     windowsEvents
   ]
 }]
-output logAnalyticsId string = logAnalyticsWorkspace.id
-*/
-output existingLAW string = existingLogAnalyticsWorkspace.id
+output logAnalyticsId string = NewLogAnalyticsWS ? logAnalyticsWorkspace.id : exsitingLogAnlayticsWS.id

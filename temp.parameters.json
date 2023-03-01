@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Location": {
+      "value": "eastu2"
+    },
+    "LogAnalyticsWorkspaceName": {
+      "value": "law-eastus2-AVDLab3"
+    },
+    "LogAnalyticsWorkspaceRetention": {
+      "value": 30
+    },
+    "LogAnalyticsWorkspaceSku": {
+      "value": "PerGB2018"
+    }
+  }
+}

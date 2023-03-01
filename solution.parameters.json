@@ -6,7 +6,7 @@
       "value": "https://storavdlabeus2.blob.core.windows.net/postdeployscripts/"
     },
     "_artifactsLocationSasToken": {
-      "value": "?sp=r&st=2023-02-02T14:10:24Z&se=2023-02-23T22:10:24Z&spr=https&sv=2021-06-08&sr=c&sig=zZNTCdYvO0limz5zljkoXsogDKS50XIVR%2BK3MUxCPH8%3D"
+      "value": "?sv=2021-06-08&ss=b&srt=sco&sp=rltf&se=2023-10-19T20:54:39Z&st=2023-02-28T13:54:39Z&spr=https&sig=5LL2Mze3Tm9HIjCkjJLcAipGTrXK9mlBcsUX53KuimE%3D"
     },
     "AppGroupName": {
       "value": "ag-general-office-users"
@@ -27,7 +27,7 @@
       "value": "8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9"
     },
     "ComputeGalleryImage": {
-      "value": "testFeaturesG2std"
+      "value": "trustedlaunchtest"
     },
     "CrossTenantRegister": {
       "value": false
@@ -48,9 +48,12 @@
       "reference": {
         "secretName": "AdminPassword",
         "keyVault": {
-          "id": "https://kv-eastus2-avdlab.vault.azure.net/secrets/AdminPassword/df66e95625a744fb937ab2606188af34"
+          "id": "/subscriptions/8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9/resourceGroups/rg-eastus2-AVDLab-Manage/providers/Microsoft.KeyVault/vaults/kv-eastus2-AVDLab"
         }
       }
+    },
+    "NewLogAnalyticsWS":{
+      "value": false
     },
     "ResourceGroupHP": {
       "value": "rg-a-a-a-a-a-AVDTEST"
@@ -71,19 +74,22 @@
       "value": "eastus2"
     },
     "LogAnalyticsWorkspaceName": {
-      "value": ""
+      "value": "law-eastus2-AVDLab"
     },
-    "ManagementResourceGroup": {
-      "value": ""
+    "LogAnalyticsSubId": {
+      "value": "8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9"
+    },
+    "LogAnalyticsRG": {
+      "value": "rg-eastus2-avdlab-manage"
     },
     "Monitoring": {
-      "value": false
+      "value": true
     },
     "NumSessionHosts": {
-      "value": 0
+      "value": 1
     },
     "NumUsersPerHost": {
-      "value": 0
+      "value": 2
     },
     "Subnet": {
       "value": "subnet-eastus2-AVDLab-HostPoolVMs"
@@ -95,7 +101,7 @@
       "value": false
     },
     "UpdateWindows": {
-      "value": true
+      "value": false
     },
     "StartVmOnConnect": {
       "value": false
@@ -107,7 +113,7 @@
       "value": 0
     },
     "VmPrefix": {
-      "value": "vmavdlabeus2"
+      "value": "vmavdeus2-"
     },
     "VirtualNetwork": {
       "value": "vnet-EastUS2-AVDLab"
@@ -122,9 +128,27 @@
         "reference": {
           "secretName": "AdminPassword",
           "keyVault": {
-            "id": "https://kv-eastus2-avdlab.vault.azure.net/secrets/AdminPassword/df66e95625a744fb937ab2606188af34"
+            "id": "/subscriptions/8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9/resourceGroups/rg-eastus2-AVDLab-Manage/providers/Microsoft.KeyVault/vaults/kv-eastus2-AVDLab"
           }
         }
+    },
+    "Availability": {
+        "value": "None"
+    },
+    "DiskSku": {
+        "value": "Standard_LRS"
+    },
+    "LogAnalyticsWorkspaceRetention": {
+        "value": 30
+    },
+    "LogAnalyticsWorkspaceSku": {
+        "value": "PerGB2018"
+    },
+    "ValidationEnvironment": {
+        "value": false
+    },
+    "VmSize": {
+        "value": "Standard_D4s_v4"
     }
   }
 }
