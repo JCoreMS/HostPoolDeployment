@@ -6,11 +6,9 @@ Param(
     $HostPoolRegistrationToken,
     [parameter(Mandatory)]
     [string]
-    $AllAppsUpdate,
-    [parameter(Mandatory)]
-    [string]
     $WindowsUpdate
 )
+
 ##############################################################
 #  FUNCTIONS
 ##############################################################
@@ -73,17 +71,21 @@ Start-Sleep -Seconds 5
 ########################################################################################
 #                    WINDOWS AND APP UPDATES
 ########################################################################################
-
-if($AllAppsUpdate){
-    Invoke-WebRequest -Uri "https://github.com/microsoft/winget-cli/releases/download/v1.4.10173/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle" -OutFile "C:\temp\WinGet.msixbundle"
-    Add-AppxPackage "C:\temp\WinGet.msixbundle"
+<#
+if($AllAppsUpdate.ToUpper() -eq 'TRUE'){
+    Invoke-WebRequest -Uri https://github.com/microsoft/winget-cli/releases/download/v1.4.10173/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -OutFile C:\Windows\Temp\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
+    Invoke-WebRequest -Uri https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx -OutFile C:\Windows\Temp\Microsoft.VCLibs.x64.14.00.Desktop.appx
+    Add-AppxProvisionedPackage -Online -PackagePath C:\Windows\Temp\Microsoft.VCLibs.x64.14.00.Desktop.appx -SkipLicense
+    Add-AppxProvisionedPackage -Online -PackagePath C:\Windows\Temp\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle -SkipLicense
 
     # Winget to update all Apps
-    & winget.exe upgrade -h --all
+    & 'C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_1.19.10173.0_x64__8wekyb3d8bbwe\winget.exe' upgrade -h --all --accept-source-agreements --disable-interactivity
 }
-if($WindowsUpdate){
+#>
+
+if($WindowsUpdate.ToUpper() -eq 'TRUE'){
     # Windows Update Exectution
+    Install-PackageProvider -Name Nuget -Force
     Install-Module -Name PSWindowsUpdate -Force -AllowClobber
-    Import-Module -Name PSWindowsUpdate -Force -AllowClobber
     Get-WindowsUpdate -AcceptAll -Install -IgnoreReboot
 }

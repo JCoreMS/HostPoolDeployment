@@ -29,6 +29,10 @@ var HostPoolLogs = [
     category: 'AgentHealthStatus'
     enabled: true
   }
+  {
+    category: 'ConnectionGraphicsData'
+    enabled: true
+  }
 ]
 
 

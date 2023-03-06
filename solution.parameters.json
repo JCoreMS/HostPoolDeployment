@@ -27,7 +27,7 @@
       "value": "8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9"
     },
     "ComputeGalleryImage": {
-      "value": "trustedlaunchtest"
+      "value": "Win10MultiOfficeGen2"
     },
     "CrossTenantRegister": {
       "value": false
@@ -97,11 +97,8 @@
     "Tags": {
       "value": {}
     },
-    "UpdateApps": {
-      "value": false
-    },
     "UpdateWindows": {
-      "value": false
+      "value": true
     },
     "StartVmOnConnect": {
       "value": false

@@ -21,7 +21,6 @@ param Subnet string
 param Tags object
 param Timestamp string
 param UpdateWindows bool
-param UpdateApps bool
 param OUPath string
 param VirtualNetwork string
 param VirtualNetworkResourceGroup string
@@ -35,7 +34,6 @@ param VmPassword string
 var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
 var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
-
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
@@ -117,13 +115,38 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
     }
     diagnosticsProfile: {
       bootDiagnostics: {
-        enabled: false
+        enabled: true
       }
     }
     licenseType: 'Windows_Client'
   }
   dependsOn: [
     networkInterface
+  ]
+}]
+
+resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): {
+  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
+  location: Location
+  tags: Tags
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [
+        '${_artifactsLocation}Register-HostPool-PostConfig.ps1${_artifactsLocationSasToken}'
+      ]
+      timestamp: Timestamp
+    }
+    protectedSettings: {
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -HostPoolRegistration ${HostPoolRegistrationToken} -WindowsUpdate ${UpdateWindows}'
+    }
+  }
+  dependsOn: [
+    virtualMachine
+    //extension_MicrosoftMonitoringAgent
   ]
 }]
 
@@ -144,34 +167,9 @@ resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/e
   }
   dependsOn: [
     virtualMachine
+    extension_CustomScriptExtension
   ]
 }]
-
-resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): {
-  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
-  location: Location
-  tags: Tags
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'CustomScriptExtension'
-    typeHandlerVersion: '1.10'
-    autoUpgradeMinorVersion: true
-    settings: {
-      fileUris: [
-        '${_artifactsLocation}Register-HostPool-PostConfig.ps1${_artifactsLocationSasToken}'
-      ]
-      timestamp: Timestamp
-    }
-    protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -HostPoolRegistration ${HostPoolRegistrationToken} -AllAppsUpdate ${UpdateApps} -WindowsUpdate ${UpdateWindows}'
-    }
-  }
-  dependsOn: [
-    virtualMachine
-    extension_MicrosoftMonitoringAgent
-  ]
-}]
-
 
 resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/JsonADDomainExtension'

@@ -20,7 +20,7 @@ param AutomationAccountName string
   'None'
 ])
 @description('Set the desired availability / SLA with a pooled host pool.  Choose "None" if deploying a personal host pool.')
-param Availability string = 'None'
+param Availability string
 
 param ComputeGalleryName string
 param ComputeGallerySubId string
@@ -93,7 +93,6 @@ param NumUsersPerHost int
 param Subnet string
 param Tags object
 param Timestamp string = utcNow('u')
-param UpdateApps bool
 param UpdateWindows bool
 param StartVmOnConnect bool
 param OUPath string
@@ -143,6 +142,7 @@ var PooledHostPool = split(HostPoolType, ' ')[0] == 'Pooled' ? true : false
 var AvailabilitySetPrefix = 'as-'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
 
+
 resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: ResourceGroupHP
   location: Location
@@ -160,7 +160,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 }
 
 module automationAccount 'modules/automationAccount.bicep' = if(PooledHostPool) {
-  name: 'AutomationAccount_AVDHostPoolDeployment'
+  name: 'linked_AutomationAccount_AVDHostPoolDeployment'
   scope: resourceGroup(ResourceGroupHP) // Management Resource Group
   params: {
     AutomationAccountName: AutomationAccountName
@@ -172,7 +172,7 @@ module automationAccount 'modules/automationAccount.bicep' = if(PooledHostPool) 
 }
 
 module availabilitySets 'modules/availabilitySets.bicep' = if ((PooledHostPool && Availability == 'AvailabilitySet') && !CrossTenantRegister) {
-  name: 'AvailabilitySets_${Timestamp}'
+  name: 'linked_AvailabilitySets_${Timestamp}'
   scope: resourceGroupHP
   params: {
     AvailabilitySetCount: AvailabilitySetCount
@@ -183,7 +183,7 @@ module availabilitySets 'modules/availabilitySets.bicep' = if ((PooledHostPool &
 }
 
 module hostPool 'modules/hostpool.bicep' = if (!CrossTenantRegister) {
-  name: 'HostPool_linkedDeployment'
+  name: 'linked_HostPoolDeployment'
   scope: resourceGroup(ResourceGroupHP)
   params: {
     AppGroupName: AppGroupName
@@ -224,7 +224,7 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = if (Monitoring) {
 // Monitoring Resources for AVD Insights
 // This module deploys a Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
 module monitoring 'modules/monitoring.bicep' = if (Monitoring) {
-  name: 'Monitoring_Setup'
+  name: 'linked_Monitoring_Setup'
   scope: resourceGroup(ResourceGroupHP) // Management Resource Group
   params: {
     AutomationAccountName: AutomationAccountName
@@ -242,14 +242,14 @@ module monitoring 'modules/monitoring.bicep' = if (Monitoring) {
 
 @batchSize(1)
 module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
-  name: 'VirtualMachines_${i - 1}_${guid(Timestamp)}'
+  name: 'linked_VirtualMachines_${i - 1}_${guid(Timestamp)}'
   scope: resourceGroup(DeployVMsTo)
   params: {
     _artifactsLocation: _artifactsLocation
     _artifactsLocationSasToken: _artifactsLocationSasToken
     Availability: Availability
     AvailabilitySetPrefix: AvailabilitySetPrefix
-    ComputeGalleryImageId: computeGalleryImage.id
+    ComputeGalleryImageId: '${computeGalleryImage.id}/versions/latest'
     ComputeGalleryProperties: computeGalleryImage.properties
     DomainUser: DomainUser
     DomainPassword: DomainPassword
@@ -263,7 +263,6 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Subnet: Subnet
     Tags: Tags
     Timestamp: Timestamp
-    UpdateApps: UpdateApps
     UpdateWindows: UpdateWindows
     VirtualNetwork: VirtualNetwork
     VirtualNetworkResourceGroup: VirtualNetworkResourceGroup
