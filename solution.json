@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.14.85.62628",
-      "templateHash": "1071457344571213455"
+      "templateHash": "91111899795711009"
     }
   },
   "parameters": {
@@ -30,7 +30,6 @@
     },
     "Availability": {
       "type": "string",
-      "defaultValue": "None",
       "metadata": {
         "description": "Set the desired availability / SLA with a pooled host pool.  Choose \"None\" if deploying a personal host pool."
       },
@@ -168,9 +167,6 @@
       "type": "string",
       "defaultValue": "[utcNow('u')]"
     },
-    "UpdateApps": {
-      "type": "bool"
-    },
     "UpdateWindows": {
       "type": "bool"
     },
@@ -237,7 +233,8 @@
     "DivisionAvSetRemainderValue": "[mod(parameters('NumSessionHosts'), variables('MaxAvSetCount'))]",
     "AvailabilitySetCount": "[if(greater(variables('DivisionAvSetRemainderValue'), 0), add(variables('DivisionAvSetValue'), 1), variables('DivisionAvSetValue'))]",
     "PooledHostPool": "[if(equals(split(parameters('HostPoolType'), ' ')[0], 'Pooled'), true(), false())]",
-    "AvailabilitySetPrefix": "as-"
+    "AvailabilitySetPrefix": "as-",
+    "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]"
   },
   "resources": [
     {
@@ -257,7 +254,7 @@
       "condition": "[variables('PooledHostPool')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "AutomationAccount_AVDAlerts",
+      "name": "linked_AutomationAccount_AVDHostPoolDeployment",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -316,7 +313,7 @@
       "condition": "[and(and(variables('PooledHostPool'), equals(parameters('Availability'), 'AvailabilitySet')), not(parameters('CrossTenantRegister')))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('AvailabilitySets_{0}', parameters('Timestamp'))]",
+      "name": "[format('linked_AvailabilitySets_{0}', parameters('Timestamp'))]",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -391,7 +388,7 @@
       "condition": "[not(parameters('CrossTenantRegister'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "HostPool_linkedDeployment",
+      "name": "linked_HostPoolDeployment",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1107,7 +1104,7 @@
       "condition": "[parameters('Monitoring')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "Monitoring_Setup",
+      "name": "linked_Monitoring_Setup",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1138,7 +1135,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.85.62628",
-              "templateHash": "3551434264374312668"
+              "templateHash": "4520834864315041263"
             }
           },
           "parameters": {
@@ -1182,6 +1179,10 @@
               },
               {
                 "category": "AgentHealthStatus",
+                "enabled": true
+              },
+              {
+                "category": "ConnectionGraphicsData",
                 "enabled": true
               }
             ]
@@ -1248,7 +1249,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]"
       ]
@@ -1262,8 +1263,8 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
-      "name": "[format('VirtualMachines_{0}_{1}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1), guid(parameters('Timestamp')))]",
-      "location": "[deployment().location]",
+      "name": "[format('linked_VirtualMachines_{0}_{1}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1), guid(parameters('Timestamp')))]",
+      "resourceGroup": "[variables('DeployVMsTo')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1283,16 +1284,10 @@
             "value": "[variables('AvailabilitySetPrefix')]"
           },
           "ComputeGalleryImageId": {
-            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1])]"
+            "value": "[format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))]"
           },
           "ComputeGalleryProperties": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')]"
-          },
-          "CrossTenantRegister": {
-            "value": "[parameters('CrossTenantRegister')]"
-          },
-          "CrossTenantRegisterToken": {
-            "value": "[parameters('CrossTenantRegisterToken')]"
           },
           "DomainUser": {
             "value": "[parameters('DomainUser')]"
@@ -1303,9 +1298,7 @@
           "DomainName": {
             "value": "[parameters('DomainName')]"
           },
-          "HostPoolRegistrationToken": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment'), '2020-10-01').outputs.HostPoolRegistrationToken.value]"
-          },
+          "HostPoolRegistrationToken": "[if(parameters('CrossTenantRegister'), createObject('value', parameters('CrossTenantRegisterToken')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2020-10-01').outputs.HostPoolRegistrationToken.value))]",
           "OUPath": {
             "value": "[parameters('OUPath')]"
           },
@@ -1329,9 +1322,6 @@
           },
           "Timestamp": {
             "value": "[parameters('Timestamp')]"
-          },
-          "UpdateApps": {
-            "value": "[parameters('UpdateApps')]"
           },
           "UpdateWindows": {
             "value": "[parameters('UpdateWindows')]"
@@ -1365,7 +1355,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.14.85.62628",
-              "templateHash": "7816461257817631592"
+              "templateHash": "2808412423862932285"
             }
           },
           "parameters": {
@@ -1387,14 +1377,8 @@
             "ComputeGalleryProperties": {
               "type": "object"
             },
-            "CrossTenantRegister": {
-              "type": "bool"
-            },
-            "CrossTenantRegisterToken": {
-              "type": "securestring"
-            },
             "DomainName": {
-              "type": "string"
+              "type": "securestring"
             },
             "DomainUser": {
               "type": "string"
@@ -1427,9 +1411,6 @@
               "type": "string"
             },
             "UpdateWindows": {
-              "type": "bool"
-            },
-            "UpdateApps": {
               "type": "bool"
             },
             "OUPath": {
@@ -1547,39 +1528,13 @@
                 },
                 "diagnosticsProfile": {
                   "bootDiagnostics": {
-                    "enabled": false
+                    "enabled": true
                   }
                 },
                 "licenseType": "Windows_Client"
               },
               "dependsOn": [
                 "networkInterface"
-              ]
-            },
-            {
-              "copy": {
-                "name": "extension_MicrosoftMonitoringAgent",
-                "count": "[length(range(0, parameters('NumSessionHosts')))]"
-              },
-              "condition": "[parameters('Monitoring')]",
-              "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2021-03-01",
-              "name": "[format('{0}{1}/MicrosoftMonitoringAgent', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('NumSessionHosts')), 3, '0'))]",
-              "location": "[parameters('Location')]",
-              "properties": {
-                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-                "type": "MicrosoftMonitoringAgent",
-                "typeHandlerVersion": "1.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                  "workspaceId": "[if(parameters('Monitoring'), parameters('LogAnalyticsWorkspaceId'), null())]"
-                },
-                "protectedSettings": {
-                  "workspaceKey": "[if(parameters('Monitoring'), listKeys(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').primarySharedKey, null())]"
-                }
-              },
-              "dependsOn": [
-                "virtualMachine"
               ]
             },
             {
@@ -1604,10 +1559,37 @@
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -HostPoolRegistration {0} -XTenantRegister {1} -XTenantRegToken {2} -AllAppsUpdate {3} -WindowsUpdate {4}', parameters('HostPoolRegistrationToken'), parameters('CrossTenantRegister'), parameters('CrossTenantRegisterToken'), parameters('UpdateApps'), parameters('UpdateWindows'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -HostPoolRegistration {0} -WindowsUpdate {1}', parameters('HostPoolRegistrationToken'), parameters('UpdateWindows'))]"
                 }
               },
               "dependsOn": [
+                "virtualMachine"
+              ]
+            },
+            {
+              "copy": {
+                "name": "extension_MicrosoftMonitoringAgent",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "condition": "[parameters('Monitoring')]",
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2021-03-01",
+              "name": "[format('{0}{1}/MicrosoftMonitoringAgent', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "MicrosoftMonitoringAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "workspaceId": "[if(parameters('Monitoring'), reference(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').customerId, null())]"
+                },
+                "protectedSettings": {
+                  "workspaceKey": "[if(parameters('Monitoring'), listKeys(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').primarySharedKey, null())]"
+                }
+              },
+              "dependsOn": [
+                "extension_CustomScriptExtension",
                 "virtualMachine"
               ]
             },
@@ -1640,6 +1622,7 @@
               },
               "dependsOn": [
                 "extension_CustomScriptExtension",
+                "extension_MicrosoftMonitoringAgent",
                 "virtualMachine"
               ]
             }
@@ -1669,9 +1652,9 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'HostPool_linkedDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'Monitoring_Setup')]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]"
       ]
     }
   ]

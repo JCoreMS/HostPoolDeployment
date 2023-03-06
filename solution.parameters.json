@@ -107,7 +107,7 @@
       "value": "OU=Workstations,DC=corefamily,DC=net"
     },
     "VmIndexStart": {
-      "value": 0
+      "value": 3
     },
     "VmPrefix": {
       "value": "vmavdeus2-"
