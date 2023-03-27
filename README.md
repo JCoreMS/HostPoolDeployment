@@ -22,3 +22,8 @@ Write-Host $encodedURL
 
 Write-Host "AVD Accelerator Deployment URL and custom URL copied to clipboard!" -ForegroundColor Yellow 
 ```
+# Deploy To Template spec
+
+```PowerShell
+New-AzTemplateSpec -ResourceGroupName 'myRG' -Name 'myTemplateSpec' -Version 'v2.0' -Location 'West US' -TemplateFile 'myTemplateContent.json' --UIFormDefinitionFile 'myUIDefinition.json'
+```
