@@ -1,8 +1,8 @@
 targetScope = 'subscription'
 
-param _artifactsLocation string
+param _artifactsLocation string = 'https://storeus2public.blob.core.windows.net/deployhostpool/'
 @secure()
-param _artifactsLocationSasToken string
+param _artifactsLocationSasToken string = ''
 
 param AppGroupName string
 
