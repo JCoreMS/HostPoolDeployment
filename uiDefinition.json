@@ -17,6 +17,14 @@
 							}
 						},
 						{
+							"name": "resourceGroupsApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/resourceGroups?api-version=2022-09-01')]"
+							}
+						},
+						{
 							"name": "storageBlobSelection",
 							"type": "Microsoft.Storage.StorageBlobSelector",
 							"visible": true,
