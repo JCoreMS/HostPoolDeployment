@@ -4,16 +4,18 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.14.85.62628",
-      "templateHash": "91111899795711009"
+      "version": "0.17.1.54307",
+      "templateHash": "13916081766545923299"
     }
   },
   "parameters": {
     "_artifactsLocation": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "https://storeus2public.blob.core.windows.net/deployhostpool/"
     },
     "_artifactsLocationSasToken": {
-      "type": "securestring"
+      "type": "securestring",
+      "defaultValue": ""
     },
     "AppGroupName": {
       "type": "string"
@@ -253,7 +255,7 @@
     {
       "condition": "[variables('PooledHostPool')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2022-09-01",
       "name": "linked_AutomationAccount_AVDHostPoolDeployment",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
@@ -275,8 +277,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.85.62628",
-              "templateHash": "11356458460314992528"
+              "version": "0.17.1.54307",
+              "templateHash": "13322290165658690676"
             }
           },
           "parameters": {
@@ -312,7 +314,7 @@
     {
       "condition": "[and(and(variables('PooledHostPool'), equals(parameters('Availability'), 'AvailabilitySet')), not(parameters('CrossTenantRegister')))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2022-09-01",
       "name": "[format('linked_AvailabilitySets_{0}', parameters('Timestamp'))]",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
@@ -340,8 +342,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.85.62628",
-              "templateHash": "7188094569970961746"
+              "version": "0.17.1.54307",
+              "templateHash": "1404895489101991725"
             }
           },
           "parameters": {
@@ -387,7 +389,7 @@
     {
       "condition": "[not(parameters('CrossTenantRegister'))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2022-09-01",
       "name": "linked_HostPoolDeployment",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
@@ -451,8 +453,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.85.62628",
-              "templateHash": "11163740222488837395"
+              "version": "0.17.1.54307",
+              "templateHash": "3455594795921845536"
             }
           },
           "parameters": {
@@ -582,7 +584,7 @@
     {
       "condition": "[parameters('Monitoring')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2022-09-01",
       "name": "linked_logAnalyticsWorkspace",
       "subscriptionId": "[parameters('LogAnalyticsSubId')]",
       "resourceGroup": "[parameters('LogAnalyticsRG')]",
@@ -617,8 +619,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.85.62628",
-              "templateHash": "3856346944953444143"
+              "version": "0.17.1.54307",
+              "templateHash": "16362482121161966165"
             }
           },
           "parameters": {
@@ -1103,7 +1105,7 @@
     {
       "condition": "[parameters('Monitoring')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2022-09-01",
       "name": "linked_Monitoring_Setup",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
@@ -1119,7 +1121,7 @@
             "value": "[parameters('HostPoolName')]"
           },
           "LogAnalyticsWorkspaceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2020-10-01').outputs.logAnalyticsId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
           },
           "PooledHostPool": {
             "value": "[variables('PooledHostPool')]"
@@ -1134,8 +1136,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.85.62628",
-              "templateHash": "4520834864315041263"
+              "version": "0.17.1.54307",
+              "templateHash": "14271446057210552871"
             }
           },
           "parameters": {
@@ -1262,7 +1264,7 @@
         "batchSize": 1
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
+      "apiVersion": "2022-09-01",
       "name": "[format('linked_VirtualMachines_{0}_{1}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1), guid(parameters('Timestamp')))]",
       "resourceGroup": "[variables('DeployVMsTo')]",
       "properties": {
@@ -1298,7 +1300,7 @@
           "DomainName": {
             "value": "[parameters('DomainName')]"
           },
-          "HostPoolRegistrationToken": "[if(parameters('CrossTenantRegister'), createObject('value', parameters('CrossTenantRegisterToken')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2020-10-01').outputs.HostPoolRegistrationToken.value))]",
+          "HostPoolRegistrationToken": "[if(parameters('CrossTenantRegister'), createObject('value', parameters('CrossTenantRegisterToken')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value))]",
           "OUPath": {
             "value": "[parameters('OUPath')]"
           },
@@ -1306,7 +1308,7 @@
             "value": "[parameters('Location')]"
           },
           "LogAnalyticsWorkspaceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2020-10-01').outputs.logAnalyticsId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
           },
           "Monitoring": {
             "value": "[parameters('Monitoring')]"
@@ -1354,8 +1356,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.14.85.62628",
-              "templateHash": "2808412423862932285"
+              "version": "0.17.1.54307",
+              "templateHash": "13274479990923180589"
             }
           },
           "parameters": {
