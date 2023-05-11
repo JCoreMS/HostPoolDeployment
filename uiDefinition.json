@@ -925,7 +925,7 @@
 		},
 		"outputs": {
 			"parameters": {
-				"_scriptRegisterPostConfig": "[steps('basics').storageBlobSelection.sasUri]",
+				"_scriptPostConfig": "[steps('basics').storageBlobSelection.sasUri]",
 				"AppGroupName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').AppGroupName, steps('hostPool').hostPoolSelection.name)]",
 				"AppGroupType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
 				"AutomationAccountName": "[if(equals(steps('basics').automationAccountNewExisting, 'Existing'), steps('basics').automationAccountSelection.name, steps('basics').AutomationAccountName)]",
