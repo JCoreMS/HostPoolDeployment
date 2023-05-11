@@ -1,7 +1,6 @@
 
-param _artifactsLocation string
 @secure()
-param _artifactsLocationSasToken string
+param _scriptPostConfig string
 
 param Availability string
 param AvailabilitySetPrefix string
@@ -136,7 +135,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        '${_artifactsLocation}Register-HostPool-PostConfig.ps1${_artifactsLocationSasToken}'
+        _scriptPostConfig
       ]
       timestamp: Timestamp
     }

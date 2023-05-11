@@ -156,6 +156,22 @@
 							}
 						},
 						{
+							"name": "hostPoolApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('hostPool').hostPoolSelection.id, '?api-version=2022-04-01-preview')]"
+							}
+						},
+						{
+							"name": "hostPoolAppGroupApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('hostPool').hostPoolApi.properties.applicationGroupReferences, '?api-version=2022-04-01-preview')]"
+							}
+						},
+						{
 							"name": "HostPoolName",
 							"type": "Microsoft.Common.TextBox",
 							"label": "Host Pool Name",
@@ -760,7 +776,7 @@
 						{
 							"name": "identityDomainCredentials",
 							"type": "Microsoft.Common.Section",
-							"visible": "[not(equals(steps('identity').identityDomainInformation.identityServiceProvider, 'AAD'))]",
+							"visible": true,
 							"label": "Domain join credentials",
 							"elements": [
 								{
@@ -909,9 +925,9 @@
 		},
 		"outputs": {
 			"parameters": {
-				"_scriptRegisterPostConfig": "[steps('basics').storageBlobSelection]",
-				"AppGroupName": "[steps('hostPool').AppGroupName]",
-				"AppGroupType": "[steps('hostPool').hostPoolPooled.AppGroupType]",
+				"_scriptRegisterPostConfig": "[steps('basics').storageBlobSelection.sasUri]",
+				"AppGroupName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').AppGroupName, steps('hostPool').hostPoolSelection.name)]",
+				"AppGroupType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
 				"AutomationAccountName": "[if(equals(steps('basics').automationAccountNewExisting, 'Existing'), steps('basics').automationAccountSelection.name, steps('basics').AutomationAccountName)]",
 				"Availability": "[steps('hostPool').Availability]",
 				"ComputeGalleryName": "[steps('imageInfo').computeGallerySelection.name]",
@@ -920,16 +936,16 @@
 				"ComputeGalleryImage": "[steps('imageInfo').imageSelection]",
 				"CrossTenantRegister": "[steps('hostPool').CrossTenantRegister]",
 				"CrossTenantRegisterToken": "[steps('hostPool').CrossTenantRegisterToken]",
-				"CustomRdpProperty": "[steps('hostPool').CustomRdpProperty]",
+				"CustomRdpProperty": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').CustomRdpProperty, steps('hostPool').hostPoolApi.properties.customRdpProperty)]",
 				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
 				"DomainName": "[steps('hostInfo').domainInformation.DomainName]",
 				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
-				"DomainPassword": "[steps('hostInfo').identityDomainCredentials.DomainPassword.password]",
+				"DomainPassword": "[steps('hostInfo').identityDomainCredentials.DomainPassword]",
 				"ResourceGroupHP": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').HostPoolName, first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)))]",
 				"HostPoolName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
 				"ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
-				"HostPoolType": "[steps('hostPool').hostPoolType]",
-				"WorkspaceName": "[steps('hostPool').WorkspaceName]",
+				"HostPoolType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
+				"WorkspaceName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').WorkspaceName, first(skip(split(steps('hostPool').hostPoolAppGroupApi.properties.workspaceArmPath, '/'),8)))]",
 				"Location": "[steps('basics').resourceScope.location.name]",
 				"NewLogAnalyticsWS": "[if(equals(steps('monitoring').deployMonitoring, true), steps('monitoring').deployMonitoringAlaWorkspace, false)]",
 				"LogAnalyticsWorkspaceRetention": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, true), steps('monitoring').deployMonitoringNewAlaWorkspaceRetention, 30)]",
@@ -937,18 +953,17 @@
 				"LogAnalyticsWorkspaceName": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, false), steps('monitoring').alaWorkspaceExistingWorkspacesSelection.name, steps('monitoring').logAnalyticsWorkspaceName)]",
 				"Monitoring": "[steps('monitoring').deployMonitoring]",
 				"NumSessionHosts": "[steps('hostPool').NumSessionHosts]",
-				"NumUsersPerHost": "[steps('hostPool').hostPoolPooled.NumUsersPerHost]",
-				"Subnet": "[steps('networking').subnet.name]",
+				"NumUsersPerHost": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.NumUsersPerHost, steps('hostPool').hostPoolApi.properties.maxSessionLimit)]",
+				"Subnet": "[steps('networking').subnet]",
 				"Tags": "[steps('basics').Tags]",
-				"Timestamp": "[steps('basics').Timestamp]",
 				"UpdateWindows": "[steps('hostInfo').vmInformation.UpdateWindows]",
-				"StartVmOnConnect": "[steps('hostPool').StartVmOnConnect]",
+				"StartVmOnConnect": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').StartVmOnConnect, steps('hostPool').hostPoolApi.properties.startVMOnConnect)]",
 				"OUPath": "[steps('hostInfo').domainInformation.OUPath]",
 				"VmIndexStart": "[steps('hostInfo').vmInformation.VmIndexStart]",
 				"VmPrefix": "[steps('hostInfo').vmInformation.VmPrefix]",
 				"ValidationEnvironment": "[steps('hostPool').ValidationEnvironment]",
 				"VirtualNetwork": "[steps('networking').virtualNetworkSelection.name]",
-				"VirtualNetworkResourceGroup": "[steps('networking').virtualNetworkSelection.resourceGroup]",
+				"VirtualNetworkResourceGroup": "[first(skip(split(steps('networking').virtualNetworkSelection.id, '/'),4))]",
 				"VmPassword": "[steps('hostInfo').identityLocalCredentials.VmPassword.password]",
 				"VmSize": "[steps('hostInfo').vmInformation.VmSize]",
 				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]"

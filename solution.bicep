@@ -1,8 +1,6 @@
 targetScope = 'subscription'
-
-param _artifactsLocation string = 'https://storeus2public.blob.core.windows.net/deployhostpool/'
 @secure()
-param _artifactsLocationSasToken string = ''
+param _scriptPostConfig string
 
 param AppGroupName string
 
@@ -28,10 +26,10 @@ param ComputeGalleryRG string
 param ComputeGalleryImage string
 
 @description('If TRUE, Resource Group for Host Pool resources not required.')
-param CrossTenantRegister bool
+param CrossTenantRegister bool = false
 
 @secure()
-param CrossTenantRegisterToken string
+param CrossTenantRegisterToken string = ''
 
 param CustomRdpProperty string
 
@@ -245,8 +243,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   name: 'linked_VirtualMachines_${i - 1}_${guid(Timestamp)}'
   scope: resourceGroup(DeployVMsTo)
   params: {
-    _artifactsLocation: _artifactsLocation
-    _artifactsLocationSasToken: _artifactsLocationSasToken
+    _scriptPostConfig: _scriptPostConfig
     Availability: Availability
     AvailabilitySetPrefix: AvailabilitySetPrefix
     ComputeGalleryImageId: '${computeGalleryImage.id}/versions/latest'

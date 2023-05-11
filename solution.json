@@ -5,17 +5,12 @@
     "_generator": {
       "name": "bicep",
       "version": "0.17.1.54307",
-      "templateHash": "13916081766545923299"
+      "templateHash": "253266541608265736"
     }
   },
   "parameters": {
-    "_artifactsLocation": {
-      "type": "string",
-      "defaultValue": "https://storeus2public.blob.core.windows.net/deployhostpool/"
-    },
-    "_artifactsLocationSasToken": {
-      "type": "securestring",
-      "defaultValue": ""
+    "_scriptPostConfig": {
+      "type": "securestring"
     },
     "AppGroupName": {
       "type": "string"
@@ -55,12 +50,14 @@
     },
     "CrossTenantRegister": {
       "type": "bool",
+      "defaultValue": false,
       "metadata": {
         "description": "If TRUE, Resource Group for Host Pool resources not required."
       }
     },
     "CrossTenantRegisterToken": {
-      "type": "securestring"
+      "type": "securestring",
+      "defaultValue": ""
     },
     "CustomRdpProperty": {
       "type": "string"
@@ -1273,11 +1270,8 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "_artifactsLocation": {
-            "value": "[parameters('_artifactsLocation')]"
-          },
-          "_artifactsLocationSasToken": {
-            "value": "[parameters('_artifactsLocationSasToken')]"
+          "_scriptPostConfig": {
+            "value": "[parameters('_scriptPostConfig')]"
           },
           "Availability": {
             "value": "[parameters('Availability')]"
@@ -1357,14 +1351,11 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "13274479990923180589"
+              "templateHash": "15860970380330788110"
             }
           },
           "parameters": {
-            "_artifactsLocation": {
-              "type": "string"
-            },
-            "_artifactsLocationSasToken": {
+            "_scriptPostConfig": {
               "type": "securestring"
             },
             "Availability": {
@@ -1556,7 +1547,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                   "fileUris": [
-                    "[format('{0}Register-HostPool-PostConfig.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]"
+                    "[parameters('_scriptPostConfig')]"
                   ],
                   "timestamp": "[parameters('Timestamp')]"
                 },
