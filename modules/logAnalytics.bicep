@@ -1,4 +1,3 @@
-
 param Location string
 param LogAnalyticsWorkspaceName string
 param LogAnalyticsWorkspaceRetention int
@@ -393,7 +392,7 @@ resource exsitingLogAnlayticsWS 'Microsoft.OperationalInsights/workspaces@2022-1
   name: LogAnalyticsWorkspaceName
 }
 
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = if(NewLogAnalyticsWS) {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = if(NewLogAnalyticsWS) {
   name: LogAnalyticsWorkspaceName
   location: Location
   tags: Tags

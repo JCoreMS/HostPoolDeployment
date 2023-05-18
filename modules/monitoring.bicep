@@ -36,11 +36,11 @@ var HostPoolLogs = [
 ]
 
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-07-05-preview' existing = {
   name: WorkspaceName
 }
 
-resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2020-02-02' = {
   name: 'diag-${WorkspaceName}'
   scope: workspace
   properties: {
@@ -66,7 +66,7 @@ resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
   }
 }
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2021-07-12' existing = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-04-01-preview' existing = {
   name: HostPoolName
 }
 
@@ -79,7 +79,7 @@ resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
   }
 }
 
-resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' existing = if(PooledHostPool) {
+resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' existing = if(PooledHostPool) {
   name: AutomationAccountName
 }
 

@@ -2,11 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "_artifactsLocation": {
-      "value": "https://storavdlabeus2.blob.core.windows.net/postdeployscripts/"
-    },
-    "_artifactsLocationSasToken": {
-      "value": "?sv=2021-06-08&ss=b&srt=sco&sp=rltf&se=2023-10-19T20:54:39Z&st=2023-02-28T13:54:39Z&spr=https&sig=5LL2Mze3Tm9HIjCkjJLcAipGTrXK9mlBcsUX53KuimE%3D"
+    "PostCfgScriptLocation": {
+      "value": "https://storeus2public.blob.core.windows.net/deployhostpool/"
     },
     "AppGroupName": {
       "value": "ag-general-office-users"

@@ -1,6 +1,7 @@
 targetScope = 'subscription'
+
 @secure()
-param _scriptPostConfig string
+param PostCfgScript string = ''
 
 param AppGroupName string
 
@@ -11,6 +12,7 @@ param AppGroupName string
 param AppGroupType string
 
 param AutomationAccountName string
+param AutomationAccountNew bool
 
 @allowed([
   'AvailabilitySet'
@@ -54,16 +56,23 @@ param HostPoolName string
 param ResourceGroupVMs string
 
 @allowed([
-  'Pooled DepthFirst'
-  'Pooled BreadthFirst'
-  'Personal Automatic'
-  'Personal Direct'
+  'Pooled'
+  'Personal'
 ])
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
-param HostPoolType string
+param HostPoolKind string
+
+@allowed([
+  'DepthFirst'
+  'BreadthFirst'
+  'Automatic'
+  'Direct'
+])
+@description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
+param HostPoolLBType string
 
 param WorkspaceName string
-param Location string
+param Location string = deployment().location
 param NewLogAnalyticsWS bool
 param LogAnalyticsWorkspaceName string
 
@@ -89,8 +98,8 @@ param Monitoring bool
 param NumSessionHosts int
 param NumUsersPerHost int
 param Subnet string
-param Tags object
-param Timestamp string = utcNow('u')
+param Tags object = {}
+param Timestamp string = utcNow()
 param UpdateWindows bool
 param StartVmOnConnect bool
 param OUPath string
@@ -115,7 +124,7 @@ param VirtualNetworkResourceGroup string
 param VmPassword string
 
 @description('The VM SKU for the AVD session hosts.')
-param VmSize string = 'Standard_D4s_v4'
+param VmSize string
 
 @description('The Local Administrator Username for the Session Hosts')
 param VmUsername string
@@ -136,7 +145,9 @@ var DivisionAvSetRemainderValue = NumSessionHosts % MaxAvSetCount // This determ
 var AvailabilitySetCount = DivisionAvSetRemainderValue > 0 ? DivisionAvSetValue + 1 : DivisionAvSetValue // This determines the total number of availability sets needed, whether full and / or partial.
 /*  END AVAILABILITY SET COUNT */
 
-var PooledHostPool = split(HostPoolType, ' ')[0] == 'Pooled' ? true : false
+var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environment().suffixes.storage}/galleryartifacts/Configuration_09-08-2022.zip'
+var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
+var PooledHostPool = HostPoolKind == 'Pooled' ? true : false
 var AvailabilitySetPrefix = 'as-'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
 
@@ -157,16 +168,13 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
   //scope: resourceGroup(ComputeGalleryRG)
 }
 
-module automationAccount 'modules/automationAccount.bicep' = if(PooledHostPool) {
+module automationAccount 'modules/automationAccount.bicep' = if(PooledHostPool && AutomationAccountNew) {
   name: 'linked_AutomationAccount_AVDHostPoolDeployment'
   scope: resourceGroup(ResourceGroupHP) // Management Resource Group
   params: {
     AutomationAccountName: AutomationAccountName
     Location: Location
   }
-  dependsOn: [
-    resourceGroupHP
-  ]
 }
 
 module availabilitySets 'modules/availabilitySets.bicep' = if ((PooledHostPool && Availability == 'AvailabilitySet') && !CrossTenantRegister) {
@@ -193,6 +201,7 @@ module hostPool 'modules/hostpool.bicep' = if (!CrossTenantRegister) {
     HostPoolName: HostPoolName
     HostPoolType: HostPoolType
     Location: Location
+    NewLogAnalyticsWS: NewLogAnalyticsWS
     NumUsersPerHost: NumUsersPerHost
     StartVmOnConnect: StartVmOnConnect
     Tags: Tags
@@ -206,7 +215,7 @@ module hostPool 'modules/hostpool.bicep' = if (!CrossTenantRegister) {
   ]
 }
 
-module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = if (Monitoring) {
+module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
   scope: resourceGroup(LogAnalyticsSubId, LogAnalyticsRG)
   name: 'linked_logAnalyticsWorkspace'
   params: {
@@ -221,7 +230,7 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = if (Monitoring) {
 
 // Monitoring Resources for AVD Insights
 // This module deploys a Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
-module monitoring 'modules/monitoring.bicep' = if (Monitoring) {
+module monitoring 'modules/monitoring.bicep' = if (NewLogAnalyticsWS) {
   name: 'linked_Monitoring_Setup'
   scope: resourceGroup(ResourceGroupHP) // Management Resource Group
   params: {
@@ -243,7 +252,8 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   name: 'linked_VirtualMachines_${i - 1}_${guid(Timestamp)}'
   scope: resourceGroup(DeployVMsTo)
   params: {
-    _scriptPostConfig: _scriptPostConfig
+    PostCfgScript: PostCfgScript
+    AgentPackageLocation: varAvdAgentPackageLocation
     Availability: Availability
     AvailabilitySetPrefix: AvailabilitySetPrefix
     ComputeGalleryImageId: '${computeGalleryImage.id}/versions/latest'
@@ -251,12 +261,14 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     DomainUser: DomainUser
     DomainPassword: DomainPassword
     DomainName: DomainName
+    HostPoolName: HostPoolName
     HostPoolRegistrationToken: CrossTenantRegister ? CrossTenantRegisterToken : hostPool.outputs.HostPoolRegistrationToken
     OUPath: OUPath
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     Monitoring: Monitoring
     NumSessionHosts: NumSessionHosts
+    ResourceGroupHP: ResourceGroupHP
     Subnet: Subnet
     Tags: Tags
     Timestamp: Timestamp
@@ -269,8 +281,12 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     VmPassword: VmPassword
     VmPrefix: VmPrefix
   }
-  dependsOn: (!CrossTenantRegister) ? [
+  dependsOn: (Availability == 'AvailabilitySet') ? [
+    availabilitySets
     hostPool
     monitoring
-  ] : []
+  ] : [
+    hostPool
+    monitoring
+  ]
 }]

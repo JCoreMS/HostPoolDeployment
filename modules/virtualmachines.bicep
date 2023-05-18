@@ -1,7 +1,6 @@
-
 @secure()
-param _scriptPostConfig string
-
+param PostCfgScript string
+param AgentPackageLocation string
 param Availability string
 param AvailabilitySetPrefix string
 param ComputeGalleryImageId string
@@ -11,11 +10,13 @@ param DomainName string
 param DomainUser string
 @secure()
 param DomainPassword string
+param HostPoolName string
 param HostPoolRegistrationToken string
 param Location string
 param LogAnalyticsWorkspaceId string
 param Monitoring bool
 param NumSessionHosts int
+param ResourceGroupHP string
 param Subnet string
 param Tags object
 param Timestamp string
@@ -34,7 +35,7 @@ var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
 var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = [for i in range(0, NumSessionHosts): {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
   tags: Tags
@@ -57,7 +58,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2020-05-01' = [fo
   }
 }]
 
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0, NumSessionHosts): {
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
   tags: Tags
@@ -66,7 +67,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   ] : null
   properties: {
     availabilitySet: Availability == 'AvailabilitySet' ? {
-      id: resourceId('Microsoft.Compute/availabilitySets', '${AvailabilitySetPrefix}-${(i + VmIndexStart) / 200}')
+      id: resourceId(ResourceGroupHP, 'Microsoft.Compute/availabilitySets', '${AvailabilitySetPrefix}${padLeft(((i + VmIndexStart) / 200) , 3, '0')}')  // '${AvailabilitySetPrefix}${padLeft(((i + VmIndexStart) / 200) , 3, '0')}'
     } : null
     hardwareProfile: {
       vmSize: VmSize
@@ -124,32 +125,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   ]
 }]
 
-resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): {
-  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
-  location: Location
-  tags: Tags
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'CustomScriptExtension'
-    typeHandlerVersion: '1.10'
-    autoUpgradeMinorVersion: true
-    settings: {
-      fileUris: [
-        _scriptPostConfig
-      ]
-      timestamp: Timestamp
-    }
-    protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -HostPoolRegistration ${HostPoolRegistrationToken} -WindowsUpdate ${UpdateWindows}'
-    }
-  }
-  dependsOn: [
-    virtualMachine
-    //extension_MicrosoftMonitoringAgent
-  ]
-}]
-
-resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): if(Monitoring) {
+resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if (Monitoring) {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/MicrosoftMonitoringAgent'
   location: Location
   properties: {
@@ -166,11 +142,10 @@ resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/e
   }
   dependsOn: [
     virtualMachine
-    extension_CustomScriptExtension
   ]
 }]
 
-resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = [for i in range(0, NumSessionHosts): {
+resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/JsonADDomainExtension'
   location: Location
   tags: Tags
@@ -192,16 +167,60 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
     }
   }
   dependsOn: [
-    virtualMachine
-    extension_CustomScriptExtension
     extension_MicrosoftMonitoringAgent
   ]
 }]
 
+// Add session hosts to Host Pool.
+resource addToHostPool 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
+  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/HostPoolRegistration'
+  location: Location
+  properties: {
+    publisher: 'Microsoft.PowerShell'
+    type: 'DSC'
+    typeHandlerVersion: '2.73'
+    autoUpgradeMinorVersion: true
+    settings: {
+      modulesUrl: AgentPackageLocation
+      configurationFunction: 'Configuration.ps1\\AddSessionHost'
+      properties: {
+        hostPoolName: HostPoolName
+        registrationInfoToken: HostPoolRegistrationToken
+        aadJoin: false
+      }
+    }
+  }
+  dependsOn: [
+    extension_JsonADDomainExtension
+  ]
+}]
+
+resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if(!empty(PostCfgScript)) {
+  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
+  location: Location
+  tags: Tags
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [
+        PostCfgScript
+      ]
+      timestamp: Timestamp
+    }
+    protectedSettings: {
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -WindowsUpdate ${UpdateWindows}'
+    }
+  }
+  dependsOn: [
+    addToHostPool
+  ]
+}]
 
 output RegistrationToken string = HostPoolRegistrationToken
 output HyperVGen string = HyperVGen
 output Architecture string = Architecture
 output ComputeGalProp object = ComputeGalleryProperties
 output SecurityFeatureValue string = SecurityFeature
-

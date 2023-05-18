@@ -10,6 +10,7 @@ param HostPoolName string
 param HostPoolType string
 param WorkspaceName string
 param Location string
+param NewLogAnalyticsWS bool
 param NumUsersPerHost int
 param Tags object
 param Timestamp string = utcNow('u')
@@ -22,14 +23,14 @@ param VmSize string
 
 
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2021-03-09-preview' = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-04-01-preview' = {
   name: HostPoolName
   location: Location
   tags: Tags
   properties: {
     hostPoolType: split(HostPoolType, ' ')[0]
     maxSessionLimit: NumUsersPerHost
-    loadBalancerType: contains(HostPoolType, 'Pooled') ? split(HostPoolType, ' ')[1] : null
+    loadBalancerType: contains(HostPoolType, 'Pooled') ? split(HostPoolType, ' ')[1] :'Persistent'
     validationEnvironment: ValidationEnvironment
     registrationInfo: {
       expirationTime: dateTimeAdd(Timestamp, 'PT2H')
@@ -43,7 +44,7 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2021-03-09-preview'
   }
 }
 
-resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2021-03-09-preview' = {
+resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-04-01-preview' = {
   name: AppGroupName
   location: Location
   tags: Tags
@@ -53,7 +54,7 @@ resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2021-03-09-
   }
 }
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-03-09-preview' = {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = if(NewLogAnalyticsWS) {
   name: WorkspaceName
   location: Location
   tags: Tags

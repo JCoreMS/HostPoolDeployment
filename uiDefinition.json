@@ -12,9 +12,7 @@
 						{
 							"name": "resourceScope",
 							"type": "Microsoft.Common.ResourceScope",
-							"location": {
-								"resourceTypes": []
-							}
+							"instanceDetailsLabel": "Host Pool Deployment Details"
 						},
 						{
 							"name": "resourceGroupsApi",
@@ -28,15 +26,14 @@
 							"name": "storageBlobSelection",
 							"type": "Microsoft.Storage.StorageBlobSelector",
 							"visible": true,
-							"toolTip": "This should be the solution provided Register-HostPool-PostConfig script and in the location you have previously uploaded it to.",
-							"label": "Solution provided Register-HostPool-PostConfig.ps1",
+							"toolTip": "This is an optional Post Configuration Script that will execute after deployment on the VM.",
+							"label": "Post Configuration Script",
 							"options": {
-								"text": "Select Register-HostPool-PostConfig.ps1"
+								"text": "Select a file with the PS1 extension"
 							},
 							"constraints": {
-								"allowedFileExtensions": [
-									"ps1"
-								]
+								"allowedFileExtensions": ["ps1"],
+								"required": false
 							}
 						},
 						{
@@ -44,7 +41,7 @@
 							"type": "Microsoft.Common.DropDown",
 							"label": "New or Existing Automation Account?",
 							"defaultValue": "Existing",
-							"toolTip": "",
+							"toolTip": "Ensure the account has at least 'Contributor' over all AVD Resources.",
 							"constraints": {
 								"allowedValues": [
 									{
@@ -100,19 +97,6 @@
 								"Microsoft.OperationalInsights/workspaces",
 								"Microsoft.Insights/diagnosticSettings"
 							]
-						},
-						{
-							"name": "Timestamp",
-							"type": "Microsoft.Common.TextBox",
-							"label": "Timestamp",
-							"defaultValue": "[[utcNow('u')]",
-							"toolTip": "",
-							"constraints": {
-								"required": false,
-								"regex": "",
-								"validationMessage": ""
-							},
-							"visible": false
 						}
 					]
 				},
@@ -123,7 +107,7 @@
 						{
 							"name": "hostPoolNewExisting",
 							"type": "Microsoft.Common.DropDown",
-							"label": "New or Existing Host Pool?",
+							"label": "New or Existing Host Pool",
 							"defaultValue": "Existing",
 							"toolTip": "",
 							"constraints": {
@@ -704,36 +688,48 @@
 								},
 								{
 									"name": "VmSize",
-									"type": "Microsoft.Common.TextBox",
-									"label": "Vm Size",
-									"defaultValue": "Standard_D4s_v4",
-									"toolTip": "The VM SKU for the AVD session hosts.",
-									"constraints": {
-										"required": false,
-										"regex": "",
-										"validationMessage": ""
-									},
+                                    "type": "Microsoft.Compute.SizeSelector",
+                                    "label": "VM Size",
+                                    "toolTip": "",
+                                    "recommendedSizes": [
+                                        "Standard_D4s_v5"
+                                    ],
+                                    "constraints": {
+                                        "allowedSizes": [],
+                                        "excludedSizes": [],
+                                        "required": true
+                                    },
+                                    "options": {
+                                        "hideDiskTypeFilter": false
+                                    },
+                                    "osPlatform": "Windows",
+                                    "imageReference": {
+                                        "publisher": "MicrosoftWindowsDesktop",
+                                        "offer": "Windows-11",
+                                        "sku": "21h2-avd"
+                                    },
+									"count": "[steps('hostPool').NumSessionHosts]",
 									"visible": true
 								},
 								{
 									"name": "DiskSku",
 									"type": "Microsoft.Common.DropDown",
-									"label": "Disk Sku",
-									"defaultValue": "Standard_LRS",
+									"label": "OS Disk Sku",
+									"defaultValue": "Standard",
 									"toolTip": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS.",
 									"constraints": {
 										"required": false,
 										"allowedValues": [
 											{
-												"label": "Standard_LRS",
+												"label": "Standard HDD (Not Recommended for Production)",
 												"value": "Standard_LRS"
 											},
 											{
-												"label": "StandardSSD_LRS",
+												"label": "Standard SSD",
 												"value": "StandardSSD_LRS"
 											},
 											{
-												"label": "Premium_LRS",
+												"label": "Premium",
 												"value": "Premium_LRS"
 											}
 										]
@@ -863,7 +859,8 @@
 									"subscription": "onBasics",
 									"location": "onBasics"
 								}
-							}
+							},
+							"required": true
 						},
 						{
 							"name": "subnetsApi",
@@ -881,7 +878,8 @@
 							"defaultValue": "",
 							"toolTip": "Select an existing subnet for AIB build virtual machines. This enables the use of Private Link and prevents the deployment of public IP addresses.",
 							"constraints": {
-								"allowedValues": "[map(steps('networking').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]"
+								"allowedValues": "[map(steps('networking').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+								"required": true
 							}
 						}
 					]
@@ -916,7 +914,16 @@
 							"defaultValue": "",
 							"toolTip": "Select an existing Image Definition to use as a source.",
 							"constraints": {
-								"allowedValues": "[map(steps('imageInfo').computeGalleryApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]"
+								"allowedValues": "[map(steps('imageInfo').computeGalleryApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+								"required": true
+							}
+						},
+						{
+							"name": "computeGalleryImageApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('imageInfo').computeGallerySelection.id,'/images/versions?api-version=2021-10-01')]"
 							}
 						}
 					]
@@ -925,10 +932,11 @@
 		},
 		"outputs": {
 			"parameters": {
-				"_scriptPostConfig": "[steps('basics').storageBlobSelection.sasUri]",
+				"PostCfgScript": "[steps('basics').storageBlobSelection.sasUri]",
 				"AppGroupName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').AppGroupName, steps('hostPool').hostPoolSelection.name)]",
 				"AppGroupType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
 				"AutomationAccountName": "[if(equals(steps('basics').automationAccountNewExisting, 'Existing'), steps('basics').automationAccountSelection.name, steps('basics').AutomationAccountName)]",
+				"AutomationAccountNew": "[if(equals(steps('basics').automationAccountNewExisting, 'New'), true, false)]",
 				"Availability": "[steps('hostPool').Availability]",
 				"ComputeGalleryName": "[steps('imageInfo').computeGallerySelection.name]",
 				"ComputeGallerySubId": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),2))]",
@@ -944,13 +952,15 @@
 				"ResourceGroupHP": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').HostPoolName, first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)))]",
 				"HostPoolName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
 				"ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
-				"HostPoolType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
-				"WorkspaceName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').WorkspaceName, first(skip(split(steps('hostPool').hostPoolAppGroupApi.properties.workspaceArmPath, '/'),8)))]",
-				"Location": "[steps('basics').resourceScope.location.name]",
+				"HostPoolKind": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
+				"HostPoolLBType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), if(equals(steps('hostPool').hostPoolType, 'Pooled'), steps('hostPool').hostPoolPooled.HostPoolBalance, steps('hostPool').hostPoolPersonal.PersonalAssignment), if(equals(steps('hostPool').hostPoolApi.properties.hostPoolType, 'Personal'), steps('hostPool').hostPoolApi.properties.personalDesktopAssignmentType, steps('hostPool').hostPoolApi.properties.loadBalancerType))]",
+				"LogAnalyticsRG": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, false), first(skip(split(steps('monitoring').alaWorkspaceExistingWorkspacesSelection.id, '/'),4)), steps('basics').resourceScope.resourceGroup.name)]",
 				"NewLogAnalyticsWS": "[if(equals(steps('monitoring').deployMonitoring, true), steps('monitoring').deployMonitoringAlaWorkspace, false)]",
-				"LogAnalyticsWorkspaceRetention": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, true), steps('monitoring').deployMonitoringNewAlaWorkspaceRetention, 30)]",
 				"LogAnalyticsSubId": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, false), first(skip(split(steps('monitoring').alaWorkspaceExistingWorkspacesSelection.id, '/'),2)), first(skip(split(steps('basics').resourceScope.subscription.id, '/'),2)))]",
 				"LogAnalyticsWorkspaceName": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, false), steps('monitoring').alaWorkspaceExistingWorkspacesSelection.name, steps('monitoring').logAnalyticsWorkspaceName)]",
+				"LogAnalyticsWorkspaceRetention": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, true), steps('monitoring').deployMonitoringNewAlaWorkspaceRetention, 30)]",
+				"LogAnalyticsWorkspaceSku": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, true), steps('monitoring').LogAnalyticsWorkspaceSku, 'PerGB2018')]",
+				"Location": "[steps('basics').resourceScope.location.name]",
 				"Monitoring": "[steps('monitoring').deployMonitoring]",
 				"NumSessionHosts": "[steps('hostPool').NumSessionHosts]",
 				"NumUsersPerHost": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.NumUsersPerHost, steps('hostPool').hostPoolApi.properties.maxSessionLimit)]",
@@ -966,11 +976,12 @@
 				"VirtualNetworkResourceGroup": "[first(skip(split(steps('networking').virtualNetworkSelection.id, '/'),4))]",
 				"VmPassword": "[steps('hostInfo').identityLocalCredentials.VmPassword.password]",
 				"VmSize": "[steps('hostInfo').vmInformation.VmSize]",
-				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]"
+				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]",
+				"WorkspaceName": "[if(equals(steps('monitoring').deployMonitoringAlaWorkspace, true), steps('monitoring').logAnalyticsWorkspaceName, steps('monitoring').alaWorkspaceExistingWorkspacesSelection.name)]"
 			},
-			"kind": "Subscription",
-			"location": "[equals('New', steps('basics').resourceScope.resourceGroup.modeName)]",
-			"subscriptionId": "[steps('basics').resourceScope.subscriptionGroup.id]"
+            "kind": "Subscription",
+            "location": "[steps('basics').resourceScope.location.name]",
+            "subscriptionId": "[steps('basics').resourceScope.subscription.id]"
 		}
 	}
 }
