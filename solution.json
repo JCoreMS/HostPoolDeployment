@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.17.1.54307",
-      "templateHash": "5749366652057548480"
+      "templateHash": "2850020234275236652"
     }
   },
   "parameters": {
@@ -354,7 +354,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "15774555199344892018"
+              "templateHash": "2275853934903925719"
             }
           },
           "parameters": {
@@ -386,7 +386,7 @@
                 "name": "Aligned"
               },
               "properties": {
-                "platformUpdateDomainCount": 5,
+                "platformUpdateDomainCount": 2,
                 "platformFaultDomainCount": 2
               }
             }
@@ -1380,7 +1380,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "2304433732941329483"
+              "templateHash": "17662656650938328332"
             }
           },
           "parameters": {
@@ -1515,7 +1515,7 @@
               "tags": "[parameters('Tags')]",
               "zones": "[if(equals(parameters('Availability'), 'AvailabilityZones'), createArray(string(add(mod(range(0, parameters('NumSessionHosts'))[copyIndex()], 3), 1))), null())]",
               "properties": {
-                "availabilitySet": "[if(equals(parameters('Availability'), 'AvailabilitySet'), createObject('id', resourceId(parameters('ResourceGroupHP'), 'Microsoft.Compute/availabilitySets', format('{0}{1}', parameters('AvailabilitySetPrefix'), padLeft(div(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 200), 3, '0')))), null())]",
+                "availabilitySet": "[if(equals(parameters('Availability'), 'AvailabilitySet'), createObject('id', format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Compute/availabilitySets/{2}{3}', subscription().subscriptionId, parameters('ResourceGroupHP'), parameters('AvailabilitySetPrefix'), padLeft(div(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 200), 3, '0'))), null())]",
                 "hardwareProfile": {
                   "vmSize": "[parameters('VmSize')]"
                 },

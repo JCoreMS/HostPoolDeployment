@@ -67,7 +67,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
   ] : null
   properties: {
     availabilitySet: Availability == 'AvailabilitySet' ? {
-      id: resourceId(ResourceGroupHP, 'Microsoft.Compute/availabilitySets', '${AvailabilitySetPrefix}${padLeft(((i + VmIndexStart) / 200) , 3, '0')}')  // '${AvailabilitySetPrefix}${padLeft(((i + VmIndexStart) / 200) , 3, '0')}'
+      id: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${ResourceGroupHP}/providers/Microsoft.Compute/availabilitySets/${AvailabilitySetPrefix}${padLeft(((i + VmIndexStart) / 200) , 3, '0')}'
     } : null
     hardwareProfile: {
       vmSize: VmSize
