@@ -3,7 +3,10 @@
 Param(
     [parameter(Mandatory)]
     [string]
-    $WindowsUpdate
+    $WindowsUpdate,
+    [parameter(Mandatory)]
+    [string]
+    $Restart
 )
 
 ##############################################################
