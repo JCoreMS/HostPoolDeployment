@@ -19,6 +19,7 @@ https://portal.azure.com#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade
 /uiFormDefinitionUri/'2nd URI Section with Custom UI Definiton JSON file'
 
 ## PowerShell to convert URL
+
 ```Powershell
 Add-Type -AssemblyName System.Web
 
@@ -35,6 +36,7 @@ Write-Host $encodedURL
 Write-Host "`nComplete URL is:" -ForegroundColor Cyan
 Write-Host "Complete URL copied to clipboard!" -ForegroundColor Yellow
 ```
+
 ## Deploy To Template spec
 
 ```PowerShell
