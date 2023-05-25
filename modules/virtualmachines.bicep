@@ -1,8 +1,5 @@
-@secure()
-param PostCfgScript string
+
 param AgentPackageLocation string
-param Availability string
-param AvailabilitySetPrefix string
 param ComputeGalleryImageId string
 param ComputeGalleryProperties object
 @secure()
@@ -14,13 +11,16 @@ param HostPoolName string
 param HostPoolRegistrationToken string
 param Location string
 param LogAnalyticsWorkspaceId string
-param Monitoring bool
 param NumSessionHosts int
-param ResourceGroupHP string
+param PostDeployEndpoint string
+param PostDeployScript string
+param Restart bool
 param Subnet string
 param Tags object
 param Timestamp string
 param UpdateWindows bool
+param UserIdentityResId string
+param UserIdentityObjId string
 param OUPath string
 param VirtualNetwork string
 param VirtualNetworkResourceGroup string
@@ -62,13 +62,13 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
   tags: Tags
-  zones: Availability == 'AvailabilityZones' ? [
-    string((i % 3) + 1)
-  ] : null
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${UserIdentityResId}':{}
+    }
+  }
   properties: {
-    availabilitySet: Availability == 'AvailabilitySet' ? {
-      id: '/subscriptions/${subscription().subscriptionId}/resourceGroups/${ResourceGroupHP}/providers/Microsoft.Compute/availabilitySets/${AvailabilitySetPrefix}${padLeft(((i + VmIndexStart) / 200) , 3, '0')}'
-    } : null
     hardwareProfile: {
       vmSize: VmSize
     }
@@ -125,7 +125,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
   ]
 }]
 
-resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if (Monitoring) {
+resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/MicrosoftMonitoringAgent'
   location: Location
   properties: {
@@ -134,10 +134,10 @@ resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/e
     typeHandlerVersion: '1.0'
     autoUpgradeMinorVersion: true
     settings: {
-      workspaceId: Monitoring ? reference(LogAnalyticsWorkspaceId, '2015-03-20').customerId : null
+      workspaceId: reference(LogAnalyticsWorkspaceId, '2015-03-20').customerId
     }
     protectedSettings: {
-      workspaceKey: Monitoring ? listKeys(LogAnalyticsWorkspaceId, '2015-03-20').primarySharedKey : null
+      workspaceKey: listKeys(LogAnalyticsWorkspaceId, '2015-03-20').primarySharedKey
     }
   }
   dependsOn: [
@@ -195,7 +195,7 @@ resource addToHostPool 'Microsoft.Compute/virtualMachines/extensions@2023-03-01'
   ]
 }]
 
-resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if(!empty(PostCfgScript)) {
+resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if (!empty(PostDeployEndpoint)) {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
   location: Location
   tags: Tags
@@ -206,12 +206,13 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        PostCfgScript
+        '${PostDeployEndpoint}${PostDeployScript}'
       ]
       timestamp: Timestamp
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -WindowsUpdate ${UpdateWindows}'
+      managedIdentity: { objectId: UserIdentityObjId }
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${PostDeployScript} -WindowsUpdate ${UpdateWindows} -Restart ${Restart}'
     }
   }
   dependsOn: [

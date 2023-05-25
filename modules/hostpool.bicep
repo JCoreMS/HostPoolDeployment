@@ -10,7 +10,6 @@ param HostPoolName string
 param HostPoolType string
 param WorkspaceName string
 param Location string
-param NewLogAnalyticsWS bool
 param NumUsersPerHost int
 param Tags object
 param Timestamp string = utcNow('u')
@@ -54,7 +53,7 @@ resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-04-01-
   }
 }
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = if(NewLogAnalyticsWS) {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = {
   name: WorkspaceName
   location: Location
   tags: Tags

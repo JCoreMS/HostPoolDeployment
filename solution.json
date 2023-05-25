@@ -5,14 +5,10 @@
     "_generator": {
       "name": "bicep",
       "version": "0.17.1.54307",
-      "templateHash": "2850020234275236652"
+      "templateHash": "12965069931017131330"
     }
   },
   "parameters": {
-    "PostCfgScript": {
-      "type": "securestring",
-      "defaultValue": ""
-    },
     "AppGroupName": {
       "type": "string"
     },
@@ -21,23 +17,6 @@
       "allowedValues": [
         "Desktop",
         "RailApplications"
-      ]
-    },
-    "AutomationAccountName": {
-      "type": "string"
-    },
-    "AutomationAccountNew": {
-      "type": "bool"
-    },
-    "Availability": {
-      "type": "string",
-      "metadata": {
-        "description": "Set the desired availability / SLA with a pooled host pool.  Choose \"None\" if deploying a personal host pool."
-      },
-      "allowedValues": [
-        "AvailabilitySet",
-        "AvailabilityZones",
-        "None"
       ]
     },
     "ComputeGalleryName": {
@@ -51,17 +30,6 @@
     },
     "ComputeGalleryImage": {
       "type": "string"
-    },
-    "CrossTenantRegister": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "If TRUE, Resource Group for Host Pool resources not required."
-      }
-    },
-    "CrossTenantRegisterToken": {
-      "type": "securestring",
-      "defaultValue": ""
     },
     "CustomRdpProperty": {
       "type": "string"
@@ -119,42 +87,16 @@
       ]
     },
     "WorkspaceName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "Location": {
       "type": "string",
       "defaultValue": "[deployment().location]"
     },
-    "NewLogAnalyticsWS": {
-      "type": "bool"
-    },
     "LogAnalyticsWorkspaceName": {
-      "type": "string"
-    },
-    "LogAnalyticsWorkspaceRetention": {
-      "type": "int",
-      "defaultValue": 30,
-      "metadata": {
-        "description": "The retention for the Log Analytics Workspace to setup the AVD Monitoring solution"
-      },
-      "minValue": 30,
-      "maxValue": 730
-    },
-    "LogAnalyticsWorkspaceSku": {
       "type": "string",
-      "defaultValue": "PerGB2018",
-      "metadata": {
-        "description": "The SKU for the Log Analytics Workspace to setup the AVD Monitoring solution"
-      },
-      "allowedValues": [
-        "Free",
-        "Standard",
-        "Premium",
-        "PerNode",
-        "PerGB2018",
-        "Standalone",
-        "CapacityReservation"
-      ]
+      "defaultValue": ""
     },
     "LogAnalyticsSubId": {
       "type": "string"
@@ -162,14 +104,28 @@
     "LogAnalyticsRG": {
       "type": "string"
     },
-    "Monitoring": {
-      "type": "bool"
-    },
     "NumSessionHosts": {
       "type": "int"
     },
     "NumUsersPerHost": {
       "type": "int"
+    },
+    "PostDeployEndpoint": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "PostDeployScript": {
+      "type": "string"
+    },
+    "PostDeployStorName": {
+      "type": "string"
+    },
+    "PostDeployStorRG": {
+      "type": "string"
+    },
+    "Restart": {
+      "type": "bool",
+      "defaultValue": true
     },
     "Subnet": {
       "type": "string"
@@ -184,6 +140,9 @@
     },
     "UpdateWindows": {
       "type": "bool"
+    },
+    "UserIdentityName": {
+      "type": "string"
     },
     "StartVmOnConnect": {
       "type": "bool"
@@ -242,15 +201,19 @@
     "DivisionValue": "[div(parameters('NumSessionHosts'), variables('MaxResourcesPerTemplateDeployment'))]",
     "DivisionRemainderValue": "[mod(parameters('NumSessionHosts'), variables('MaxResourcesPerTemplateDeployment'))]",
     "SessionHostBatchCount": "[if(greater(variables('DivisionRemainderValue'), 0), add(variables('DivisionValue'), 1), variables('DivisionValue'))]",
-    "MaxAvSetCount": 200,
-    "DivisionAvSetValue": "[div(parameters('NumSessionHosts'), variables('MaxAvSetCount'))]",
-    "DivisionAvSetRemainderValue": "[mod(parameters('NumSessionHosts'), variables('MaxAvSetCount'))]",
-    "AvailabilitySetCount": "[if(greater(variables('DivisionAvSetRemainderValue'), 0), add(variables('DivisionAvSetValue'), 1), variables('DivisionAvSetValue'))]",
     "varAvdAgentPackageLocation": "[format('https://wvdportalstorageblob.blob.{0}/galleryartifacts/Configuration_09-08-2022.zip', environment().suffixes.storage)]",
     "HostPoolType": "[format('{0} {1}', parameters('HostPoolKind'), parameters('HostPoolLBType'))]",
-    "PooledHostPool": "[if(equals(parameters('HostPoolKind'), 'Pooled'), true(), false())]",
-    "AvailabilitySetPrefix": "as-",
-    "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]"
+    "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]",
+    "RoleAssignments": {
+      "BlobDataRead": {
+        "Name": "Blob-Data-Reader",
+        "GUID": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
+      },
+      "ARMRead": {
+        "Name": "ARM-Reader",
+        "GUID": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+      }
+    }
   },
   "resources": [
     {
@@ -267,10 +230,9 @@
       "location": "[if(not(empty(parameters('Location'))), parameters('Location'), 'none')]"
     },
     {
-      "condition": "[and(variables('PooledHostPool'), parameters('AutomationAccountNew'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_AutomationAccount_AVDHostPoolDeployment",
+      "name": "linked_UserIdentityCreateAssign",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -278,11 +240,20 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "AutomationAccountName": {
-            "value": "[parameters('AutomationAccountName')]"
-          },
           "Location": {
             "value": "[parameters('Location')]"
+          },
+          "PostDeployStorRG": {
+            "value": "[parameters('PostDeployStorRG')]"
+          },
+          "PostDeployStorName": {
+            "value": "[parameters('PostDeployStorName')]"
+          },
+          "RoleAssignments": {
+            "value": "[variables('RoleAssignments')]"
+          },
+          "UserIdentityName": {
+            "value": "[parameters('UserIdentityName')]"
           }
         },
         "template": {
@@ -292,59 +263,138 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "13138929097750652597"
+              "templateHash": "17766928518179058869"
             }
           },
           "parameters": {
-            "AutomationAccountName": {
+            "Location": {
               "type": "string"
             },
-            "Location": {
+            "PostDeployStorName": {
+              "type": "string"
+            },
+            "PostDeployStorRG": {
+              "type": "string"
+            },
+            "RoleAssignments": {
+              "type": "object"
+            },
+            "UserIdentityName": {
               "type": "string"
             }
           },
           "resources": [
             {
-              "type": "Microsoft.Automation/automationAccounts",
-              "apiVersion": "2022-08-08",
-              "name": "[parameters('AutomationAccountName')]",
-              "location": "[parameters('Location')]",
-              "identity": {
-                "type": "SystemAssigned"
-              },
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2018-11-30",
+              "name": "[parameters('UserIdentityName')]",
+              "location": "[parameters('Location')]"
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "linked_assignUserIDRole",
+              "resourceGroup": "[parameters('PostDeployStorRG')]",
               "properties": {
-                "sku": {
-                  "name": "Free"
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "PostDeployStorName": {
+                    "value": "[parameters('PostDeployStorName')]"
+                  },
+                  "PostDeployStorRG": {
+                    "value": "[parameters('PostDeployStorRG')]"
+                  },
+                  "UserIdentityName": {
+                    "value": "[parameters('UserIdentityName')]"
+                  },
+                  "RoleAssignments": {
+                    "value": "[parameters('RoleAssignments')]"
+                  },
+                  "UserIdentityPrincipalId": {
+                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName')), '2018-11-30').principalId]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.17.1.54307",
+                      "templateHash": "1736797033326895001"
+                    }
+                  },
+                  "parameters": {
+                    "PostDeployStorName": {
+                      "type": "string"
+                    },
+                    "PostDeployStorRG": {
+                      "type": "string"
+                    },
+                    "RoleAssignments": {
+                      "type": "object"
+                    },
+                    "UserIdentityName": {
+                      "type": "string"
+                    },
+                    "UserIdentityPrincipalId": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "copy": {
+                        "name": "roleAssignment",
+                        "count": "[length(items(parameters('RoleAssignments')))]"
+                      },
+                      "type": "Microsoft.Authorization/roleAssignments",
+                      "apiVersion": "2022-04-01",
+                      "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('PostDeployStorName'))]",
+                      "name": "[guid(parameters('PostDeployStorName'), items(parameters('RoleAssignments'))[copyIndex()].value.Name, parameters('PostDeployStorRG'))]",
+                      "properties": {
+                        "description": "[format('Provides User Identity {0} read access for post deployment scripts.', parameters('UserIdentityName'))]",
+                        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', items(parameters('RoleAssignments'))[copyIndex()].value.GUID)]",
+                        "principalId": "[parameters('UserIdentityPrincipalId')]"
+                      }
+                    }
+                  ]
                 }
-              }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName'))]"
+              ]
             }
-          ]
+          ],
+          "outputs": {
+            "userIdentityResId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName'))]"
+            },
+            "userIdentityObjId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName')), '2018-11-30').principalId]"
+            }
+          }
         }
       }
     },
     {
-      "condition": "[and(and(variables('PooledHostPool'), equals(parameters('Availability'), 'AvailabilitySet')), not(parameters('CrossTenantRegister')))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('linked_AvailabilitySets_{0}', parameters('Timestamp'))]",
-      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "name": "linked_logAnalyticsWorkspace",
+      "subscriptionId": "[parameters('LogAnalyticsSubId')]",
+      "resourceGroup": "[parameters('LogAnalyticsRG')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
         },
         "mode": "Incremental",
         "parameters": {
-          "AvailabilitySetCount": {
-            "value": "[variables('AvailabilitySetCount')]"
-          },
-          "AvailabilitySetPrefix": {
-            "value": "[variables('AvailabilitySetPrefix')]"
-          },
-          "Location": {
-            "value": "[parameters('Location')]"
-          },
-          "Tags": {
-            "value": "[parameters('Tags')]"
+          "LogAnalyticsWorkspaceName": {
+            "value": "[parameters('LogAnalyticsWorkspaceName')]"
           }
         },
         "template": {
@@ -354,51 +404,25 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "2275853934903925719"
+              "templateHash": "9786688280559185175"
             }
           },
           "parameters": {
-            "AvailabilitySetCount": {
-              "type": "int"
-            },
-            "AvailabilitySetPrefix": {
+            "LogAnalyticsWorkspaceName": {
               "type": "string"
-            },
-            "Location": {
-              "type": "string"
-            },
-            "Tags": {
-              "type": "object"
             }
           },
-          "resources": [
-            {
-              "copy": {
-                "name": "availabilitySet",
-                "count": "[length(range(0, parameters('AvailabilitySetCount')))]"
-              },
-              "type": "Microsoft.Compute/availabilitySets",
-              "apiVersion": "2023-03-01",
-              "name": "[format('{0}{1}', parameters('AvailabilitySetPrefix'), padLeft(range(0, parameters('AvailabilitySetCount'))[copyIndex()], 3, '0'))]",
-              "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
-              "sku": {
-                "name": "Aligned"
-              },
-              "properties": {
-                "platformUpdateDomainCount": 2,
-                "platformFaultDomainCount": 2
-              }
+          "resources": [],
+          "outputs": {
+            "logAnalyticsId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]"
             }
-          ]
+          }
         }
-      },
-      "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]"
-      ]
+      }
     },
     {
-      "condition": "[not(parameters('CrossTenantRegister'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_HostPoolDeployment",
@@ -436,9 +460,6 @@
           "Location": {
             "value": "[parameters('Location')]"
           },
-          "NewLogAnalyticsWS": {
-            "value": "[parameters('NewLogAnalyticsWS')]"
-          },
           "NumUsersPerHost": {
             "value": "[parameters('NumUsersPerHost')]"
           },
@@ -468,7 +489,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "1097794227862781245"
+              "templateHash": "15592616400424127629"
             }
           },
           "parameters": {
@@ -498,9 +519,6 @@
             },
             "Location": {
               "type": "string"
-            },
-            "NewLogAnalyticsWS": {
-              "type": "bool"
             },
             "NumUsersPerHost": {
               "type": "int"
@@ -566,7 +584,6 @@
               ]
             },
             {
-              "condition": "[parameters('NewLogAnalyticsWS')]",
               "type": "Microsoft.DesktopVirtualization/workspaces",
               "apiVersion": "2022-04-01-preview",
               "name": "[parameters('WorkspaceName')]",
@@ -602,527 +619,6 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_logAnalyticsWorkspace",
-      "subscriptionId": "[parameters('LogAnalyticsSubId')]",
-      "resourceGroup": "[parameters('LogAnalyticsRG')]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "LogAnalyticsWorkspaceName": {
-            "value": "[parameters('LogAnalyticsWorkspaceName')]"
-          },
-          "LogAnalyticsWorkspaceRetention": {
-            "value": "[parameters('LogAnalyticsWorkspaceRetention')]"
-          },
-          "LogAnalyticsWorkspaceSku": {
-            "value": "[parameters('LogAnalyticsWorkspaceSku')]"
-          },
-          "Location": {
-            "value": "[parameters('Location')]"
-          },
-          "NewLogAnalyticsWS": {
-            "value": "[parameters('NewLogAnalyticsWS')]"
-          },
-          "Tags": {
-            "value": "[parameters('Tags')]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "16576677299200995600"
-            }
-          },
-          "parameters": {
-            "Location": {
-              "type": "string"
-            },
-            "LogAnalyticsWorkspaceName": {
-              "type": "string"
-            },
-            "LogAnalyticsWorkspaceRetention": {
-              "type": "int"
-            },
-            "LogAnalyticsWorkspaceSku": {
-              "type": "string"
-            },
-            "NewLogAnalyticsWS": {
-              "type": "bool"
-            },
-            "Tags": {
-              "type": "object"
-            }
-          },
-          "variables": {
-            "WindowsEvents": [
-              {
-                "name": "Microsoft-FSLogix-Apps/Operational",
-                "types": [
-                  {
-                    "eventType": "Error"
-                  },
-                  {
-                    "eventType": "Warning"
-                  },
-                  {
-                    "eventType": "Information"
-                  }
-                ]
-              },
-              {
-                "name": "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational",
-                "types": [
-                  {
-                    "eventType": "Error"
-                  },
-                  {
-                    "eventType": "Warning"
-                  },
-                  {
-                    "eventType": "Information"
-                  }
-                ]
-              },
-              {
-                "name": "System",
-                "types": [
-                  {
-                    "eventType": "Error"
-                  },
-                  {
-                    "eventType": "Warning"
-                  }
-                ]
-              },
-              {
-                "name": "Microsoft-Windows-TerminalServices-RemoteConnectionManager/Admin",
-                "types": [
-                  {
-                    "eventType": "Error"
-                  },
-                  {
-                    "eventType": "Warning"
-                  },
-                  {
-                    "eventType": "Information"
-                  }
-                ]
-              },
-              {
-                "name": "Microsoft-FSLogix-Apps/Admin",
-                "types": [
-                  {
-                    "eventType": "Error"
-                  },
-                  {
-                    "eventType": "Warning"
-                  },
-                  {
-                    "eventType": "Information"
-                  }
-                ]
-              },
-              {
-                "name": "Application",
-                "types": [
-                  {
-                    "eventType": "Error"
-                  },
-                  {
-                    "eventType": "Warning"
-                  }
-                ]
-              }
-            ],
-            "WindowsPerformanceCounters": [
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Disk Transfers/sec"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Current Disk Queue Length"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Disk Reads/sec"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "% Free Space"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk sec/Read"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Disk Writes/sec"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk sec/Write"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Free Megabytes"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "C:",
-                "intervalSeconds": 60,
-                "counterName": "% Free Space"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "C:",
-                "intervalSeconds": 30,
-                "counterName": "Avg. Disk Queue Length"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "C:",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk sec/Transfer"
-              },
-              {
-                "objectName": "LogicalDisk",
-                "instanceName": "C:",
-                "intervalSeconds": 30,
-                "counterName": "Current Disk Queue Length"
-              },
-              {
-                "objectName": "Memory",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "% Committed Bytes In Use"
-              },
-              {
-                "objectName": "Memory",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Available MBytes"
-              },
-              {
-                "objectName": "Memory",
-                "instanceName": "*",
-                "intervalSeconds": 30,
-                "counterName": "Available Mbytes"
-              },
-              {
-                "objectName": "Memory",
-                "instanceName": "*",
-                "intervalSeconds": 30,
-                "counterName": "Page Faults/sec"
-              },
-              {
-                "objectName": "Memory",
-                "instanceName": "*",
-                "intervalSeconds": 30,
-                "counterName": "Pages/sec"
-              },
-              {
-                "objectName": "Network Adapter",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Bytes Sent/sec"
-              },
-              {
-                "objectName": "Network Adapter",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Bytes Received/sec"
-              },
-              {
-                "objectName": "Network Interface",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Bytes Total/sec"
-              },
-              {
-                "objectName": "PhysicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk Bytes/Transfer"
-              },
-              {
-                "objectName": "PhysicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk Bytes/Read"
-              },
-              {
-                "objectName": "PhysicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk sec/Write"
-              },
-              {
-                "objectName": "PhysicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk sec/Read"
-              },
-              {
-                "objectName": "PhysicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk Bytes/Write"
-              },
-              {
-                "objectName": "PhysicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Avg. Disk sec/Transfer"
-              },
-              {
-                "objectName": "PhysicalDisk",
-                "instanceName": "*",
-                "intervalSeconds": 30,
-                "counterName": "Avg. Disk Queue Length"
-              },
-              {
-                "objectName": "Process",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "IO Write Operations/sec"
-              },
-              {
-                "objectName": "Process",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "IO Read Operations/sec"
-              },
-              {
-                "objectName": "Process",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Thread Count"
-              },
-              {
-                "objectName": "Process",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "% User Time"
-              },
-              {
-                "objectName": "Process",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Working Set"
-              },
-              {
-                "objectName": "Process",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "% Processor Time"
-              },
-              {
-                "objectName": "Processor",
-                "instanceName": "_Total",
-                "intervalSeconds": 60,
-                "counterName": "% Processor Time"
-              },
-              {
-                "objectName": "Processor Information",
-                "instanceName": "_Total",
-                "intervalSeconds": 30,
-                "counterName": "% Processor Time"
-              },
-              {
-                "objectName": "RemoteFX Graphics",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Frames Skipped/Second - Insufficient Server Resources"
-              },
-              {
-                "objectName": "RemoteFX Graphics",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Average Encoding Time"
-              },
-              {
-                "objectName": "RemoteFX Graphics",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Frames Skipped/Second - Insufficient Client Resources"
-              },
-              {
-                "objectName": "RemoteFX Graphics",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Frames Skipped/Second - Insufficient Network Resources"
-              },
-              {
-                "objectName": "RemoteFX Network",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Current UDP Bandwidth"
-              },
-              {
-                "objectName": "RemoteFX Network",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Current TCP Bandwidth"
-              },
-              {
-                "objectName": "RemoteFX Network",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Current TCP RTT"
-              },
-              {
-                "objectName": "RemoteFX Network",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Current UDP RTT"
-              },
-              {
-                "objectName": "System",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Processor Queue Length"
-              },
-              {
-                "objectName": "Terminal Services",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Inactive Sessions"
-              },
-              {
-                "objectName": "Terminal Services",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Total Sessions"
-              },
-              {
-                "objectName": "Terminal Services",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "Active Sessions"
-              },
-              {
-                "objectName": "Terminal Services Session",
-                "instanceName": "*",
-                "intervalSeconds": 60,
-                "counterName": "% Processor Time"
-              },
-              {
-                "objectName": "User Input Delay per Process",
-                "instanceName": "*",
-                "intervalSeconds": 30,
-                "counterName": "Max Input Delay"
-              },
-              {
-                "objectName": "User Input Delay per Session",
-                "instanceName": "*",
-                "intervalSeconds": 30,
-                "counterName": "Max Input Delay"
-              }
-            ]
-          },
-          "resources": [
-            {
-              "condition": "[parameters('NewLogAnalyticsWS')]",
-              "type": "Microsoft.OperationalInsights/workspaces",
-              "apiVersion": "2022-10-01",
-              "name": "[parameters('LogAnalyticsWorkspaceName')]",
-              "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
-              "properties": {
-                "sku": {
-                  "name": "[parameters('LogAnalyticsWorkspaceSku')]"
-                },
-                "retentionInDays": "[parameters('LogAnalyticsWorkspaceRetention')]",
-                "workspaceCapping": {
-                  "dailyQuotaGb": -1
-                },
-                "publicNetworkAccessForIngestion": "Enabled",
-                "publicNetworkAccessForQuery": "Enabled"
-              }
-            },
-            {
-              "copy": {
-                "name": "windowsEvents",
-                "count": "[length(variables('WindowsEvents'))]",
-                "mode": "serial",
-                "batchSize": 1
-              },
-              "condition": "[parameters('NewLogAnalyticsWS')]",
-              "type": "Microsoft.OperationalInsights/workspaces/dataSources",
-              "apiVersion": "2020-08-01",
-              "name": "[format('{0}/{1}', parameters('LogAnalyticsWorkspaceName'), format('WindowsEvent{0}', copyIndex()))]",
-              "tags": "[parameters('Tags')]",
-              "kind": "WindowsEvent",
-              "properties": {
-                "eventLogName": "[variables('WindowsEvents')[copyIndex()].name]",
-                "eventTypes": "[variables('WindowsEvents')[copyIndex()].types]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]"
-              ]
-            },
-            {
-              "copy": {
-                "name": "windowsPerformanceCounters",
-                "count": "[length(variables('WindowsPerformanceCounters'))]",
-                "mode": "serial",
-                "batchSize": 1
-              },
-              "condition": "[parameters('NewLogAnalyticsWS')]",
-              "type": "Microsoft.OperationalInsights/workspaces/dataSources",
-              "apiVersion": "2020-08-01",
-              "name": "[format('{0}/{1}', parameters('LogAnalyticsWorkspaceName'), format('WindowsPerformanceCounter{0}', copyIndex()))]",
-              "tags": "[parameters('Tags')]",
-              "kind": "WindowsPerformanceCounter",
-              "properties": {
-                "objectName": "[variables('WindowsPerformanceCounters')[copyIndex()].objectName]",
-                "instanceName": "[variables('WindowsPerformanceCounters')[copyIndex()].instanceName]",
-                "intervalSeconds": "[variables('WindowsPerformanceCounters')[copyIndex()].intervalSeconds]",
-                "counterName": "[variables('WindowsPerformanceCounters')[copyIndex()].counterName]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]",
-                "windowsEvents"
-              ]
-            }
-          ],
-          "outputs": {
-            "logAnalyticsId": {
-              "type": "string",
-              "value": "[if(parameters('NewLogAnalyticsWS'), resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName')), resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName')))]"
-            }
-          }
-        }
-      }
-    },
-    {
-      "condition": "[parameters('NewLogAnalyticsWS')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
       "name": "linked_Monitoring_Setup",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
@@ -1131,17 +627,11 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "AutomationAccountName": {
-            "value": "[parameters('AutomationAccountName')]"
-          },
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
           "LogAnalyticsWorkspaceId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
-          },
-          "PooledHostPool": {
-            "value": "[variables('PooledHostPool')]"
           },
           "WorkspaceName": {
             "value": "[parameters('WorkspaceName')]"
@@ -1154,21 +644,15 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "9907467603999896102"
+              "templateHash": "2479181005303214743"
             }
           },
           "parameters": {
-            "AutomationAccountName": {
-              "type": "string"
-            },
             "HostPoolName": {
               "type": "string"
             },
             "LogAnalyticsWorkspaceId": {
               "type": "string"
-            },
-            "PooledHostPool": {
-              "type": "bool"
             },
             "WorkspaceName": {
               "type": "string"
@@ -1208,8 +692,9 @@
           },
           "resources": [
             {
+              "condition": "[not(equals(parameters('WorkspaceName'), 'none'))]",
               "type": "Microsoft.Insights/diagnosticSettings",
-              "apiVersion": "2020-02-02",
+              "apiVersion": "2017-05-01-preview",
               "scope": "[format('Microsoft.DesktopVirtualization/workspaces/{0}', parameters('WorkspaceName'))]",
               "name": "[format('diag-{0}', parameters('WorkspaceName'))]",
               "properties": {
@@ -1243,26 +728,6 @@
                 "logs": "[variables('HostPoolLogs')]",
                 "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
               }
-            },
-            {
-              "condition": "[parameters('PooledHostPool')]",
-              "type": "Microsoft.Insights/diagnosticSettings",
-              "apiVersion": "2021-05-01-preview",
-              "scope": "[format('Microsoft.Automation/automationAccounts/{0}', parameters('AutomationAccountName'))]",
-              "name": "[format('diag-{0}', parameters('AutomationAccountName'))]",
-              "properties": {
-                "logs": [
-                  {
-                    "category": "JobLogs",
-                    "enabled": true
-                  },
-                  {
-                    "category": "JobStreams",
-                    "enabled": true
-                  }
-                ],
-                "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
-              }
             }
           ]
         }
@@ -1290,17 +755,8 @@
         },
         "mode": "Incremental",
         "parameters": {
-          "PostCfgScript": {
-            "value": "[parameters('PostCfgScript')]"
-          },
           "AgentPackageLocation": {
             "value": "[variables('varAvdAgentPackageLocation')]"
-          },
-          "Availability": {
-            "value": "[parameters('Availability')]"
-          },
-          "AvailabilitySetPrefix": {
-            "value": "[variables('AvailabilitySetPrefix')]"
           },
           "ComputeGalleryImageId": {
             "value": "[format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))]"
@@ -1320,7 +776,9 @@
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
-          "HostPoolRegistrationToken": "[if(parameters('CrossTenantRegister'), createObject('value', parameters('CrossTenantRegisterToken')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value))]",
+          "HostPoolRegistrationToken": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value]"
+          },
           "OUPath": {
             "value": "[parameters('OUPath')]"
           },
@@ -1330,14 +788,17 @@
           "LogAnalyticsWorkspaceId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
           },
-          "Monitoring": {
-            "value": "[parameters('Monitoring')]"
-          },
           "NumSessionHosts": {
             "value": "[parameters('NumSessionHosts')]"
           },
-          "ResourceGroupHP": {
-            "value": "[parameters('ResourceGroupHP')]"
+          "PostDeployEndpoint": {
+            "value": "[parameters('PostDeployEndpoint')]"
+          },
+          "PostDeployScript": {
+            "value": "[parameters('PostDeployScript')]"
+          },
+          "Restart": {
+            "value": "[parameters('Restart')]"
           },
           "Subnet": {
             "value": "[parameters('Subnet')]"
@@ -1350,6 +811,12 @@
           },
           "UpdateWindows": {
             "value": "[parameters('UpdateWindows')]"
+          },
+          "UserIdentityResId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value]"
+          },
+          "UserIdentityObjId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityObjId.value]"
           },
           "VirtualNetwork": {
             "value": "[parameters('VirtualNetwork')]"
@@ -1380,20 +847,11 @@
             "_generator": {
               "name": "bicep",
               "version": "0.17.1.54307",
-              "templateHash": "17662656650938328332"
+              "templateHash": "4456534122623406526"
             }
           },
           "parameters": {
-            "PostCfgScript": {
-              "type": "securestring"
-            },
             "AgentPackageLocation": {
-              "type": "string"
-            },
-            "Availability": {
-              "type": "string"
-            },
-            "AvailabilitySetPrefix": {
               "type": "string"
             },
             "ComputeGalleryImageId": {
@@ -1423,14 +881,17 @@
             "LogAnalyticsWorkspaceId": {
               "type": "string"
             },
-            "Monitoring": {
-              "type": "bool"
-            },
             "NumSessionHosts": {
               "type": "int"
             },
-            "ResourceGroupHP": {
+            "PostDeployEndpoint": {
               "type": "string"
+            },
+            "PostDeployScript": {
+              "type": "string"
+            },
+            "Restart": {
+              "type": "bool"
             },
             "Subnet": {
               "type": "string"
@@ -1443,6 +904,12 @@
             },
             "UpdateWindows": {
               "type": "bool"
+            },
+            "UserIdentityResId": {
+              "type": "string"
+            },
+            "UserIdentityObjId": {
+              "type": "string"
             },
             "OUPath": {
               "type": "string"
@@ -1513,9 +980,13 @@
               "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
               "tags": "[parameters('Tags')]",
-              "zones": "[if(equals(parameters('Availability'), 'AvailabilityZones'), createArray(string(add(mod(range(0, parameters('NumSessionHosts'))[copyIndex()], 3), 1))), null())]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', parameters('UserIdentityResId'))]": {}
+                }
+              },
               "properties": {
-                "availabilitySet": "[if(equals(parameters('Availability'), 'AvailabilitySet'), createObject('id', format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Compute/availabilitySets/{2}{3}', subscription().subscriptionId, parameters('ResourceGroupHP'), parameters('AvailabilitySetPrefix'), padLeft(div(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 200), 3, '0'))), null())]",
                 "hardwareProfile": {
                   "vmSize": "[parameters('VmSize')]"
                 },
@@ -1573,7 +1044,6 @@
                 "name": "extension_MicrosoftMonitoringAgent",
                 "count": "[length(range(0, parameters('NumSessionHosts')))]"
               },
-              "condition": "[parameters('Monitoring')]",
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/MicrosoftMonitoringAgent', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
@@ -1584,10 +1054,10 @@
                 "typeHandlerVersion": "1.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                  "workspaceId": "[if(parameters('Monitoring'), reference(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').customerId, null())]"
+                  "workspaceId": "[reference(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').customerId]"
                 },
                 "protectedSettings": {
-                  "workspaceKey": "[if(parameters('Monitoring'), listKeys(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').primarySharedKey, null())]"
+                  "workspaceKey": "[listKeys(parameters('LogAnalyticsWorkspaceId'), '2015-03-20').primarySharedKey]"
                 }
               },
               "dependsOn": [
@@ -1658,7 +1128,7 @@
                 "name": "extension_CustomScriptExtension",
                 "count": "[length(range(0, parameters('NumSessionHosts')))]"
               },
-              "condition": "[not(empty(parameters('PostCfgScript')))]",
+              "condition": "[not(empty(parameters('PostDeployEndpoint')))]",
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/CustomScriptExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
@@ -1671,12 +1141,15 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                   "fileUris": [
-                    "[parameters('PostCfgScript')]"
+                    "[format('{0}{1}', parameters('PostDeployEndpoint'), parameters('PostDeployScript'))]"
                   ],
                   "timestamp": "[parameters('Timestamp')]"
                 },
                 "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File Register-HostPool-PostConfig.ps1 -WindowsUpdate {0}', parameters('UpdateWindows'))]"
+                  "managedIdentity": {
+                    "objectId": "[parameters('UserIdentityObjId')]"
+                  },
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} -WindowsUpdate {1} -Restart {2}', parameters('PostDeployScript'), parameters('UpdateWindows'), parameters('Restart'))]"
                 }
               },
               "dependsOn": [
@@ -1709,10 +1182,9 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_AvailabilitySets_{0}', parameters('Timestamp')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
       ]
     }
   ]

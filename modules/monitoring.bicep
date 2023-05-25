@@ -1,7 +1,5 @@
-param AutomationAccountName string
 param HostPoolName string
 param LogAnalyticsWorkspaceId string
-param PooledHostPool bool
 param WorkspaceName string
 
 var HostPoolLogs = [
@@ -36,11 +34,11 @@ var HostPoolLogs = [
 ]
 
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-07-05-preview' existing = {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = {
   name: WorkspaceName
 }
 
-resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2020-02-02' = {
+resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = if (WorkspaceName != 'none') {
   name: 'diag-${WorkspaceName}'
   scope: workspace
   properties: {
@@ -79,24 +77,4 @@ resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
   }
 }
 
-resource automationAccount 'Microsoft.Automation/automationAccounts@2022-08-08' existing = if(PooledHostPool) {
-  name: AutomationAccountName
-}
 
-resource automationAccountDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if(PooledHostPool) {
-  name: 'diag-${AutomationAccountName}'
-  scope: automationAccount
-  properties: {
-    logs: [
-      {
-        category: 'JobLogs'
-        enabled: true
-      }
-      {
-        category: 'JobStreams'
-        enabled: true
-      }
-    ]
-    workspaceId: LogAnalyticsWorkspaceId
-  }
-}
