@@ -13,9 +13,15 @@ Additionally the solution was written in BICEP to provide an ease of use and mec
 
 If you'd like to host the solution on you're own GitHub repository or other publicly accessible web site you can form you're own URL from the above buttons.  Notice that the URLs are formated in the following way:
 
-https://aka.ms/deploytoazurebutton - URL for the button logo for Markdown  
-https://portal.azure.com#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/  - launches Azure Portal (change .com to .us for US Government)  
-/uri/'First URI segment - ARM Template for deployment'  
+https://aka.ms/deploytoazurebutton  
+
+- URL for the button logo for Markdown
+
+https://portal.azure.com#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/  
+
+- launches Azure Portal (change .com to .us for US Government)  
+
+/uri/'First URI segment ARM Template for deployment'  
 /uiFormDefinitionUri/'2nd URI Section with Custom UI Definiton JSON file'  
 
 ## PowerShell to convert URL
