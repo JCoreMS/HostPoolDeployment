@@ -1,0 +1,106 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "AppGroupName": {
+      "value": ""
+    },
+    "AppGroupType": {},
+    "ComputeGalleryName": {
+      "value": ""
+    },
+    "ComputeGallerySubId": {
+      "value": ""
+    },
+    "ComputeGalleryRG": {
+      "value": ""
+    },
+    "ComputeGalleryImage": {
+      "value": ""
+    },
+    "CustomRdpProperty": {
+      "value": ""
+    },
+    "DomainName": {
+      "value": ""
+    },
+    "DomainUser": {
+      "value": ""
+    },
+    "DomainPassword": {
+      "value": ""
+    },
+    "ResourceGroupHP": {
+      "value": ""
+    },
+    "HostPoolName": {
+      "value": ""
+    },
+    "ResourceGroupVMs": {
+      "value": ""
+    },
+    "HostPoolKind": {
+      "value": ""
+    },
+    "HostPoolLBType": {
+      "value": ""
+    },
+    "LogAnalyticsSubId": {
+      "value": ""
+    },
+    "LogAnalyticsRG": {
+      "value": ""
+    },
+    "NumSessionHosts": {
+      "value": 0
+    },
+    "NumUsersPerHost": {
+      "value": 0
+    },
+    "PostDeployScript": {
+      "value": ""
+    },
+    "PostDeployStorName": {
+      "value": ""
+    },
+    "PostDeployStorRG": {
+      "value": ""
+    },
+    "Subnet": {
+      "value": ""
+    },
+    "UpdateWindows": {
+      "value": false
+    },
+    "UserIdentityName": {
+      "value": ""
+    },
+    "StartVmOnConnect": {
+      "value": false
+    },
+    "OUPath": {
+      "value": ""
+    },
+    "VmIndexStart": {
+      "value": 0
+    },
+    "VmPrefix": {
+      "value": ""
+    },
+    "VirtualNetwork": {
+      "value": ""
+    },
+    "VirtualNetworkResourceGroup": {
+      "value": ""
+    },
+    "VmPassword": {
+      "value": ""
+    },
+    "VmSize": {
+      "value": ""
+    },
+    "VmUsername": {
+      "value": ""
+    }
+  }
+}
