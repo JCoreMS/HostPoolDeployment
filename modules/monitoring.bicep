@@ -1,6 +1,6 @@
 param HostPoolName string
 param LogAnalyticsWorkspaceId string
-param LogAnalyticsWorkspaceName string
+param HostPoolWorkspaceName string
 
 var HostPoolLogs = [
   {
@@ -35,10 +35,11 @@ var HostPoolLogs = [
 
 
 resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = {
-  name: LogAnalyticsWorkspaceName
+  name: HostPoolWorkspaceName
 }
 
-resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = if (LogAnalyticsWorkspaceName != 'none') {
+// Name is the same as WVD Insights created to avoid conflict
+resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-preview' = if (HostPoolWorkspaceName != 'none') {
   name: 'WVDInsights'
   scope: workspace
   properties: {

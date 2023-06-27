@@ -187,7 +187,7 @@ module monitoring 'modules/monitoring.bicep' = {
   params: {
     HostPoolName: HostPoolName
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
-    LogAnalyticsWorkspaceName: LogAnalyticsWorkspaceName
+    HostPoolWorkspaceName: HostPoolWorkspaceName
   }
   dependsOn: [
     logAnalyticsWorkspace

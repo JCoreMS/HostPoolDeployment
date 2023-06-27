@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "16718747990787412581"
+      "templateHash": "6324761933592042197"
     }
   },
   "parameters": {
@@ -634,8 +634,8 @@
           "LogAnalyticsWorkspaceId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
           },
-          "LogAnalyticsWorkspaceName": {
-            "value": "[parameters('LogAnalyticsWorkspaceName')]"
+          "HostPoolWorkspaceName": {
+            "value": "[parameters('HostPoolWorkspaceName')]"
           }
         },
         "template": {
@@ -645,7 +645,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "5345460199289141040"
+              "templateHash": "7521791272494911789"
             }
           },
           "parameters": {
@@ -655,7 +655,7 @@
             "LogAnalyticsWorkspaceId": {
               "type": "string"
             },
-            "LogAnalyticsWorkspaceName": {
+            "HostPoolWorkspaceName": {
               "type": "string"
             }
           },
@@ -693,10 +693,10 @@
           },
           "resources": [
             {
-              "condition": "[not(equals(parameters('LogAnalyticsWorkspaceName'), 'none'))]",
+              "condition": "[not(equals(parameters('HostPoolWorkspaceName'), 'none'))]",
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2017-05-01-preview",
-              "scope": "[format('Microsoft.DesktopVirtualization/workspaces/{0}', parameters('LogAnalyticsWorkspaceName'))]",
+              "scope": "[format('Microsoft.DesktopVirtualization/workspaces/{0}', parameters('HostPoolWorkspaceName'))]",
               "name": "WVDInsights",
               "properties": {
                 "logs": [
