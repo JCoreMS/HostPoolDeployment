@@ -8,7 +8,7 @@ param DiskSku string
 param DomainName string
 param HostPoolName string
 param HostPoolType string
-param WorkspaceName string
+param HostPoolWorkspaceName string
 param Location string
 param NumUsersPerHost int
 param Tags object
@@ -53,8 +53,8 @@ resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-04-01-
   }
 }
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = if(WorkspaceName != 'none') {
-  name: WorkspaceName
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = if(HostPoolWorkspaceName != 'none') {
+  name: HostPoolWorkspaceName
   location: Location
   tags: Tags
   properties: {

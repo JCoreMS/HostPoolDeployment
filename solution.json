@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "13515785564267864693"
+      "templateHash": "16718747990787412581"
     }
   },
   "parameters": {
@@ -478,7 +478,7 @@
           "VmSize": {
             "value": "[parameters('VmSize')]"
           },
-          "WorkspaceName": {
+          "HostPoolWorkspaceName": {
             "value": "[parameters('HostPoolWorkspaceName')]"
           }
         },
@@ -489,7 +489,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "14276752257023205441"
+              "templateHash": "16882998287849224101"
             }
           },
           "parameters": {
@@ -514,7 +514,7 @@
             "HostPoolType": {
               "type": "string"
             },
-            "WorkspaceName": {
+            "HostPoolWorkspaceName": {
               "type": "string"
             },
             "Location": {
@@ -584,10 +584,10 @@
               ]
             },
             {
-              "condition": "[not(equals(parameters('WorkspaceName'), 'none'))]",
+              "condition": "[not(equals(parameters('HostPoolWorkspaceName'), 'none'))]",
               "type": "Microsoft.DesktopVirtualization/workspaces",
               "apiVersion": "2022-04-01-preview",
-              "name": "[parameters('WorkspaceName')]",
+              "name": "[parameters('HostPoolWorkspaceName')]",
               "location": "[parameters('Location')]",
               "tags": "[parameters('Tags')]",
               "properties": {
@@ -634,7 +634,7 @@
           "LogAnalyticsWorkspaceId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
           },
-          "WorkspaceName": {
+          "LogAnalyticsWorkspaceName": {
             "value": "[parameters('LogAnalyticsWorkspaceName')]"
           }
         },
@@ -645,7 +645,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "16683374849567753950"
+              "templateHash": "5345460199289141040"
             }
           },
           "parameters": {
@@ -655,7 +655,7 @@
             "LogAnalyticsWorkspaceId": {
               "type": "string"
             },
-            "WorkspaceName": {
+            "LogAnalyticsWorkspaceName": {
               "type": "string"
             }
           },
@@ -693,11 +693,11 @@
           },
           "resources": [
             {
-              "condition": "[not(equals(parameters('WorkspaceName'), 'none'))]",
+              "condition": "[not(equals(parameters('LogAnalyticsWorkspaceName'), 'none'))]",
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2017-05-01-preview",
-              "scope": "[format('Microsoft.DesktopVirtualization/workspaces/{0}', parameters('WorkspaceName'))]",
-              "name": "[format('diag-{0}', parameters('WorkspaceName'))]",
+              "scope": "[format('Microsoft.DesktopVirtualization/workspaces/{0}', parameters('LogAnalyticsWorkspaceName'))]",
+              "name": "WVDInsights",
               "properties": {
                 "logs": [
                   {
@@ -724,7 +724,7 @@
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2021-05-01-preview",
               "scope": "[format('Microsoft.DesktopVirtualization/hostPools/{0}', parameters('HostPoolName'))]",
-              "name": "[format('diag-{0}', parameters('HostPoolName'))]",
+              "name": "WVDInsights",
               "properties": {
                 "logs": "[variables('HostPoolLogs')]",
                 "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"

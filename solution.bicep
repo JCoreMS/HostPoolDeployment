@@ -172,7 +172,7 @@ module hostPool 'modules/hostpool.bicep' = {
     ValidationEnvironment: ValidationEnvironment
     VmPrefix: VmPrefix
     VmSize: VmSize
-    WorkspaceName: HostPoolWorkspaceName
+    HostPoolWorkspaceName: HostPoolWorkspaceName
   }
   dependsOn: [
     resourceGroupHP
@@ -187,7 +187,7 @@ module monitoring 'modules/monitoring.bicep' = {
   params: {
     HostPoolName: HostPoolName
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
-    WorkspaceName: LogAnalyticsWorkspaceName
+    LogAnalyticsWorkspaceName: LogAnalyticsWorkspaceName
   }
   dependsOn: [
     logAnalyticsWorkspace
