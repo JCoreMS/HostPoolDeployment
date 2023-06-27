@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "6324761933592042197"
+      "templateHash": "49131930996436283"
     }
   },
   "parameters": {
@@ -263,7 +263,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "13190095839665023147"
+              "templateHash": "1346019163777877557"
             }
           },
           "parameters": {
@@ -304,9 +304,6 @@
                   "PostDeployStorName": {
                     "value": "[parameters('PostDeployStorName')]"
                   },
-                  "PostDeployStorRG": {
-                    "value": "[parameters('PostDeployStorRG')]"
-                  },
                   "UserIdentityName": {
                     "value": "[parameters('UserIdentityName')]"
                   },
@@ -324,14 +321,11 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.18.4.5664",
-                      "templateHash": "9802514349294321509"
+                      "templateHash": "18208384504502530241"
                     }
                   },
                   "parameters": {
                     "PostDeployStorName": {
-                      "type": "string"
-                    },
-                    "PostDeployStorRG": {
                       "type": "string"
                     },
                     "RoleAssignments": {
@@ -353,7 +347,7 @@
                       "type": "Microsoft.Authorization/roleAssignments",
                       "apiVersion": "2022-04-01",
                       "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('PostDeployStorName'))]",
-                      "name": "[guid(parameters('PostDeployStorName'), items(parameters('RoleAssignments'))[copyIndex()].value.Name, parameters('PostDeployStorRG'))]",
+                      "name": "[guid(subscription().id, parameters('UserIdentityPrincipalId'), items(parameters('RoleAssignments'))[copyIndex()].value.GUID)]",
                       "properties": {
                         "description": "[format('Provides User Identity {0} read access for post deployment scripts.', parameters('UserIdentityName'))]",
                         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', items(parameters('RoleAssignments'))[copyIndex()].value.GUID)]",
