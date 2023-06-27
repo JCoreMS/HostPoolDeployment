@@ -53,7 +53,7 @@ resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-04-01-
   }
 }
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = if(WorkspaceName != 'none') {
   name: WorkspaceName
   location: Location
   tags: Tags

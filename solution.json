@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.17.1.54307",
-      "templateHash": "12965069931017131330"
+      "version": "0.18.4.5664",
+      "templateHash": "13515785564267864693"
     }
   },
   "parameters": {
@@ -61,6 +61,10 @@
     "HostPoolName": {
       "type": "string"
     },
+    "HostPoolWorkspaceName": {
+      "type": "string",
+      "defaultValue": "none"
+    },
     "ResourceGroupVMs": {
       "type": "string"
     },
@@ -85,10 +89,6 @@
         "Automatic",
         "Direct"
       ]
-    },
-    "WorkspaceName": {
-      "type": "string",
-      "defaultValue": "none"
     },
     "Location": {
       "type": "string",
@@ -262,8 +262,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "17766928518179058869"
+              "version": "0.18.4.5664",
+              "templateHash": "13190095839665023147"
             }
           },
           "parameters": {
@@ -323,8 +323,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.17.1.54307",
-                      "templateHash": "1736797033326895001"
+                      "version": "0.18.4.5664",
+                      "templateHash": "9802514349294321509"
                     }
                   },
                   "parameters": {
@@ -403,8 +403,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "9786688280559185175"
+              "version": "0.18.4.5664",
+              "templateHash": "10731590578486752352"
             }
           },
           "parameters": {
@@ -479,7 +479,7 @@
             "value": "[parameters('VmSize')]"
           },
           "WorkspaceName": {
-            "value": "[parameters('WorkspaceName')]"
+            "value": "[parameters('HostPoolWorkspaceName')]"
           }
         },
         "template": {
@@ -488,8 +488,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "15592616400424127629"
+              "version": "0.18.4.5664",
+              "templateHash": "14276752257023205441"
             }
           },
           "parameters": {
@@ -584,6 +584,7 @@
               ]
             },
             {
+              "condition": "[not(equals(parameters('WorkspaceName'), 'none'))]",
               "type": "Microsoft.DesktopVirtualization/workspaces",
               "apiVersion": "2022-04-01-preview",
               "name": "[parameters('WorkspaceName')]",
@@ -634,7 +635,7 @@
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
           },
           "WorkspaceName": {
-            "value": "[parameters('WorkspaceName')]"
+            "value": "[parameters('LogAnalyticsWorkspaceName')]"
           }
         },
         "template": {
@@ -643,8 +644,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "2479181005303214743"
+              "version": "0.18.4.5664",
+              "templateHash": "16683374849567753950"
             }
           },
           "parameters": {
@@ -846,8 +847,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.17.1.54307",
-              "templateHash": "4456534122623406526"
+              "version": "0.18.4.5664",
+              "templateHash": "4777826134281364155"
             }
           },
           "parameters": {

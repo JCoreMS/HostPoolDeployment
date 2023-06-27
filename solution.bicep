@@ -31,6 +31,7 @@ param DomainPassword string
 
 param ResourceGroupHP string
 param HostPoolName string
+param HostPoolWorkspaceName string = 'none'
 
 param ResourceGroupVMs string
 
@@ -50,7 +51,6 @@ param HostPoolKind string
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
 param HostPoolLBType string
 
-param WorkspaceName string = 'none'
 param Location string = deployment().location
 param LogAnalyticsWorkspaceName string = ''
 param LogAnalyticsSubId string
@@ -172,7 +172,7 @@ module hostPool 'modules/hostpool.bicep' = {
     ValidationEnvironment: ValidationEnvironment
     VmPrefix: VmPrefix
     VmSize: VmSize
-    WorkspaceName: WorkspaceName
+    WorkspaceName: HostPoolWorkspaceName
   }
   dependsOn: [
     resourceGroupHP
@@ -187,7 +187,7 @@ module monitoring 'modules/monitoring.bicep' = {
   params: {
     HostPoolName: HostPoolName
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
-    WorkspaceName: WorkspaceName
+    WorkspaceName: LogAnalyticsWorkspaceName
   }
   dependsOn: [
     logAnalyticsWorkspace
