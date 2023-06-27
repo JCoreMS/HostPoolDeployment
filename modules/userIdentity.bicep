@@ -18,7 +18,6 @@ module roleAssign 'usrId_RoleAssign.bicep' = {
   scope: resourceGroup(PostDeployStorRG)
   params: {
     PostDeployStorName: PostDeployStorName
-    PostDeployStorRG: PostDeployStorRG
     UserIdentityName: UserIdentityName
     RoleAssignments: RoleAssignments
     UserIdentityPrincipalId: userIdentityCreate.properties.principalId
