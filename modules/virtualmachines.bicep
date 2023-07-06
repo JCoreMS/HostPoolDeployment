@@ -77,7 +77,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
       vmSize: VmSize
     }
     storageProfile: {
-      imageReference: useSharedImage ? {id: ComputeGalleryImageId} : marketPlaceGalleryWindows
+      imageReference: {id: ComputeGalleryImageId}
       osDisk: {
         name: 'osDisk-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
         osType: 'Windows'
@@ -227,3 +227,6 @@ output HyperVGen string = HyperVGen
 output Architecture string = Architecture
 output ComputeGalProp object = ComputeGalleryProperties
 output SecurityFeatureValue string = SecurityFeature
+output useSharedImage bool = useSharedImage
+output ComputeGalleryImageId string = ComputeGalleryImageId
+output marketPlaceGalleryWindows object = marketPlaceGalleryWindows
