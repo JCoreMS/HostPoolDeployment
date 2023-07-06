@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "5113482545022339157"
+      "templateHash": "17616057099981065467"
     }
   },
   "parameters": {
@@ -956,7 +956,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "15770500525172876733"
+              "templateHash": "13074954671948972603"
             }
           },
           "parameters": {
@@ -1112,7 +1112,7 @@
                   "vmSize": "[parameters('VmSize')]"
                 },
                 "storageProfile": {
-                  "imageReference": "[if(parameters('useSharedImage'), json(format('{{''id'': ''{0}''}}', parameters('ComputeGalleryImageId'))), parameters('marketPlaceGalleryWindows'))]",
+                  "imageReference": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('marketPlaceGalleryWindows'))]",
                   "osDisk": {
                     "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
                     "osType": "Windows",

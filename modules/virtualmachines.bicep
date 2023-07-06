@@ -77,7 +77,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
       vmSize: VmSize
     }
     storageProfile: {
-      imageReference: useSharedImage ? json('{\'id\': \'${ComputeGalleryImageId}\'}') : marketPlaceGalleryWindows
+      imageReference: useSharedImage ? {id: ComputeGalleryImageId} : marketPlaceGalleryWindows
       osDisk: {
         name: 'osDisk-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
         osType: 'Windows'
