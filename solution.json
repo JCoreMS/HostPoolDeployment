@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "9284025276643003392"
+      "templateHash": "2817932165369220228"
     }
   },
   "parameters": {
@@ -862,7 +862,7 @@
             "value": "[variables('varAvdAgentPackageLocation')]"
           },
           "ComputeGalleryImageId": {
-            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1])]"
+            "value": "[format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))]"
           },
           "ComputeGalleryProperties": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')]"
@@ -956,7 +956,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "13557481469113065407"
+              "templateHash": "1493123775655981109"
             }
           },
           "parameters": {
@@ -1112,9 +1112,7 @@
                   "vmSize": "[parameters('VmSize')]"
                 },
                 "storageProfile": {
-                  "imageReference": {
-                    "id": "[parameters('ComputeGalleryImageId')]"
-                  },
+                  "imageReference": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('marketPlaceGalleryWindows'))]",
                   "osDisk": {
                     "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
                     "osType": "Windows",

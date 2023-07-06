@@ -299,7 +299,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   scope: resourceGroup(DeployVMsTo)
   params: {
     AgentPackageLocation: varAvdAgentPackageLocation
-    ComputeGalleryImageId: '${computeGalleryImage.id}/versions/latest'}
+    ComputeGalleryImageId: '${computeGalleryImage.id}/versions/latest'
     ComputeGalleryProperties: computeGalleryImage.properties
     DomainUser: DomainUser
     DomainPassword: DomainPassword
