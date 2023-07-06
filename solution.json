@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "49131930996436283"
+      "templateHash": "7544043065663217054"
     }
   },
   "parameters": {
@@ -17,6 +17,23 @@
       "allowedValues": [
         "Desktop",
         "RailApplications"
+      ]
+    },
+    "avdOsImage": {
+      "type": "string",
+      "defaultValue": "win11_22h2",
+      "metadata": {
+        "description": "Optional. AVD OS image SKU. (Default: win11-21h2)"
+      },
+      "allowedValues": [
+        "win10_21h2",
+        "win10_21h2_office",
+        "win10_22h2_g2",
+        "win10_22h2_office_g2",
+        "win11_21h2",
+        "win11_21h2_office",
+        "win11_22h2",
+        "win11_22h2_office"
       ]
     },
     "ComputeGalleryName": {
@@ -150,6 +167,13 @@
     "OUPath": {
       "type": "string"
     },
+    "useSharedImage": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Set to deploy image from Azure Compute Gallery. (Default: false)"
+      }
+    },
     "VmIndexStart": {
       "type": "int",
       "maxValue": 99
@@ -212,6 +236,86 @@
       "ARMRead": {
         "Name": "ARM-Reader",
         "GUID": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+      }
+    },
+    "varMarketPlaceGalleryWindows": {
+      "win10_21h2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "windows-10",
+        "sku": "win10-21h2-avd",
+        "version": "latest"
+      },
+      "win10_21h2_office": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win10-21h2-avd-m365",
+        "version": "latest"
+      },
+      "win10_22h2_g2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "windows-10",
+        "sku": "win10-22h2-avd-g2",
+        "version": "latest"
+      },
+      "win10_22h2_office_g2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win10-21h2-avd-m365-g2",
+        "version": "latest"
+      },
+      "win11_21h2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "Windows-11",
+        "sku": "win11-21h2-avd",
+        "version": "latest"
+      },
+      "win11_21h2_office": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win11-21h2-avd-m365",
+        "version": "latest"
+      },
+      "win11_22h2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "Windows-11",
+        "sku": "win11-22h2-avd",
+        "version": "latest"
+      },
+      "win11_22h2_office": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win11-22h2-avd-m365",
+        "version": "latest"
+      },
+      "winServer_2022_Datacenter": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter",
+        "version": "latest"
+      },
+      "winServer_2019_Datacenter": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2019-datacenter",
+        "version": "latest"
+      },
+      "winServer_2022_datacenter_core": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter-core",
+        "version": "latest"
+      },
+      "winServer_2022_datacenter_azure_edition_core": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter-azure-edition-core",
+        "version": "latest"
+      },
+      "winServer_2022_Datacenter_core_smalldisk_g2": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter-core-smalldisk-g2",
+        "version": "latest"
       }
     }
   },
@@ -786,6 +890,9 @@
           "NumSessionHosts": {
             "value": "[parameters('NumSessionHosts')]"
           },
+          "marketPlaceGalleryWindows": {
+            "value": "[variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]]"
+          },
           "PostDeployEndpoint": {
             "value": "[parameters('PostDeployEndpoint')]"
           },
@@ -806,6 +913,9 @@
           },
           "UpdateWindows": {
             "value": "[parameters('UpdateWindows')]"
+          },
+          "useSharedImage": {
+            "value": "[parameters('useSharedImage')]"
           },
           "UserIdentityResId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value]"
@@ -842,7 +952,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "4777826134281364155"
+              "templateHash": "13074954671948972603"
             }
           },
           "parameters": {
@@ -879,6 +989,12 @@
             "NumSessionHosts": {
               "type": "int"
             },
+            "marketPlaceGalleryWindows": {
+              "type": "object",
+              "metadata": {
+                "description": "Market Place OS image."
+              }
+            },
             "PostDeployEndpoint": {
               "type": "string"
             },
@@ -899,6 +1015,12 @@
             },
             "UpdateWindows": {
               "type": "bool"
+            },
+            "useSharedImage": {
+              "type": "bool",
+              "metadata": {
+                "description": "Optional. Set to deploy image from Azure Compute Gallery. (Default: false)"
+              }
             },
             "UserIdentityResId": {
               "type": "string"
@@ -986,9 +1108,7 @@
                   "vmSize": "[parameters('VmSize')]"
                 },
                 "storageProfile": {
-                  "imageReference": {
-                    "id": "[parameters('ComputeGalleryImageId')]"
-                  },
+                  "imageReference": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('marketPlaceGalleryWindows'))]",
                   "osDisk": {
                     "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
                     "osType": "Windows",

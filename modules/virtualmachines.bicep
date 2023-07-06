@@ -12,6 +12,8 @@ param HostPoolRegistrationToken string
 param Location string
 param LogAnalyticsWorkspaceId string
 param NumSessionHosts int
+@description('Market Place OS image.')
+param marketPlaceGalleryWindows object
 param PostDeployEndpoint string
 param PostDeployScript string
 param Restart bool
@@ -19,6 +21,8 @@ param Subnet string
 param Tags object
 param Timestamp string
 param UpdateWindows bool
+@description('Optional. Set to deploy image from Azure Compute Gallery. (Default: false)')
+param useSharedImage bool
 param UserIdentityResId string
 param UserIdentityObjId string
 param OUPath string
@@ -73,9 +77,9 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
       vmSize: VmSize
     }
     storageProfile: {
-      imageReference: {
+      imageReference: useSharedImage ? {
         id: ComputeGalleryImageId
-      }
+      } : marketPlaceGalleryWindows
       osDisk: {
         name: 'osDisk-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
         osType: 'Windows'
