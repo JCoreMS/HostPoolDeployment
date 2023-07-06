@@ -21,10 +21,10 @@ param AppGroupType string
 @description('Optional. AVD OS image SKU. (Default: win11-21h2)')
 param avdOsImage string = 'win11_22h2'
 
-param ComputeGalleryName string
-param ComputeGallerySubId string
-param ComputeGalleryRG string
-param ComputeGalleryImage string
+param ComputeGalleryName string = 'none'
+param ComputeGallerySubId string = 'none'
+param ComputeGalleryRG string = 'none'
+param ComputeGalleryImage string = 'none'
 
 param CustomRdpProperty string
 
@@ -225,7 +225,7 @@ resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (
   location: !empty(Location) ? Location : 'none'
 }
 
-resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing = {
+resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing = if(ComputeGalleryName != 'none') {
   name: '${ComputeGalleryName}/${ComputeGalleryImage}'
   scope: resourceGroup(ComputeGallerySubId, ComputeGalleryRG) //scope to alternate subscription
 }
