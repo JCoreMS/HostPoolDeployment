@@ -35,9 +35,6 @@ param VmUsername string
 @secure()
 param VmPassword string
 
-var ComputerGalleryImage = {
-  id: '${ComputeGalleryImageId}/versions/latest}'
-}
 var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
 var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
@@ -80,7 +77,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
       vmSize: VmSize
     }
     storageProfile: {
-      imageReference: useSharedImage ? ComputerGalleryImage : marketPlaceGalleryWindows
+      imageReference: useSharedImage ? json('{\'id\': \'${ComputeGalleryImageId}\'}') : marketPlaceGalleryWindows
       osDisk: {
         name: 'osDisk-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
         osType: 'Windows'

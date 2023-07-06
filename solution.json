@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "11589731945101183823"
+      "templateHash": "5113482545022339157"
     }
   },
   "parameters": {
@@ -956,7 +956,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "13086799137535970808"
+              "templateHash": "15770500525172876733"
             }
           },
           "parameters": {
@@ -1058,9 +1058,6 @@
             }
           },
           "variables": {
-            "ComputerGalleryImage": {
-              "id": "[format('{0}/versions/latest}}', parameters('ComputeGalleryImageId'))]"
-            },
             "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
             "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
             "SecurityFeature": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]"
@@ -1115,7 +1112,7 @@
                   "vmSize": "[parameters('VmSize')]"
                 },
                 "storageProfile": {
-                  "imageReference": "[if(parameters('useSharedImage'), variables('ComputerGalleryImage'), parameters('marketPlaceGalleryWindows'))]",
+                  "imageReference": "[if(parameters('useSharedImage'), json(format('{{''id'': ''{0}''}}', parameters('ComputeGalleryImageId'))), parameters('marketPlaceGalleryWindows'))]",
                   "osDisk": {
                     "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
                     "osType": "Windows",
