@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "7544043065663217054"
+      "templateHash": "3744190406442931662"
     }
   },
   "parameters": {
@@ -37,16 +37,20 @@
       ]
     },
     "ComputeGalleryName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "ComputeGallerySubId": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "ComputeGalleryRG": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "ComputeGalleryImage": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "CustomRdpProperty": {
       "type": "string"
