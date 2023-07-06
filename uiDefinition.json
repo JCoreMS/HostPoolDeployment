@@ -775,13 +775,34 @@
 					"label": "ImageInformation",
 					"elements": [
 						{
+							"name": "ImageSource",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Image Source",
+							"defaultValue": "Microsoft Gallery",
+							"toolTip": "Select whether to use a Microsoft Gallery Image or your own Compute Gallery Image.",
+							"constraints": {
+								"required": false,
+								"allowedValues": [
+									{
+										"label": "Microsoft Gallery",
+										"value": "MSGallery"
+									},
+									{
+										"label": "Compute Gallery",
+										"value": "ComputeGallery"
+									}
+								]
+							},
+							"visible": true
+						},
+						{
 							"name": "computeGallerySelection",
 							"type": "Microsoft.Solutions.ResourceSelector",
-							"visible": true,
+							"visible": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
 							"label": "Azure Compute Gallery Selection",
 							"resourceType": "Microsoft.Compute/galleries",
 							"constraints": {
-								"required": true
+								"required": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]"
 							}
 						},
 						{
@@ -795,13 +816,13 @@
 						{
 							"name": "imageSelection",
 							"type": "Microsoft.Common.DropDown",
-							"visible": true,
+							"visible": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
 							"label": "Gallery Image",
 							"defaultValue": "",
 							"toolTip": "Select an existing Image Definition to use as a source.",
 							"constraints": {
 								"allowedValues": "[map(steps('imageInfo').computeGalleryApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
-								"required": true
+								"required": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]"
 							}
 						},
 						{
@@ -810,6 +831,52 @@
 							"request": {
 								"method": "GET",
 								"path": "[concat(steps('imageInfo').computeGallerySelection.id,'/images/versions?api-version=2021-10-01')]"
+							}
+						},
+						{
+							"name": "sessionHostsOsImage",
+							"type": "Microsoft.Common.DropDown",
+							"visible": "[if(equals(steps('imageInfo').ImageSource, 'MSGallery'), true, false)]",
+							"label": "OS version",
+							"filter": true,
+							"defaultValue": "Windows 11 22H2 (Gen2)",
+							"toolTip": "Select the operating system version of the session hosts.",
+							"constraints": {
+								"required": "[if(equals(steps('imageInfo').ImageSource, 'MSGallery'), true, false)]",
+								"allowedValues": [
+									{
+										"label": "Windows 10 21H2",
+										"value": "win10_21h2"
+									},
+									{
+										"label": "Windows 10 21H2 - Office 365",
+										"value": "win10_21h2_office"
+									},
+									{
+										"label": "Windows 10 22H2 (Gen2)",
+										"value": "win10_22h2_g2"
+									},
+									{
+										"label": "Windows 10 22H2 - Office 365 (Gen2)",
+										"value": "win10_22h2_office_g2"
+									},
+									{
+										"label": "Windows 11",
+										"value": "win11_21h2"
+									},
+									{
+										"label": "Windows 11 - Office 365",
+										"value": "win11_21h2_office"
+									},
+									{
+										"label": "Windows 11 22H2 (Gen2)",
+										"value": "win11_22h2"
+									},
+									{
+										"label": "Windows 11 22H2 - Office 365 (Gen2)",
+										"value": "win11_22h2_office"
+									}
+								]
 							}
 						}
 					]
@@ -820,6 +887,7 @@
 			"parameters": {
 				"AppGroupName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').AppGroupName, steps('hostPool').hostPoolSelection.name)]",
 				"AppGroupType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
+				"avdOsImage": "[if(equals(steps('imageInfo').imageSelection, false), steps('imageInfo').sessionHostsOsImage, 'win11_22h2')]",
 				"ComputeGalleryName": "[steps('imageInfo').computeGallerySelection.name]",
 				"ComputeGallerySubId": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),2))]",
 				"ComputeGalleryRG": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),4))]",
@@ -849,6 +917,7 @@
 				"Subnet": "[steps('networking').subnet]",
 				"Tags": "[steps('basics').Tags]",
 				"UpdateWindows": "[steps('hostInfo').vmInformation.UpdateWindows]",
+				"useSharedImage": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
 				"StartVmOnConnect": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').StartVmOnConnect, steps('hostPool').hostPoolApi.properties.startVMOnConnect)]",
 				"UserIdentityName": "[steps('basics').UserIdentityName]",
 				"OUPath": "[steps('hostInfo').domainInformation.OUPath]",

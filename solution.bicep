@@ -8,6 +8,19 @@ param AppGroupName string
 ])
 param AppGroupType string
 
+@allowed([
+  'win10_21h2'
+  'win10_21h2_office'
+  'win10_22h2_g2'
+  'win10_22h2_office_g2'
+  'win11_21h2'
+  'win11_21h2_office'
+  'win11_22h2'
+  'win11_22h2_office'
+])
+@description('Optional. AVD OS image SKU. (Default: win11-21h2)')
+param avdOsImage string = 'win11_22h2'
+
 param ComputeGalleryName string
 param ComputeGallerySubId string
 param ComputeGalleryRG string
@@ -70,6 +83,9 @@ param UserIdentityName string
 param StartVmOnConnect bool
 param OUPath string
 
+@description('Optional. Set to deploy image from Azure Compute Gallery. (Default: false)')
+param useSharedImage bool = false
+
 @maxValue(99)
 param VmIndexStart int
 
@@ -115,6 +131,87 @@ var RoleAssignments = {
   ARMRead: {
     Name: 'ARM-Reader'
     GUID: 'acdd72a7-3385-48ef-bd42-f606fba81ae7' //View all resources, but does not allow you to make any changes
+  }
+}
+
+var varMarketPlaceGalleryWindows = {
+  win10_21h2: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'windows-10'
+      sku: 'win10-21h2-avd'
+      version: 'latest'
+  }
+  win10_21h2_office: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'office-365'
+      sku: 'win10-21h2-avd-m365'
+      version: 'latest'
+  }
+  win10_22h2_g2: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'windows-10'
+      sku: 'win10-22h2-avd-g2'
+      version: 'latest'
+  }
+  win10_22h2_office_g2: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'office-365'
+      sku: 'win10-21h2-avd-m365-g2'
+      version: 'latest'
+  }
+  win11_21h2: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'Windows-11'
+      sku: 'win11-21h2-avd'
+      version: 'latest'
+  }
+  win11_21h2_office: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'office-365'
+      sku: 'win11-21h2-avd-m365'
+      version: 'latest'
+  }
+  win11_22h2: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'Windows-11'
+      sku: 'win11-22h2-avd'
+      version: 'latest'
+  }
+  win11_22h2_office: {
+      publisher: 'MicrosoftWindowsDesktop'
+      offer: 'office-365'
+      sku: 'win11-22h2-avd-m365'
+      version: 'latest'
+  }
+  winServer_2022_Datacenter: {
+      publisher: 'MicrosoftWindowsServer'
+      offer: 'WindowsServer'
+      sku: '2022-datacenter'
+      version: 'latest'
+  }
+  winServer_2019_Datacenter: {
+      publisher: 'MicrosoftWindowsServer'
+      offer: 'WindowsServer'
+      sku: '2019-datacenter'
+      version: 'latest'
+  }
+  winServer_2022_datacenter_core: {
+      publisher: 'MicrosoftWindowsServer'
+      offer: 'WindowsServer'
+      sku: '2022-datacenter-core'
+      version: 'latest'
+  }
+  winServer_2022_datacenter_azure_edition_core: {
+      publisher: 'MicrosoftWindowsServer'
+      offer: 'WindowsServer'
+      sku: '2022-datacenter-azure-edition-core'
+      version: 'latest'
+  }
+  winServer_2022_Datacenter_core_smalldisk_g2: {
+      publisher: 'MicrosoftWindowsServer'
+      offer: 'WindowsServer'
+      sku: '2022-datacenter-core-smalldisk-g2'
+      version: 'latest'
   }
 }
 
@@ -213,6 +310,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
+    marketPlaceGalleryWindows: varMarketPlaceGalleryWindows[avdOsImage]
     PostDeployEndpoint: PostDeployEndpoint
     PostDeployScript: PostDeployScript
     Restart: Restart
@@ -220,6 +318,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Tags: Tags
     Timestamp: Timestamp
     UpdateWindows: UpdateWindows
+    useSharedImage: useSharedImage
     UserIdentityResId: userIdentity.outputs.userIdentityResId
     UserIdentityObjId: userIdentity.outputs.userIdentityObjId
     VirtualNetwork: VirtualNetwork
