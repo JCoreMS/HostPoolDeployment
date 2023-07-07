@@ -294,7 +294,7 @@ module monitoring 'modules/monitoring.bicep' = {
 }
 
 @batchSize(1)
-module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
+module virtualMachines 'modules/test.bicep' = [for i in range(1, SessionHostBatchCount): {
   name: 'linked_VirtualMachines_${i - 1}_${guid(Timestamp)}'
   scope: resourceGroup(DeployVMsTo)
   params: {
