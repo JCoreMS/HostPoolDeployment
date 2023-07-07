@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "2817932165369220228"
+      "templateHash": "17614557270015117923"
     }
   },
   "parameters": {
@@ -861,9 +861,7 @@
           "AgentPackageLocation": {
             "value": "[variables('varAvdAgentPackageLocation')]"
           },
-          "ComputeGalleryImageId": {
-            "value": "[format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))]"
-          },
+          "ComputeGalleryImageId": "[if(not(empty(parameters('ComputeGalleryName'))), createObject('value', format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))), createObject('value', 'none'))]",
           "ComputeGalleryProperties": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')]"
           },
@@ -956,7 +954,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.18.4.5664",
-              "templateHash": "1493123775655981109"
+              "templateHash": "13508358041024295031"
             }
           },
           "parameters": {
@@ -1060,7 +1058,8 @@
           "variables": {
             "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
             "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
-            "SecurityFeature": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]"
+            "SecurityFeature": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
+            "imageToUse": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('marketPlaceGalleryWindows'))]"
           },
           "resources": [
             {
@@ -1112,7 +1111,7 @@
                   "vmSize": "[parameters('VmSize')]"
                 },
                 "storageProfile": {
-                  "imageReference": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('marketPlaceGalleryWindows'))]",
+                  "imageReference": "[variables('imageToUse')]",
                   "osDisk": {
                     "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
                     "osType": "Windows",

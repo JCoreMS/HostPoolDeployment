@@ -38,6 +38,7 @@ param VmPassword string
 var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
 var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
+var imageToUse = useSharedImage ? {id: ComputeGalleryImageId} : marketPlaceGalleryWindows
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
@@ -77,9 +78,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' = [for i 
       vmSize: VmSize
     }
     storageProfile: {
-      imageReference: useSharedImage ? {
-        id: ComputeGalleryImageId
-      } : marketPlaceGalleryWindows
+      imageReference: imageToUse
       osDisk: {
         name: 'osDisk-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
         osType: 'Windows'
