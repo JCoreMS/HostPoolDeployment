@@ -46,7 +46,7 @@ param ResourceGroupHP string
 param HostPoolName string
 param HostPoolWorkspaceName string = 'none'
 
-param ResourceGroupVMs string
+param ResourceGroupVMs string = ''
 
 @allowed([
   'Pooled'
@@ -310,7 +310,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
-    marketPlaceGalleryWindows: varMarketPlaceGalleryWindows[avdOsImage]
+    marketPlaceGalleryWindows: empty(ComputeGalleryName) ? varMarketPlaceGalleryWindows[avdOsImage] : 'none'
     PostDeployEndpoint: PostDeployEndpoint
     PostDeployScript: PostDeployScript
     Restart: Restart

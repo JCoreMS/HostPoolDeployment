@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.18.4.5664",
-      "templateHash": "17614557270015117923"
+      "templateHash": "12158753353389133036"
     }
   },
   "parameters": {
@@ -87,7 +87,8 @@
       "defaultValue": "none"
     },
     "ResourceGroupVMs": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "HostPoolKind": {
       "type": "string",
@@ -892,9 +893,7 @@
           "NumSessionHosts": {
             "value": "[parameters('NumSessionHosts')]"
           },
-          "marketPlaceGalleryWindows": {
-            "value": "[variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]]"
-          },
+          "marketPlaceGalleryWindows": "[if(empty(parameters('ComputeGalleryName')), createObject('value', variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]), createObject('value', 'none'))]",
           "PostDeployEndpoint": {
             "value": "[parameters('PostDeployEndpoint')]"
           },
