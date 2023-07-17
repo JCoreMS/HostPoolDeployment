@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.18.4.5664",
-      "templateHash": "12158753353389133036"
+      "version": "0.19.5.34762",
+      "templateHash": "7844034175679205773"
     }
   },
   "parameters": {
@@ -371,8 +371,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.18.4.5664",
-              "templateHash": "1346019163777877557"
+              "version": "0.19.5.34762",
+              "templateHash": "14952118657209018171"
             }
           },
           "parameters": {
@@ -429,8 +429,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.18.4.5664",
-                      "templateHash": "18208384504502530241"
+                      "version": "0.19.5.34762",
+                      "templateHash": "10495951730458244041"
                     }
                   },
                   "parameters": {
@@ -506,8 +506,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.18.4.5664",
-              "templateHash": "10731590578486752352"
+              "version": "0.19.5.34762",
+              "templateHash": "4675345650375706925"
             }
           },
           "parameters": {
@@ -591,8 +591,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.18.4.5664",
-              "templateHash": "16882998287849224101"
+              "version": "0.19.5.34762",
+              "templateHash": "16324101705218575869"
             }
           },
           "parameters": {
@@ -747,8 +747,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.18.4.5664",
-              "templateHash": "7521791272494911789"
+              "version": "0.19.5.34762",
+              "templateHash": "5177707212109496032"
             }
           },
           "parameters": {
@@ -952,8 +952,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.18.4.5664",
-              "templateHash": "13508358041024295031"
+              "version": "0.19.5.34762",
+              "templateHash": "8332143699540596595"
             }
           },
           "parameters": {
@@ -1095,7 +1095,7 @@
                 "count": "[length(range(0, parameters('NumSessionHosts')))]"
               },
               "type": "Microsoft.Compute/virtualMachines",
-              "apiVersion": "2023-03-01",
+              "apiVersion": "2022-11-01",
               "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
               "tags": "[parameters('Tags')]",
