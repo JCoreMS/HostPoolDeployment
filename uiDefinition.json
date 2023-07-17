@@ -550,7 +550,7 @@
 									"type": "Microsoft.Common.TextBox",
 									"label": "Vm Index Start",
 									"defaultValue": "",
-									"toolTip": "",
+									"toolTip": "This would be the starting index number for the VM name. For example, if you have VMs with 0-4 and want to start with 5.",
 									"constraints": {
 										"required": true,
 										"regex": "",
