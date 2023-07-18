@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "13281546847096660235"
+      "templateHash": "12007991648472600061"
     }
   },
   "parameters": {
@@ -270,18 +270,6 @@
       }
     },
     "varMarketPlaceGalleryWindows": {
-      "win10_21h2": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "windows-10",
-        "sku": "win10-21h2-avd",
-        "version": "latest"
-      },
-      "win10_21h2_office": {
-        "publisher": "MicrosoftWindowsDesktop",
-        "offer": "office-365",
-        "sku": "win10-21h2-avd-m365",
-        "version": "latest"
-      },
       "win10_22h2_g2": {
         "publisher": "MicrosoftWindowsDesktop",
         "offer": "windows-10",
@@ -322,12 +310,6 @@
         "publisher": "MicrosoftWindowsServer",
         "offer": "WindowsServer",
         "sku": "2022-datacenter",
-        "version": "latest"
-      },
-      "winServer_2019_Datacenter": {
-        "publisher": "MicrosoftWindowsServer",
-        "offer": "WindowsServer",
-        "sku": "2019-datacenter",
         "version": "latest"
       },
       "winServer_2022_datacenter_core": {
@@ -975,7 +957,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.19.5.34762",
-              "templateHash": "4797337340827570948"
+              "templateHash": "6199415478213993063"
             }
           },
           "parameters": {
@@ -1079,7 +1061,7 @@
           "variables": {
             "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
             "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
-            "SecurityType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
+            "SecurityType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'TrustedLaunch')]",
             "imageToUse": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]"
           },
           "resources": [
