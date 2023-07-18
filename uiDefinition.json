@@ -662,6 +662,39 @@
 							"label": "Domain join credentials",
 							"elements": [
 								{
+									"name": "optionDomainCredsKeyvault",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Use Keyvault for Credentials",
+									"defaultValue": true,
+									"toolTip": "Use credentials stored in an existing Keyvault.",
+									"constraints": {
+										"required": false
+									},
+									"visible": true
+								},
+								{
+									"name": "kvDomain",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Select Keyvault",
+									"resourceType": "Microsoft.KeyVault/vaults",
+									"toolTip": "Select Keyvault which contains the secrets for the Domain Credentials.",
+									"constraints": {
+										"required": true
+									},
+									"visible": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
+								},
+								{
+									"name": "kvDomainSecretName",
+									"type": "Microsoft.Common.TextBox",
+									"defaultValue": "DomainAdminPassword",
+									"label": "KeyVault Secret Name (Domain Credential)",
+									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
+									"constratins": {
+										"required": true
+									},
+									"visible": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
+								},
+								{
 									"name": "DomainUser",
 									"type": "Microsoft.Common.TextBox",
 									"label": "Username",
@@ -670,7 +703,8 @@
 									"defaultValue": "",
 									"constraints": {
 										"required": true
-									}
+									},
+									"visible": "[equals(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, false)]"
 								},
 								{
 									"name": "DomainPassword",
@@ -684,7 +718,8 @@
 									},
 									"options": {
 										"hideConfirmation": false
-									}
+									},
+									"visible": "[equals(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, false)]"
 								}
 							]
 						},
@@ -694,6 +729,39 @@
 							"visible": true,
 							"label": "Session host local admin credentials",
 							"elements": [
+								{
+									"name": "optionLocalCredsKeyvault",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Use Keyvault for Credentials",
+									"defaultValue": true,
+									"toolTip": "Use credentials stored in an existing Keyvault.",
+									"constraints": {
+										"required": false
+									},
+									"visible": true
+								},
+								{
+									"name": "kvLocal",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Select Keyvault",
+									"resourceType": "Microsoft.KeyVault/vaults",
+									"toolTip": "Select Keyvault which contains the secrets for the Local Admin Credentials.",
+									"constraints": {
+										"required": true
+									},
+									"visible": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
+								},
+								{
+									"name": "kvLocalSecretName",
+									"type": "Microsoft.Common.TextBox",
+									"defaultValue": "AdminPassword",
+									"label": "KeyVault Secret Name (Local Admin Credential)",
+									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
+									"constratins": {
+										"required": true
+									},
+									"visible": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
+								},
 								{
 									"name": "VmUsername",
 									"type": "Microsoft.Common.TextBox",
@@ -705,12 +773,13 @@
 										"regex": "^(?!.*[aA]dministrator).*$",
 										"validationMessage": "This username can't be used, it is a reserved word.",
 										"required": true
-									}
+									},
+									"visible": "[equals(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, false)]"
 								},
 								{
 									"name": "VmPassword",
 									"type": "Microsoft.Compute.CredentialsCombo",
-									"visible": true,
+									"visible": "[equals(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, false)]",
 									"label": {
 										"password": "Password",
 										"confirmPassword": "Confirm password"
@@ -902,6 +971,12 @@
 				"ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
 				"HostPoolKind": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
 				"HostPoolLBType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), if(equals(steps('hostPool').hostPoolType, 'Pooled'), steps('hostPool').hostPoolPooled.HostPoolBalance, steps('hostPool').hostPoolPersonal.PersonalAssignment), if(equals(steps('hostPool').hostPoolApi.properties.hostPoolType, 'Personal'), steps('hostPool').hostPoolApi.properties.personalDesktopAssignmentType, steps('hostPool').hostPoolApi.properties.loadBalancerType))]",
+				"KeyVaultDomainOption": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]",
+				"KeyVaultLocalOption": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]",
+				"KeyVaultDomain": "[steps('hostInfo').identityDomainCredentials.kvDomain]",
+				"KeyVaultLocal": "[steps('hostInfo').identityLocalCredentials.kvLocal]",
+				"KeyVaultDomSecret": "[steps('hostInfo').identityDomainCredentials.kvDomainSecretName]",
+				"KeyVaultLocSecret": "[steps('hostInfo').identityLocalCredentials.kvLocalSecretName]",
 				"LogAnalyticsRG": "[first(skip(split(steps('monitoring').alaWorkspaceExistingWorkspacesSelection.id, '/'),4))]",
 				"LogAnalyticsSubId": "[first(skip(split(steps('monitoring').alaWorkspaceExistingWorkspacesSelection.id, '/'),2))]",
 				"LogAnalyticsWorkspaceName": "[steps('monitoring').alaWorkspaceExistingWorkspacesSelection.name]",

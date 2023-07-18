@@ -64,6 +64,13 @@ param HostPoolKind string
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
 param HostPoolLBType string
 
+param KeyVaultDomainOption bool
+param KeyVaultLocalOption bool
+param KeyVaultDomain object
+param KeyVaultLocal object
+param KeyVaultDomSecret string
+param KeyVaultLocSecret string
+
 param Location string = deployment().location
 param LogAnalyticsWorkspaceName string = ''
 param LogAnalyticsSubId string
@@ -122,6 +129,11 @@ var SessionHostBatchCount = DivisionRemainderValue > 0 ? DivisionValue + 1 : Div
 var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environment().suffixes.storage}/galleryartifacts/Configuration_09-08-2022.zip'
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
+
+var varKvDomSubId = split(KeyVaultDomain.id, '/')[2]
+var varKvLocSubId = split(KeyVaultLocal.id, '/')[2]
+var varKvDomRg = split(KeyVaultDomain.id, '/')[4]
+var varKvLocRg = split(KeyVaultLocal.id, '/')[4]
 
 var RoleAssignments = {
   BlobDataRead: {
@@ -220,6 +232,16 @@ resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: Location
 }
 
+resource kvDomain 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultDomainOption) {
+  name: KeyVaultDomain.Name
+  scope: resourceGroup(varKvDomSubId, varKvDomRg)
+}
+
+resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultLocalOption) {
+  name: KeyVaultLocal.Name
+  scope: resourceGroup(varKvLocSubId, varKvLocRg)
+}
+
 resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (!empty(ResourceGroupVMs)) {
   name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none'
   location: !empty(Location) ? Location : 'none'
@@ -302,15 +324,15 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     ComputeGalleryImageId: !empty(ComputeGalleryName) ? '${computeGalleryImage.id}/versions/latest' : 'none'
     ComputeGalleryProperties: computeGalleryImage.properties
     DomainUser: DomainUser
-    DomainPassword: DomainPassword
+    DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomSecret) : DomainPassword
     DomainName: DomainName
     HostPoolName: HostPoolName
     HostPoolRegistrationToken: hostPool.outputs.HostPoolRegistrationToken
-    OUPath: OUPath
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
     marketPlaceGalleryWindows: empty(ComputeGalleryName) ? varMarketPlaceGalleryWindows[avdOsImage] : 'none'
+    OUPath: OUPath
     PostDeployEndpoint: PostDeployEndpoint
     PostDeployScript: PostDeployScript
     Restart: Restart
@@ -326,7 +348,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     VmIndexStart: VmIndexStart
     VmSize: VmSize
     VmUsername: VmUsername
-    VmPassword: VmPassword
+    VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocSecret) : VmPassword
     VmPrefix: VmPrefix
   }
   dependsOn: [hostPool]

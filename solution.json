@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "7844034175679205773"
+      "templateHash": "15905696631961938472"
     }
   },
   "parameters": {
@@ -111,6 +111,24 @@
         "Automatic",
         "Direct"
       ]
+    },
+    "KeyVaultDomainOption": {
+      "type": "bool"
+    },
+    "KeyVaultLocalOption": {
+      "type": "bool"
+    },
+    "KeyVaultDomain": {
+      "type": "object"
+    },
+    "KeyVaultLocal": {
+      "type": "object"
+    },
+    "KeyVaultDomSecret": {
+      "type": "string"
+    },
+    "KeyVaultLocSecret": {
+      "type": "string"
     },
     "Location": {
       "type": "string",
@@ -233,6 +251,10 @@
     "varAvdAgentPackageLocation": "[format('https://wvdportalstorageblob.blob.{0}/galleryartifacts/Configuration_09-08-2022.zip', environment().suffixes.storage)]",
     "HostPoolType": "[format('{0} {1}', parameters('HostPoolKind'), parameters('HostPoolLBType'))]",
     "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]",
+    "varKvDomSubId": "[split(parameters('KeyVaultDomain').id, '/')[2]]",
+    "varKvLocSubId": "[split(parameters('KeyVaultLocal').id, '/')[2]]",
+    "varKvDomRg": "[split(parameters('KeyVaultDomain').id, '/')[4]]",
+    "varKvLocRg": "[split(parameters('KeyVaultLocal').id, '/')[4]]",
     "RoleAssignments": {
       "BlobDataRead": {
         "Name": "Blob-Data-Reader",
@@ -869,9 +891,7 @@
           "DomainUser": {
             "value": "[parameters('DomainUser')]"
           },
-          "DomainPassword": {
-            "value": "[parameters('DomainPassword')]"
-          },
+          "DomainPassword": "[if(parameters('KeyVaultDomainOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvDomSubId'), variables('varKvDomRg')), 'Microsoft.KeyVault/vaults', parameters('KeyVaultDomain').Name)), 'secretName', parameters('KeyVaultDomSecret'))), createObject('value', parameters('DomainPassword')))]",
           "DomainName": {
             "value": "[parameters('DomainName')]"
           },
@@ -880,9 +900,6 @@
           },
           "HostPoolRegistrationToken": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value]"
-          },
-          "OUPath": {
-            "value": "[parameters('OUPath')]"
           },
           "Location": {
             "value": "[parameters('Location')]"
@@ -894,6 +911,9 @@
             "value": "[parameters('NumSessionHosts')]"
           },
           "marketPlaceGalleryWindows": "[if(empty(parameters('ComputeGalleryName')), createObject('value', variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]), createObject('value', 'none'))]",
+          "OUPath": {
+            "value": "[parameters('OUPath')]"
+          },
           "PostDeployEndpoint": {
             "value": "[parameters('PostDeployEndpoint')]"
           },
@@ -939,9 +959,7 @@
           "VmUsername": {
             "value": "[parameters('VmUsername')]"
           },
-          "VmPassword": {
-            "value": "[parameters('VmPassword')]"
-          },
+          "VmPassword": "[if(parameters('KeyVaultLocalOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvLocSubId'), variables('varKvLocRg')), 'Microsoft.KeyVault/vaults', parameters('KeyVaultLocal').Name)), 'secretName', parameters('KeyVaultLocSecret'))), createObject('value', parameters('VmPassword')))]",
           "VmPrefix": {
             "value": "[parameters('VmPrefix')]"
           }
