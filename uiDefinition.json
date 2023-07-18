@@ -965,7 +965,7 @@
 				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
 				"DomainName": "[steps('hostInfo').domainInformation.DomainName]",
 				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
-				"DomainPassword": "[steps('hostInfo').identityDomainCredentials.DomainPassword]",
+				"DomainPassword": "[if(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityDomainCredentials.DomainPassword)]",
 				"ResourceGroupHP": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)), if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), steps('hostPool').hpRGExisting, steps('hostPool').hpRGNameNew))]",
 				"HostPoolName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
 				"ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
@@ -1001,7 +1001,7 @@
 				"ValidationEnvironment": "[steps('hostPool').ValidationEnvironment]",
 				"VirtualNetwork": "[steps('networking').virtualNetworkSelection.name]",
 				"VirtualNetworkResourceGroup": "[first(skip(split(steps('networking').virtualNetworkSelection.id, '/'),4))]",
-				"VmPassword": "[steps('hostInfo').identityLocalCredentials.VmPassword.password]",
+				"VmPassword": "[if(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityLocalCredentials.VmPassword.password)]",
 				"VmSize": "[steps('hostInfo').vmInformation.VmSize]",
 				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]",
 				"WorkspaceName": "[steps('hostPool').WorkspaceName]"

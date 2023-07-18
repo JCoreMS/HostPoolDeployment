@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "14404934108525425236"
+      "templateHash": "4462025091823798394"
     }
   },
   "parameters": {
@@ -74,8 +74,7 @@
       "type": "string"
     },
     "DomainPassword": {
-      "type": "securestring",
-      "defaultValue": ""
+      "type": "securestring"
     },
     "ResourceGroupHP": {
       "type": "string"
@@ -120,16 +119,20 @@
       "type": "bool"
     },
     "KeyVaultDomain": {
-      "type": "object"
+      "type": "object",
+      "defaultValue": {}
     },
     "KeyVaultLocal": {
-      "type": "object"
+      "type": "object",
+      "defaultValue": {}
     },
     "KeyVaultDomSecret": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "KeyVaultLocSecret": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "Location": {
       "type": "string",
@@ -227,7 +230,6 @@
     },
     "VmPassword": {
       "type": "securestring",
-      "defaultValue": "",
       "metadata": {
         "description": "Local administrator password for the AVD session hosts"
       }
