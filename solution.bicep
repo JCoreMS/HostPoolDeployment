@@ -130,10 +130,10 @@ var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environmen
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
 
-var varKvDomSubId = split(KeyVaultDomain.id, '/')[2]
-var varKvLocSubId = split(KeyVaultLocal.id, '/')[2]
-var varKvDomRg = split(KeyVaultDomain.id, '/')[4]
-var varKvLocRg = split(KeyVaultLocal.id, '/')[4]
+var varKvDomSubId = useSharedImage ? 'none' : split(KeyVaultDomain.id, '/')[2]
+var varKvLocSubId = useSharedImage ? 'none' : split(KeyVaultLocal.id, '/')[2]
+var varKvDomRg = useSharedImage ? 'none' : split(KeyVaultDomain.id, '/')[4]
+var varKvLocRg = useSharedImage ? 'none' : split(KeyVaultLocal.id, '/')[4]
 
 var RoleAssignments = {
   BlobDataRead: {
@@ -313,7 +313,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
-    MarketPlaceGalleryWindows: !useSharedImage ? varMarketPlaceGalleryWindows[avdOsImage] : {}
+    MarketPlaceGalleryWindows: !(useSharedImage) ? varMarketPlaceGalleryWindows[avdOsImage] : {}
     OUPath: OUPath
     PostDeployEndpoint: PostDeployEndpoint
     PostDeployScript: PostDeployScript
