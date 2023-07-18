@@ -1,4 +1,3 @@
-
 param AgentPackageLocation string
 param ComputeGalleryImageId string
 param ComputeGalleryProperties object
@@ -37,8 +36,8 @@ param VmPassword string
 
 var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
-var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
-var imageToUse = useSharedImage ? {id: ComputeGalleryImageId} : MarketPlaceGalleryWindows
+var SecurityType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
+var imageToUse = useSharedImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
@@ -70,7 +69,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${UserIdentityResId}':{}
+      '${UserIdentityResId}': {}
     }
   }
   properties: {
@@ -83,7 +82,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
         offer: 'windows-10'
         sku: 'win10-22h2-avd-g2'
         version: 'latest'
-    }
+      }
       osDisk: {
         name: 'osDisk-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
         osType: 'Windows'
@@ -115,15 +114,15 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
       ]
     }
     securityProfile: {
-      uefiSettings: SecurityFeature == 'Standard' ? null : {
+      uefiSettings: SecurityType == 'Standard' ? null : {
         secureBootEnabled: true
         vTpmEnabled: true
       }
-      securityType: SecurityFeature == 'Standard' ? null : SecurityFeature
+      securityType: SecurityType == 'Standard' ? null : SecurityType
     }
     diagnosticsProfile: {
       bootDiagnostics: {
-        enabled: true
+        enabled: false
       }
     }
     licenseType: 'Windows_Client'
@@ -232,7 +231,6 @@ output RegistrationToken string = HostPoolRegistrationToken
 output HyperVGen string = HyperVGen
 output Architecture string = Architecture
 output ComputeGalProp object = ComputeGalleryProperties
-output SecurityFeatureValue string = SecurityFeature
 output useSharedImage bool = useSharedImage
 output ComputeGalleryImageId string = ComputeGalleryImageId
 output marketPlaceGalleryWindows object = MarketPlaceGalleryWindows

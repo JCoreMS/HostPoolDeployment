@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "10292091456545367765"
+      "templateHash": "13281546847096660235"
     }
   },
   "parameters": {
@@ -975,7 +975,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.19.5.34762",
-              "templateHash": "17953436108754290467"
+              "templateHash": "4797337340827570948"
             }
           },
           "parameters": {
@@ -1079,7 +1079,7 @@
           "variables": {
             "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
             "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
-            "SecurityFeature": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
+            "SecurityType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
             "imageToUse": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]"
           },
           "resources": [
@@ -1169,12 +1169,12 @@
                   ]
                 },
                 "securityProfile": {
-                  "uefiSettings": "[if(equals(variables('SecurityFeature'), 'Standard'), null(), createObject('secureBootEnabled', true(), 'vTpmEnabled', true()))]",
-                  "securityType": "[if(equals(variables('SecurityFeature'), 'Standard'), null(), variables('SecurityFeature'))]"
+                  "uefiSettings": "[if(equals(variables('SecurityType'), 'Standard'), null(), createObject('secureBootEnabled', true(), 'vTpmEnabled', true()))]",
+                  "securityType": "[if(equals(variables('SecurityType'), 'Standard'), null(), variables('SecurityType'))]"
                 },
                 "diagnosticsProfile": {
                   "bootDiagnostics": {
-                    "enabled": true
+                    "enabled": false
                   }
                 },
                 "licenseType": "Windows_Client"
@@ -1317,10 +1317,6 @@
             "ComputeGalProp": {
               "type": "object",
               "value": "[parameters('ComputeGalleryProperties')]"
-            },
-            "SecurityFeatureValue": {
-              "type": "string",
-              "value": "[variables('SecurityFeature')]"
             },
             "useSharedImage": {
               "type": "bool",
