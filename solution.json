@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "15905696631961938472"
+      "templateHash": "14404934108525425236"
     }
   },
   "parameters": {
@@ -74,7 +74,8 @@
       "type": "string"
     },
     "DomainPassword": {
-      "type": "securestring"
+      "type": "securestring",
+      "defaultValue": ""
     },
     "ResourceGroupHP": {
       "type": "string"
@@ -226,6 +227,7 @@
     },
     "VmPassword": {
       "type": "securestring",
+      "defaultValue": "",
       "metadata": {
         "description": "Local administrator password for the AVD session hosts"
       }

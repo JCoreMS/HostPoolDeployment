@@ -662,6 +662,18 @@
 							"label": "Domain join credentials",
 							"elements": [
 								{
+									"name": "DomainUser",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Username",
+									"toolTip": "Provide username with permissions to join session host to the domain.",
+									"placeholder": "Example: avdadmin@contoso.com",
+									"defaultValue": "",
+									"constraints": {
+										"required": true
+									},
+									"visible": true
+								},
+								{
 									"name": "optionDomainCredsKeyvault",
 									"type": "Microsoft.Common.CheckBox",
 									"label": "Use Keyvault for Credentials",
@@ -695,18 +707,6 @@
 									"visible": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
 								},
 								{
-									"name": "DomainUser",
-									"type": "Microsoft.Common.TextBox",
-									"label": "Username",
-									"toolTip": "Provide username with permissions to join session host to the domain.",
-									"placeholder": "Example: avdadmin@contoso.com",
-									"defaultValue": "",
-									"constraints": {
-										"required": true
-									},
-									"visible": true
-								},
-								{
 									"name": "DomainPassword",
 									"type": "Microsoft.Common.PasswordBox",
 									"label": {
@@ -729,6 +729,20 @@
 							"visible": true,
 							"label": "Session host local admin credentials",
 							"elements": [
+								{
+									"name": "VmUsername",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Username",
+									"toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system.",
+									"placeholder": "Example: avdadmin",
+									"defaultValue": "",
+									"constraints": {
+										"regex": "^(?!.*[aA]dministrator).*$",
+										"validationMessage": "This username can't be used, it is a reserved word.",
+										"required": true
+									},
+									"visible": true
+								},
 								{
 									"name": "optionLocalCredsKeyvault",
 									"type": "Microsoft.Common.CheckBox",
@@ -761,20 +775,6 @@
 										"required": true
 									},
 									"visible": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
-								},
-								{
-									"name": "VmUsername",
-									"type": "Microsoft.Common.TextBox",
-									"label": "Username",
-									"toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system.",
-									"placeholder": "Example: avdadmin",
-									"defaultValue": "",
-									"constraints": {
-										"regex": "^(?!.*[aA]dministrator).*$",
-										"validationMessage": "This username can't be used, it is a reserved word.",
-										"required": true
-									},
-									"visible": true
 								},
 								{
 									"name": "VmPassword",

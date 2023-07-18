@@ -40,7 +40,7 @@ param DomainName string
 param DomainUser string
 
 @secure()
-param DomainPassword string
+param DomainPassword string = ''
 
 param ResourceGroupHP string
 param HostPoolName string
@@ -110,7 +110,7 @@ param VirtualNetworkResourceGroup string
 
 @secure()
 @description('Local administrator password for the AVD session hosts')
-param VmPassword string
+param VmPassword string = ''
 
 @description('The VM SKU for the AVD session hosts.')
 param VmSize string
