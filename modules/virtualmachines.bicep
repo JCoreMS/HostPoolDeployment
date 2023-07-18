@@ -37,6 +37,13 @@ param VmPassword string
 var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
 var SecurityType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'TrustedLaunch'
+var securityProfileJson = {
+  uefiSettings: {
+    secureBootEnabled: true
+    vTpmEnabled: true
+  }
+  securityType: SecurityType
+}
 var imageToUse = useSharedImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
@@ -113,13 +120,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
         }
       ]
     }
-    securityProfile: {
-      uefiSettings: SecurityType == 'Standard' ? null : {
-        secureBootEnabled: true
-        vTpmEnabled: true
-      }
-      securityType: SecurityType == 'Standard' ? null : SecurityType
-    }
+    securityProfile: ((SecurityType == 'TrustedLaunch') ? securityProfileJson : null)
     diagnosticsProfile: {
       bootDiagnostics: {
         enabled: false

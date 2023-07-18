@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "12007991648472600061"
+      "templateHash": "4896017861398039851"
     }
   },
   "parameters": {
@@ -957,7 +957,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.19.5.34762",
-              "templateHash": "6199415478213993063"
+              "templateHash": "14969836968969759581"
             }
           },
           "parameters": {
@@ -1062,6 +1062,13 @@
             "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
             "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
             "SecurityType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'TrustedLaunch')]",
+            "securityProfileJson": {
+              "uefiSettings": {
+                "secureBootEnabled": true,
+                "vTpmEnabled": true
+              },
+              "securityType": "[variables('SecurityType')]"
+            },
             "imageToUse": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]"
           },
           "resources": [
@@ -1150,10 +1157,7 @@
                     }
                   ]
                 },
-                "securityProfile": {
-                  "uefiSettings": "[if(equals(variables('SecurityType'), 'Standard'), null(), createObject('secureBootEnabled', true(), 'vTpmEnabled', true()))]",
-                  "securityType": "[if(equals(variables('SecurityType'), 'Standard'), null(), variables('SecurityType'))]"
-                },
+                "securityProfile": "[if(equals(variables('SecurityType'), 'TrustedLaunch'), variables('securityProfileJson'), null())]",
                 "diagnosticsProfile": {
                   "bootDiagnostics": {
                     "enabled": false
