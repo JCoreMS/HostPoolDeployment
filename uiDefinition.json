@@ -704,7 +704,7 @@
 									"constraints": {
 										"required": true
 									},
-									"visible": "[equals(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, false)]"
+									"visible": true
 								},
 								{
 									"name": "DomainPassword",
@@ -774,7 +774,7 @@
 										"validationMessage": "This username can't be used, it is a reserved word.",
 										"required": true
 									},
-									"visible": "[equals(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, false)]"
+									"visible": true
 								},
 								{
 									"name": "VmPassword",
