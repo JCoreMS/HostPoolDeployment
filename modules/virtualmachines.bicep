@@ -13,7 +13,7 @@ param Location string
 param LogAnalyticsWorkspaceId string
 param NumSessionHosts int
 @description('Market Place OS image.')
-param marketPlaceGalleryWindows object
+param MarketPlaceGalleryWindows object
 param PostDeployEndpoint string
 param PostDeployScript string
 param Restart bool
@@ -38,7 +38,7 @@ param VmPassword string
 var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
 var SecurityFeature = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
-var imageToUse = useSharedImage ? {id: ComputeGalleryImageId} : marketPlaceGalleryWindows
+var imageToUse = useSharedImage ? {id: ComputeGalleryImageId} : MarketPlaceGalleryWindows
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
@@ -230,4 +230,4 @@ output ComputeGalProp object = ComputeGalleryProperties
 output SecurityFeatureValue string = SecurityFeature
 output useSharedImage bool = useSharedImage
 output ComputeGalleryImageId string = ComputeGalleryImageId
-output marketPlaceGalleryWindows object = marketPlaceGalleryWindows
+output marketPlaceGalleryWindows object = MarketPlaceGalleryWindows

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "2657839296107617556"
+      "templateHash": "9015285489202855986"
     }
   },
   "parameters": {
@@ -888,7 +888,7 @@
           "AgentPackageLocation": {
             "value": "[variables('varAvdAgentPackageLocation')]"
           },
-          "ComputeGalleryImageId": "[if(not(empty(parameters('ComputeGalleryName'))), createObject('value', format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))), createObject('value', 'none'))]",
+          "ComputeGalleryImageId": "[if(parameters('useSharedImage'), createObject('value', format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))), createObject('value', 'none'))]",
           "ComputeGalleryProperties": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')]"
           },
@@ -914,7 +914,7 @@
           "NumSessionHosts": {
             "value": "[parameters('NumSessionHosts')]"
           },
-          "marketPlaceGalleryWindows": "[if(empty(parameters('ComputeGalleryName')), createObject('value', variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]), createObject('value', createObject()))]",
+          "MarketPlaceGalleryWindows": "[if(not(parameters('useSharedImage')), createObject('value', variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]), createObject('value', createObject()))]",
           "OUPath": {
             "value": "[parameters('OUPath')]"
           },
@@ -1012,7 +1012,7 @@
             "NumSessionHosts": {
               "type": "int"
             },
-            "marketPlaceGalleryWindows": {
+            "MarketPlaceGalleryWindows": {
               "type": "object",
               "metadata": {
                 "description": "Market Place OS image."
@@ -1080,7 +1080,7 @@
             "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
             "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
             "SecurityFeature": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
-            "imageToUse": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('marketPlaceGalleryWindows'))]"
+            "imageToUse": "[if(parameters('useSharedImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]"
           },
           "resources": [
             {
@@ -1327,7 +1327,7 @@
             },
             "marketPlaceGalleryWindows": {
               "type": "object",
-              "value": "[parameters('marketPlaceGalleryWindows')]"
+              "value": "[parameters('MarketPlaceGalleryWindows')]"
             }
           }
         }

@@ -321,7 +321,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   scope: resourceGroup(DeployVMsTo)
   params: {
     AgentPackageLocation: varAvdAgentPackageLocation
-    ComputeGalleryImageId: !empty(ComputeGalleryName) ? '${computeGalleryImage.id}/versions/latest' : 'none'
+    ComputeGalleryImageId: useSharedImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
     ComputeGalleryProperties: computeGalleryImage.properties
     DomainUser: DomainUser
     DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomSecret) : DomainPassword
@@ -331,7 +331,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
-    marketPlaceGalleryWindows: empty(ComputeGalleryName) ? varMarketPlaceGalleryWindows[avdOsImage] : {}
+    MarketPlaceGalleryWindows: !useSharedImage ? varMarketPlaceGalleryWindows[avdOsImage] : {}
     OUPath: OUPath
     PostDeployEndpoint: PostDeployEndpoint
     PostDeployScript: PostDeployScript
