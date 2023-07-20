@@ -968,7 +968,7 @@
 				"DomainPassword": "[if(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityDomainCredentials.DomainPassword)]",
 				"ResourceGroupHP": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)), if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), steps('hostPool').hpRGExisting, steps('hostPool').hpRGNameNew))]",
 				"HostPoolName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
-				"HostPoolWorkspaceName": "[setps('hostPool').WorkspaceName]",
+				"HostPoolWorkspaceName": "[steps('hostPool').WorkspaceName]",
 				"ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
 				"HostPoolKind": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
 				"HostPoolLBType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), if(equals(steps('hostPool').hostPoolType, 'Pooled'), steps('hostPool').hostPoolPooled.HostPoolBalance, steps('hostPool').hostPoolPersonal.PersonalAssignment), if(equals(steps('hostPool').hostPoolApi.properties.hostPoolType, 'Personal'), steps('hostPool').hostPoolApi.properties.personalDesktopAssignmentType, steps('hostPool').hostPoolApi.properties.loadBalancerType))]",
