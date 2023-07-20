@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "5185279373256679868"
+      "templateHash": "4292282244960677608"
     }
   },
   "parameters": {
@@ -957,7 +957,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.19.5.34762",
-              "templateHash": "14969836968969759581"
+              "templateHash": "7879869805052922451"
             }
           },
           "parameters": {
@@ -1121,12 +1121,7 @@
                   "vmSize": "[parameters('VmSize')]"
                 },
                 "storageProfile": {
-                  "imageReference": {
-                    "publisher": "MicrosoftWindowsDesktop",
-                    "offer": "windows-10",
-                    "sku": "win10-22h2-avd-g2",
-                    "version": "latest"
-                  },
+                  "imageReference": "[variables('imageToUse')]",
                   "osDisk": {
                     "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
                     "osType": "Windows",

@@ -84,12 +84,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
       vmSize: VmSize
     }
     storageProfile: {
-      imageReference: {
-        publisher: 'MicrosoftWindowsDesktop'
-        offer: 'windows-10'
-        sku: 'win10-22h2-avd-g2'
-        version: 'latest'
-      }
+      imageReference: imageToUse
       osDisk: {
         name: 'osDisk-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
         osType: 'Windows'
