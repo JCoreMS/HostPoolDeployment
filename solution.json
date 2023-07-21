@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "15108683489459531194"
+      "templateHash": "18304797264447495163"
     }
   },
   "parameters": {
@@ -859,7 +859,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "[format('linked_VirtualMachines_{0}_{1}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1), parameters('Timestamp'))]",
+      "name": "[format('linked_VirtualMachines_batch_{0}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1))]",
       "resourceGroup": "[variables('DeployVMsTo')]",
       "properties": {
         "expressionEvaluationOptions": {

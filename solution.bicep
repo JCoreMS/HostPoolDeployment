@@ -299,7 +299,7 @@ module monitoring 'modules/monitoring.bicep' = {
 
 @batchSize(1)
 module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
-  name: 'linked_VirtualMachines_${i - 1}_${Timestamp}'
+  name: 'linked_VirtualMachines_batch_${i - 1}'
   scope: resourceGroup(DeployVMsTo)
   params: {
     AgentPackageLocation: varAvdAgentPackageLocation
