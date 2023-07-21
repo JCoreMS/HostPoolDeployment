@@ -7,6 +7,20 @@ Additionally the solution was written in BICEP to provide an ease of use and mec
 - Azure Storage Account with a Blob Container housing your PowerShell script (Use provided PostConfig.ps1 as an example)
 - VS Code for customizing the User Interface and/or code for deployment
 
+Currently it provides a way to deploy a Host Pool with diagnostics enabled, using a KeyVault as an option for domain and local VM password(s) and from either the Microsoft Marketplace or Azure Compute Gallery. Finally, it incorporates a PowerShell script to provide additional post deployment configurations which currently has a reboot and Windows Update option. You can easily add to this script and create parameters within the provided code to then pass to the script for execution.    
+
+## Components
+
+1. Deployment Code  
+This can be in either ARM format or JSON files or in BICEP which provides a more consolidated code syntax with an easier to read format as well.  
+
+2. Parameters / Input  
+This is what provides a way to reuse code by having an answer file sort of approach with things like naming preferences, specific Resource Groups to use, etc.  
+
+    **Parameters File** - This is a JSON based file in which you would supply the required parameters and deploy via PowerShell and possibly build a Template Spec from in Azure.  
+
+    **Custom UI Definition** - This is yet another mechanism for providing the parameters however it is a JSON file which defines a custom User Interface that is similar to what you see in the portal when deploying new resources. It can be much more user friendly and has options to hard code and hide certain inputs. Additionally it can also be compbined with the deployment code to create a Template Spec in Azure but the Template Spec must be created from PowerShell to specify a customer UI definition.   
+
 ## Deploy A Host Pool or Add Session Hosts
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2Fsolution.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinition.json) [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2Fsolution.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinition.json)
