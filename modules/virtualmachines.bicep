@@ -34,8 +34,6 @@ param VmUsername string
 @secure()
 param VmPassword string
 
-var HyperVGen = ComputeGalleryProperties.hyperVGeneration
-var Architecture = ComputeGalleryProperties.architecture
 var SharedImageSecType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
 var SecurityType = useSharedImage ? SharedImageSecType : 'TrustedLaunch'
 var securityProfileJson = {

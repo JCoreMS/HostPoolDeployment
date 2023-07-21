@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "10517849082277033674"
+      "templateHash": "402917500533209073"
     }
   },
   "parameters": {
@@ -955,7 +955,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.19.5.34762",
-              "templateHash": "10017673312068749347"
+              "templateHash": "4704795819839523458"
             }
           },
           "parameters": {
@@ -1057,8 +1057,6 @@
             }
           },
           "variables": {
-            "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
-            "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
             "SharedImageSecType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
             "SecurityType": "[if(parameters('useSharedImage'), variables('SharedImageSecType'), 'TrustedLaunch')]",
             "securityProfileJson": {
