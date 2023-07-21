@@ -304,7 +304,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   params: {
     AgentPackageLocation: varAvdAgentPackageLocation
     ComputeGalleryImageId: useSharedImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
-    ComputeGalleryProperties: computeGalleryImage.properties
+    ComputeGalleryProperties: useSharedImage ? computeGalleryImage.properties : {}
     DomainUser: DomainUser
     DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomSecret) : DomainPassword
     DomainName: DomainName
