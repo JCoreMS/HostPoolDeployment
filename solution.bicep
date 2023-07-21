@@ -333,5 +333,8 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocSecret) : VmPassword
     VmPrefix: VmPrefix
   }
-  dependsOn: [hostPool]
+  dependsOn: [
+    monitoring
+    userIdentity
+  ]
 }]
