@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "18304797264447495163"
+      "templateHash": "3034458922908683760"
     }
   },
   "parameters": {
@@ -896,7 +896,7 @@
           "NumSessionHosts": {
             "value": "[parameters('NumSessionHosts')]"
           },
-          "MarketPlaceGalleryWindows": "[if(not(parameters('useSharedImage')), createObject('value', variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]), createObject('value', createObject()))]",
+          "MarketPlaceGalleryWindows": "[if(parameters('useSharedImage'), createObject('value', createObject()), createObject('value', variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]))]",
           "OUPath": {
             "value": "[parameters('OUPath')]"
           },

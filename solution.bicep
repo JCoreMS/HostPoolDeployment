@@ -313,7 +313,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
-    MarketPlaceGalleryWindows: !(useSharedImage) ? varMarketPlaceGalleryWindows[avdOsImage] : {}
+    MarketPlaceGalleryWindows: useSharedImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
     OUPath: OUPath
     PostDeployEndpoint: PostDeployEndpoint
     PostDeployScript: PostDeployScript
