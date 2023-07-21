@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "14652879398893343761"
+      "templateHash": "10517849082277033674"
     }
   },
   "parameters": {
@@ -955,7 +955,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.19.5.34762",
-              "templateHash": "14634258522826650619"
+              "templateHash": "10017673312068749347"
             }
           },
           "parameters": {
@@ -1281,37 +1281,7 @@
                 "addToHostPool"
               ]
             }
-          ],
-          "outputs": {
-            "RegistrationToken": {
-              "type": "string",
-              "value": "[parameters('HostPoolRegistrationToken')]"
-            },
-            "HyperVGen": {
-              "type": "string",
-              "value": "[variables('HyperVGen')]"
-            },
-            "Architecture": {
-              "type": "string",
-              "value": "[variables('Architecture')]"
-            },
-            "ComputeGalProp": {
-              "type": "object",
-              "value": "[parameters('ComputeGalleryProperties')]"
-            },
-            "useSharedImage": {
-              "type": "bool",
-              "value": "[parameters('useSharedImage')]"
-            },
-            "ComputeGalleryImageId": {
-              "type": "string",
-              "value": "[parameters('ComputeGalleryImageId')]"
-            },
-            "marketPlaceGalleryWindows": {
-              "type": "object",
-              "value": "[parameters('MarketPlaceGalleryWindows')]"
-            }
-          }
+          ]
         }
       },
       "dependsOn": [

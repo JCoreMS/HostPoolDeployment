@@ -224,10 +224,4 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
   ]
 }]
 
-output RegistrationToken string = HostPoolRegistrationToken
-output HyperVGen string = HyperVGen
-output Architecture string = Architecture
-output ComputeGalProp object = ComputeGalleryProperties
-output useSharedImage bool = useSharedImage
-output ComputeGalleryImageId string = ComputeGalleryImageId
-output marketPlaceGalleryWindows object = MarketPlaceGalleryWindows
+
