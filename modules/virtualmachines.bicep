@@ -36,7 +36,8 @@ param VmPassword string
 
 var HyperVGen = ComputeGalleryProperties.hyperVGeneration
 var Architecture = ComputeGalleryProperties.architecture
-var SecurityType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'TrustedLaunch'
+var SharedImageSecType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
+var SecurityType = useSharedImage ? SharedImageSecType : 'TrustedLaunch'
 var securityProfileJson = {
   uefiSettings: {
     secureBootEnabled: true
@@ -69,7 +70,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [fo
   }
 }]
 
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i in range(0, NumSessionHosts): {
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i in range(0, NumSessionHosts): if(useSharedImage) {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
   tags: Tags

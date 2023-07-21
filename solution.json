@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.19.5.34762",
-      "templateHash": "10559273998851034580"
+      "templateHash": "15108683489459531194"
     }
   },
   "parameters": {
@@ -957,7 +957,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.19.5.34762",
-              "templateHash": "7879869805052922451"
+              "templateHash": "14634258522826650619"
             }
           },
           "parameters": {
@@ -1061,7 +1061,8 @@
           "variables": {
             "HyperVGen": "[parameters('ComputeGalleryProperties').hyperVGeneration]",
             "Architecture": "[parameters('ComputeGalleryProperties').architecture]",
-            "SecurityType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'TrustedLaunch')]",
+            "SharedImageSecType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
+            "SecurityType": "[if(parameters('useSharedImage'), variables('SharedImageSecType'), 'TrustedLaunch')]",
             "securityProfileJson": {
               "uefiSettings": {
                 "secureBootEnabled": true,
@@ -1105,6 +1106,7 @@
                 "name": "virtualMachine",
                 "count": "[length(range(0, parameters('NumSessionHosts')))]"
               },
+              "condition": "[parameters('useSharedImage')]",
               "type": "Microsoft.Compute/virtualMachines",
               "apiVersion": "2022-11-01",
               "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
