@@ -3,7 +3,7 @@
 	"view": {
 		"kind": "Form",
 		"properties": {
-			"title": "Deploy AVD HostPool from Azure Compute Gallery Image",
+			"title": "Deploy or Update AVD HostPool",
 			"steps": [
 				{
 					"name": "basics",
@@ -465,7 +465,7 @@
 				},
 				{
 					"name": "hostInfo",
-					"label": "HostInformation",
+					"label": "Host Information",
 					"elements": [
 						{
 							"name": "vmInformation",

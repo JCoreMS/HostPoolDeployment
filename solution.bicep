@@ -130,10 +130,10 @@ var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environmen
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
 
-var varKvDomSubId = useSharedImage ? 'none' : split(KeyVaultDomain.id, '/')[2]
-var varKvLocSubId = useSharedImage ? 'none' : split(KeyVaultLocal.id, '/')[2]
-var varKvDomRg = useSharedImage ? 'none' : split(KeyVaultDomain.id, '/')[4]
-var varKvLocRg = useSharedImage ? 'none' : split(KeyVaultLocal.id, '/')[4]
+var varKvDomSubId = KeyVaultDomainOption ? split(KeyVaultDomain.id, '/')[2] : 'none'
+var varKvLocSubId = KeyVaultLocalOption ? split(KeyVaultLocal.id, '/')[2] : 'none'
+var varKvDomRg = KeyVaultDomainOption ? split(KeyVaultDomain.id, '/')[4] : 'none'
+var varKvLocRg = KeyVaultLocalOption ? split(KeyVaultLocal.id, '/')[4] : 'none'
 
 var RoleAssignments = {
   BlobDataRead: {

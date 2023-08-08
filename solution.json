@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "2836117482791226122"
+      "templateHash": "3750793777782750059"
     }
   },
   "parameters": {
@@ -255,10 +255,10 @@
     "varAvdAgentPackageLocation": "[format('https://wvdportalstorageblob.blob.{0}/galleryartifacts/Configuration_09-08-2022.zip', environment().suffixes.storage)]",
     "HostPoolType": "[format('{0} {1}', parameters('HostPoolKind'), parameters('HostPoolLBType'))]",
     "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]",
-    "varKvDomSubId": "[if(parameters('useSharedImage'), 'none', split(parameters('KeyVaultDomain').id, '/')[2])]",
-    "varKvLocSubId": "[if(parameters('useSharedImage'), 'none', split(parameters('KeyVaultLocal').id, '/')[2])]",
-    "varKvDomRg": "[if(parameters('useSharedImage'), 'none', split(parameters('KeyVaultDomain').id, '/')[4])]",
-    "varKvLocRg": "[if(parameters('useSharedImage'), 'none', split(parameters('KeyVaultLocal').id, '/')[4])]",
+    "varKvDomSubId": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomain').id, '/')[2], 'none')]",
+    "varKvLocSubId": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocal').id, '/')[2], 'none')]",
+    "varKvDomRg": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomain').id, '/')[4], 'none')]",
+    "varKvLocRg": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocal').id, '/')[4], 'none')]",
     "RoleAssignments": {
       "BlobDataRead": {
         "Name": "Blob-Data-Reader",
