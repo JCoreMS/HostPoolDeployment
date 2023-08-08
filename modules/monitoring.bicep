@@ -2,7 +2,7 @@ param HostPoolName string
 param LogAnalyticsWorkspaceId string
 param HostPoolWorkspaceName string
 
-var HostPoolLogs = [
+var HostPoolLogsComm = [
   {
     category: 'Checkpoint'
     enabled: true
@@ -33,6 +33,34 @@ var HostPoolLogs = [
   }
 ]
 
+var HostPoolLogsGov = [
+  {
+    category: 'Checkpoint'
+    enabled: true
+  }
+  {
+    category: 'Error'
+    enabled: true
+  }
+  {
+    category: 'Management'
+    enabled: true
+  }
+  {
+    category: 'Connection'
+    enabled: true
+  }
+  {
+    category: 'HostRegistration'
+    enabled: true
+  }
+  {
+    category: 'AgentHealthStatus'
+    enabled: true
+  }
+]
+
+var HostPoolLogs = environment().name == 'AzureCloud' ? HostPoolLogsComm : HostPoolLogsGov
 
 resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = {
   name: HostPoolWorkspaceName

@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.19.5.34762",
-      "templateHash": "5872410071465193390"
+      "version": "0.20.4.51522",
+      "templateHash": "2836117482791226122"
     }
   },
   "parameters": {
@@ -22,9 +22,6 @@
     "avdOsImage": {
       "type": "string",
       "defaultValue": "win11_22h2",
-      "metadata": {
-        "description": "Optional. AVD OS image SKU. (Default: win11-21h2)"
-      },
       "allowedValues": [
         "win10_21h2",
         "win10_21h2_office",
@@ -34,7 +31,10 @@
         "win11_21h2_office",
         "win11_22h2",
         "win11_22h2_office"
-      ]
+      ],
+      "metadata": {
+        "description": "Optional. AVD OS image SKU. (Default: win11-21h2)"
+      }
     },
     "ComputeGalleryName": {
       "type": "string",
@@ -58,14 +58,14 @@
     "DiskSku": {
       "type": "string",
       "defaultValue": "Standard_LRS",
-      "metadata": {
-        "description": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS."
-      },
       "allowedValues": [
         "Standard_LRS",
         "StandardSSD_LRS",
         "Premium_LRS"
-      ]
+      ],
+      "metadata": {
+        "description": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS."
+      }
     },
     "DomainName": {
       "type": "string"
@@ -92,25 +92,25 @@
     },
     "HostPoolKind": {
       "type": "string",
-      "metadata": {
-        "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
-      },
       "allowedValues": [
         "Pooled",
         "Personal"
-      ]
+      ],
+      "metadata": {
+        "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
+      }
     },
     "HostPoolLBType": {
       "type": "string",
-      "metadata": {
-        "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
-      },
       "allowedValues": [
         "DepthFirst",
         "BreadthFirst",
         "Automatic",
         "Direct"
-      ]
+      ],
+      "metadata": {
+        "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
+      }
     },
     "KeyVaultDomainOption": {
       "type": "bool"
@@ -379,8 +379,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.19.5.34762",
-              "templateHash": "14952118657209018171"
+              "version": "0.20.4.51522",
+              "templateHash": "9506022961974784996"
             }
           },
           "parameters": {
@@ -437,8 +437,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.19.5.34762",
-                      "templateHash": "10495951730458244041"
+                      "version": "0.20.4.51522",
+                      "templateHash": "86351413185096813"
                     }
                   },
                   "parameters": {
@@ -514,8 +514,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.19.5.34762",
-              "templateHash": "4675345650375706925"
+              "version": "0.20.4.51522",
+              "templateHash": "15866775783442096083"
             }
           },
           "parameters": {
@@ -599,8 +599,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.19.5.34762",
-              "templateHash": "16324101705218575869"
+              "version": "0.20.4.51522",
+              "templateHash": "3540087408598445813"
             }
           },
           "parameters": {
@@ -755,8 +755,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.19.5.34762",
-              "templateHash": "5177707212109496032"
+              "version": "0.20.4.51522",
+              "templateHash": "6968171983583450524"
             }
           },
           "parameters": {
@@ -771,7 +771,7 @@
             }
           },
           "variables": {
-            "HostPoolLogs": [
+            "HostPoolLogsComm": [
               {
                 "category": "Checkpoint",
                 "enabled": true
@@ -800,7 +800,34 @@
                 "category": "ConnectionGraphicsData",
                 "enabled": true
               }
-            ]
+            ],
+            "HostPoolLogsGov": [
+              {
+                "category": "Checkpoint",
+                "enabled": true
+              },
+              {
+                "category": "Error",
+                "enabled": true
+              },
+              {
+                "category": "Management",
+                "enabled": true
+              },
+              {
+                "category": "Connection",
+                "enabled": true
+              },
+              {
+                "category": "HostRegistration",
+                "enabled": true
+              },
+              {
+                "category": "AgentHealthStatus",
+                "enabled": true
+              }
+            ],
+            "HostPoolLogs": "[if(equals(environment().name, 'AzureCloud'), variables('HostPoolLogsComm'), variables('HostPoolLogsGov'))]"
           },
           "resources": [
             {
@@ -954,8 +981,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.19.5.34762",
-              "templateHash": "9233460253023890224"
+              "version": "0.20.4.51522",
+              "templateHash": "9454954913169890501"
             }
           },
           "parameters": {
