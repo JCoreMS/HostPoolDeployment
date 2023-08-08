@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "3750793777782750059"
+      "templateHash": "2863849208431038954"
     }
   },
   "parameters": {
@@ -118,19 +118,19 @@
     "KeyVaultLocalOption": {
       "type": "bool"
     },
-    "KeyVaultDomain": {
-      "type": "object",
-      "defaultValue": {}
-    },
-    "KeyVaultLocal": {
-      "type": "object",
-      "defaultValue": {}
-    },
-    "KeyVaultDomSecret": {
+    "KeyVaultDomResId": {
       "type": "string",
       "defaultValue": ""
     },
-    "KeyVaultLocSecret": {
+    "KeyVaultLocResId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "KeyVaultDomName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "KeyVaultLocName": {
       "type": "string",
       "defaultValue": ""
     },
@@ -255,10 +255,12 @@
     "varAvdAgentPackageLocation": "[format('https://wvdportalstorageblob.blob.{0}/galleryartifacts/Configuration_09-08-2022.zip', environment().suffixes.storage)]",
     "HostPoolType": "[format('{0} {1}', parameters('HostPoolKind'), parameters('HostPoolLBType'))]",
     "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]",
-    "varKvDomSubId": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomain').id, '/')[2], 'none')]",
-    "varKvLocSubId": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocal').id, '/')[2], 'none')]",
-    "varKvDomRg": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomain').id, '/')[4], 'none')]",
-    "varKvLocRg": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocal').id, '/')[4], 'none')]",
+    "varKvDomSubId": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[2], 'none')]",
+    "varKvLocSubId": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[2], 'none')]",
+    "varKvNameDom": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[8], 'none')]",
+    "varKvNameLoc": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[8], 'none')]",
+    "varKvDomRg": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[4], 'none')]",
+    "varKvLocRg": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[4], 'none')]",
     "RoleAssignments": {
       "BlobDataRead": {
         "Name": "Blob-Data-Reader",
@@ -902,7 +904,7 @@
           "DomainUser": {
             "value": "[parameters('DomainUser')]"
           },
-          "DomainPassword": "[if(parameters('KeyVaultDomainOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvDomSubId'), variables('varKvDomRg')), 'Microsoft.KeyVault/vaults', parameters('KeyVaultDomain').Name)), 'secretName', parameters('KeyVaultDomSecret'))), createObject('value', parameters('DomainPassword')))]",
+          "DomainPassword": "[if(parameters('KeyVaultDomainOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvDomSubId'), variables('varKvDomRg')), 'Microsoft.KeyVault/vaults', variables('varKvNameDom'))), 'secretName', parameters('KeyVaultDomName'))), createObject('value', parameters('DomainPassword')))]",
           "DomainName": {
             "value": "[parameters('DomainName')]"
           },
@@ -970,7 +972,7 @@
           "VmUsername": {
             "value": "[parameters('VmUsername')]"
           },
-          "VmPassword": "[if(parameters('KeyVaultLocalOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvLocSubId'), variables('varKvLocRg')), 'Microsoft.KeyVault/vaults', parameters('KeyVaultLocal').Name)), 'secretName', parameters('KeyVaultLocSecret'))), createObject('value', parameters('VmPassword')))]",
+          "VmPassword": "[if(parameters('KeyVaultLocalOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvLocSubId'), variables('varKvLocRg')), 'Microsoft.KeyVault/vaults', variables('varKvNameLoc'))), 'secretName', parameters('KeyVaultLocName'))), createObject('value', parameters('VmPassword')))]",
           "VmPrefix": {
             "value": "[parameters('VmPrefix')]"
           }

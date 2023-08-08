@@ -66,10 +66,10 @@ param HostPoolLBType string
 
 param KeyVaultDomainOption bool
 param KeyVaultLocalOption bool
-param KeyVaultDomain object = {}
-param KeyVaultLocal object = {}
-param KeyVaultDomSecret string = ''
-param KeyVaultLocSecret string = ''
+param KeyVaultDomResId string = ''
+param KeyVaultLocResId string = ''
+param KeyVaultDomName string = ''
+param KeyVaultLocName string = ''
 
 param Location string = deployment().location
 param LogAnalyticsWorkspaceName string = ''
@@ -130,10 +130,12 @@ var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environmen
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
 
-var varKvDomSubId = KeyVaultDomainOption ? split(KeyVaultDomain.id, '/')[2] : 'none'
-var varKvLocSubId = KeyVaultLocalOption ? split(KeyVaultLocal.id, '/')[2] : 'none'
-var varKvDomRg = KeyVaultDomainOption ? split(KeyVaultDomain.id, '/')[4] : 'none'
-var varKvLocRg = KeyVaultLocalOption ? split(KeyVaultLocal.id, '/')[4] : 'none'
+var varKvDomSubId = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[2] : 'none'
+var varKvLocSubId = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[2] : 'none'
+var varKvNameDom = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[8] : 'none'
+var varKvNameLoc = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[8] : 'none'
+var varKvDomRg = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[4] : 'none'
+var varKvLocRg = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[4] : 'none'
 
 var RoleAssignments = {
   BlobDataRead: {
@@ -215,12 +217,12 @@ resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = {
 }
 
 resource kvDomain 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultDomainOption) {
-  name: KeyVaultDomain.Name
+  name: varKvNameDom
   scope: resourceGroup(varKvDomSubId, varKvDomRg)
 }
 
 resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultLocalOption) {
-  name: KeyVaultLocal.Name
+  name: varKvNameLoc
   scope: resourceGroup(varKvLocSubId, varKvLocRg)
 }
 
@@ -306,7 +308,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     ComputeGalleryImageId: useSharedImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
     ComputeGalleryProperties: useSharedImage ? computeGalleryImage.properties : {}
     DomainUser: DomainUser
-    DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomSecret) : DomainPassword
+    DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
     DomainName: DomainName
     HostPoolName: HostPoolName
     HostPoolRegistrationToken: hostPool.outputs.HostPoolRegistrationToken
@@ -330,7 +332,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     VmIndexStart: VmIndexStart
     VmSize: VmSize
     VmUsername: VmUsername
-    VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocSecret) : VmPassword
+    VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocName) : VmPassword
     VmPrefix: VmPrefix
   }
   dependsOn: [
