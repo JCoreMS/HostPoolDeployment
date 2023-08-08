@@ -841,7 +841,7 @@
 				},
 				{
 					"name": "imageInfo",
-					"label": "ImageInformation",
+					"label": "Image Information",
 					"elements": [
 						{
 							"name": "ImageSource",
