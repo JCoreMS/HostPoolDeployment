@@ -1,7 +1,7 @@
 # AVD Host Pool Deployment
 
-## **NOTE: This solution currently breaks the ability to add session hosts via the AVD Portal natively!  Working on a resolution and will remove this text once resolved!**  
-You can continue to use this solution to add Session Hosts to a Host Pool but may be forced to recreate or redploy the host pool new once the issues is resolved.  
+## **NOTE: Beginning May 2023 to Aug 15, 2023 4pm EST this solution broke the ability to add Session Hosts via the AVD Portal!**  
+Please see this [article and instructions](./fixhostpool.md) to see details and resolve the issue.
 
 This solution was designed to provide a quick start for using Infrastructure as Code for AVD. It's a simple solution that combines a Custom UI Definition and ARM template to deploy a Host Pool, Add Session Hosts, and executes a Post Deployment Script.
 

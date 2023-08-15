@@ -13,14 +13,21 @@ param Location string
 param NumUsersPerHost int
 param Tags object
 param Timestamp string = utcNow('u')
+param UseCustomImage bool
 param StartVmOnConnect bool
 param ComputeGalleryImageId string
+param vmImage object
 param VmPrefix string
 param ValidationEnvironment bool
 param VmSize string
 
-
-
+var vmImagePub = vmImage.publisher
+var vmOffer = vmImage.offer
+var vmSKU = vmImage.sku
+var vmGalleryItemId = '${vmImagePub}.${vmOffer}${vmSKU}'
+var vmTemplateMS = '{"domain":"${DomainName}","galleryImageOffer":"${vmOffer}","galleryImagePublisher":"${vmImagePub}","galleryImageSKU":"${vmSKU}","imageType":"Gallery","customImageId":null,"namePrefix":"${VmPrefix}","osDiskType":"${DiskSku}","vmSize":{"id":"${VmSize}","cores":null,"ram":null},"galleryItemId":"${vmGalleryItemId}","hibernate":false,"diskSizeGB":0,"securityType":"TrustedLaunch","secureBoot":true,"vTPM":true}' 
+var vmTemplateCompGal = '{"domain":"${DomainName}","galleryImageOffer":null,"galleryImagePublisher":null,"galleryImageSKU":null,"imageType":"CustomImage","imageUri":null,"customImageId":"${ComputeGalleryImageId}","namePrefix":"${VmPrefix}","osDiskType":"${DiskSku}","useManagedDisks":true,"vmSize":{"id":"${VmSize}","cores":null,"ram":null},"galleryItemId":null}' 
+var vmTemplate = UseCustomImage ? vmTemplateCompGal : vmTemplateMS
 
 resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' = {
   name: HostPoolName
@@ -39,9 +46,10 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview'
     customRdpProperty: CustomRdpProperty
     personalDesktopAssignmentType: contains(HostPoolType, 'Personal') ? split(HostPoolType, ' ')[1] : null
     startVMOnConnect: StartVmOnConnect // https://docs.microsoft.com/en-us/azure/virtual-desktop/start-virtual-machine-connect
-    vmTemplate: '{"domain":"${DomainName}","galleryImageOffer":null,"galleryImagePublisher":null,"galleryImageSKU":null,"imageType":"CustomImage","imageUri":null,"customImageId":"${ComputeGalleryImageId}","namePrefix":"${VmPrefix}","osDiskType":"${DiskSku}","useManagedDisks":true,"vmSize":{"id":"${VmSize}","cores":null,"ram":null},"galleryItemId":null}'
+    vmTemplate: vmTemplate
   }
 }
+
 
 resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-preview' = {
   name: AppGroupName

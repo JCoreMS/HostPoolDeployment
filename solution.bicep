@@ -91,7 +91,7 @@ param StartVmOnConnect bool
 param OUPath string
 
 @description('Optional. Set to deploy image from Azure Compute Gallery. (Default: false)')
-param useSharedImage bool = false
+param useCustomImage bool = false
 
 @maxValue(99)
 param VmIndexStart int
@@ -272,7 +272,9 @@ module hostPool 'modules/hostpool.bicep' = {
     NumUsersPerHost: NumUsersPerHost
     StartVmOnConnect: StartVmOnConnect
     Tags: Tags
+    UseCustomImage: useCustomImage
     ValidationEnvironment: ValidationEnvironment
+    vmImage: varMarketPlaceGalleryWindows[avdOsImage]
     VmPrefix: VmPrefix
     VmSize: VmSize
     HostPoolWorkspaceName: HostPoolWorkspaceName
@@ -305,8 +307,8 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   scope: resourceGroup(DeployVMsTo)
   params: {
     AgentPackageLocation: varAvdAgentPackageLocation
-    ComputeGalleryImageId: useSharedImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
-    ComputeGalleryProperties: useSharedImage ? computeGalleryImage.properties : {}
+    ComputeGalleryImageId: useCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
+    ComputeGalleryProperties: useCustomImage ? computeGalleryImage.properties : {}
     DomainUser: DomainUser
     DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
     DomainName: DomainName
@@ -315,7 +317,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
-    MarketPlaceGalleryWindows: useSharedImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
+    MarketPlaceGalleryWindows: useCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
     OUPath: OUPath
     PostDeployEndpoint: PostDeployEndpoint
     PostDeployScript: PostDeployScript
@@ -324,7 +326,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Tags: Tags
     Timestamp: Timestamp
     UpdateWindows: UpdateWindows
-    useSharedImage: useSharedImage
+    useSharedImage: useCustomImage
     UserIdentityResId: userIdentity.outputs.userIdentityResId
     UserIdentityObjId: userIdentity.outputs.userIdentityObjId
     VirtualNetwork: VirtualNetwork
