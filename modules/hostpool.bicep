@@ -43,7 +43,7 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview'
   }
 }
 
-resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-04-01-preview' = {
+resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-preview' = {
   name: AppGroupName
   location: Location
   tags: Tags
@@ -53,7 +53,7 @@ resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-04-01-
   }
 }
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-04-01-preview' = if(HostPoolWorkspaceName != 'none') {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-10-14-preview' = if(HostPoolWorkspaceName != 'none') {
   name: HostPoolWorkspaceName
   location: Location
   tags: Tags
