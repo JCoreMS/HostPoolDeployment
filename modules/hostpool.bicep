@@ -22,7 +22,7 @@ param VmSize string
 
 
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-04-01-preview' = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' = {
   name: HostPoolName
   location: Location
   tags: Tags
