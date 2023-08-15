@@ -93,7 +93,7 @@ resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2017-05-01-
   }
 }
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-04-01-preview' existing = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = {
   name: HostPoolName
 }
 
