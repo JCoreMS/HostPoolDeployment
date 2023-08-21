@@ -107,7 +107,7 @@
 								"Microsoft.OperationalInsights/workspaces",
 								"Microsoft.Insights/diagnosticSettings"
 							],
-							"visible": false
+							"visible": true
 						}
 					]
 				},
