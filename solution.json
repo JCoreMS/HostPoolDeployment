@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "5031309360241993609"
+      "templateHash": "9648965937179875803"
     }
   },
   "parameters": {
@@ -339,14 +339,16 @@
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
       "name": "[parameters('ResourceGroupHP')]",
-      "location": "[parameters('Location')]"
+      "location": "[parameters('Location')]",
+      "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
     {
       "condition": "[not(empty(parameters('ResourceGroupVMs')))]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
       "name": "[if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none')]",
-      "location": "[if(not(empty(parameters('Location'))), parameters('Location'), 'none')]"
+      "location": "[if(not(empty(parameters('Location'))), parameters('Location'), 'none')]",
+      "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -371,6 +373,9 @@
           "RoleAssignments": {
             "value": "[variables('RoleAssignments')]"
           },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
           "UserIdentityName": {
             "value": "[parameters('UserIdentityName')]"
           }
@@ -382,7 +387,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.20.4.51522",
-              "templateHash": "9506022961974784996"
+              "templateHash": "9850008573693943313"
             }
           },
           "parameters": {
@@ -398,6 +403,9 @@
             "RoleAssignments": {
               "type": "object"
             },
+            "Tags": {
+              "type": "object"
+            },
             "UserIdentityName": {
               "type": "string"
             }
@@ -407,7 +415,8 @@
               "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
               "apiVersion": "2018-11-30",
               "name": "[parameters('UserIdentityName')]",
-              "location": "[parameters('Location')]"
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), parameters('Tags')['Microsoft.ManagedIdentity/userAssignedIdentities'], createObject())]"
             },
             {
               "type": "Microsoft.Resources/deployments",
@@ -608,7 +617,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.20.4.51522",
-              "templateHash": "17514691592128968021"
+              "templateHash": "7065400406753497577"
             }
           },
           "parameters": {
@@ -686,7 +695,7 @@
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('HostPoolName')]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/hostPools'), parameters('Tags')['Microsoft.DesktopVirtualization/hostPools'], createObject())]",
               "properties": {
                 "hostPoolType": "[split(parameters('HostPoolType'), ' ')[0]]",
                 "maxSessionLimit": "[parameters('NumUsersPerHost')]",
@@ -708,7 +717,7 @@
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('AppGroupName')]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/applicationGroups'), parameters('Tags')['Microsoft.DesktopVirtualization/applicationGroups'], createObject())]",
               "properties": {
                 "hostPoolArmPath": "[resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))]",
                 "applicationGroupType": "Desktop"
@@ -723,7 +732,7 @@
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('HostPoolWorkspaceName')]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/workspaces'), parameters('Tags')['Microsoft.DesktopVirtualization/workspaces'], createObject())]",
               "properties": {
                 "applicationGroupReferences": [
                   "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', parameters('AppGroupName'))]"
@@ -1005,7 +1014,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.20.4.51522",
-              "templateHash": "9454954913169890501"
+              "templateHash": "4006364967596795923"
             }
           },
           "parameters": {
@@ -1128,7 +1137,7 @@
               "apiVersion": "2022-11-01",
               "name": "[format('nic-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Network/networkInterfaces'), parameters('Tags')['Microsoft.Network/networkInterfaces'], createObject())]",
               "properties": {
                 "ipConfigurations": [
                   {
@@ -1156,7 +1165,7 @@
               "apiVersion": "2022-11-01",
               "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines'), parameters('Tags')['Microsoft.Compute/virtualMachines'], createObject())]",
               "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
@@ -1220,6 +1229,7 @@
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/MicrosoftMonitoringAgent', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
                 "publisher": "Microsoft.EnterpriseCloud.Monitoring",
                 "type": "MicrosoftMonitoringAgent",
@@ -1245,7 +1255,7 @@
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/JsonADDomainExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
                 "forceUpdateTag": "[parameters('Timestamp')]",
                 "publisher": "Microsoft.Compute",
@@ -1276,6 +1286,7 @@
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/HostPoolRegistration', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
                 "publisher": "Microsoft.PowerShell",
                 "type": "DSC",
@@ -1305,7 +1316,7 @@
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/CustomScriptExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
                 "publisher": "Microsoft.Compute",
                 "type": "CustomScriptExtension",

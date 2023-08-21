@@ -32,7 +32,7 @@ var vmTemplate = UseCustomImage ? vmTemplateCompGal : vmTemplateMS
 resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' = {
   name: HostPoolName
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.DesktopVirtualization/hostPools') ? Tags['Microsoft.DesktopVirtualization/hostPools'] : {}
   properties: {
     hostPoolType: split(HostPoolType, ' ')[0]
     maxSessionLimit: NumUsersPerHost
@@ -54,7 +54,7 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview'
 resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-preview' = {
   name: AppGroupName
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.DesktopVirtualization/applicationGroups') ? Tags['Microsoft.DesktopVirtualization/applicationGroups'] : {}
   properties: {
     hostPoolArmPath: hostPool.id
     applicationGroupType: 'Desktop'
@@ -64,7 +64,7 @@ resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-
 resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-10-14-preview' = if(HostPoolWorkspaceName != 'none') {
   name: HostPoolWorkspaceName
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.DesktopVirtualization/workspaces') ? Tags['Microsoft.DesktopVirtualization/workspaces'] : {}
   properties: {
     applicationGroupReferences: [
       appGroup.id

@@ -214,6 +214,7 @@ var varMarketPlaceGalleryWindows = {
 resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: ResourceGroupHP
   location: Location
+  tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
 }
 
 resource kvDomain 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultDomainOption) {
@@ -229,6 +230,7 @@ resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultLo
 resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (!empty(ResourceGroupVMs)) {
   name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none'
   location: !empty(Location) ? Location : 'none'
+  tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
 }
 
 resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing = if(!empty(ComputeGalleryName)) {
@@ -244,6 +246,7 @@ module userIdentity 'modules/userIdentity.bicep' = {
     PostDeployStorRG: PostDeployStorRG
     PostDeployStorName: PostDeployStorName
     RoleAssignments: RoleAssignments
+    Tags: Tags
     UserIdentityName: UserIdentityName
   }
 }

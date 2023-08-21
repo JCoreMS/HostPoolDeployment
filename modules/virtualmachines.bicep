@@ -48,7 +48,7 @@ var imageToUse = useSharedImage ? { id: ComputeGalleryImageId } : MarketPlaceGal
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.Network/networkInterfaces') ? Tags['Microsoft.Network/networkInterfaces'] : {}
   properties: {
     ipConfigurations: [
       {
@@ -71,7 +71,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [fo
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.Compute/virtualMachines') ? Tags['Microsoft.Compute/virtualMachines'] : {}
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
@@ -130,6 +130,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
 resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/MicrosoftMonitoringAgent'
   location: Location
+  tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
   properties: {
     publisher: 'Microsoft.EnterpriseCloud.Monitoring'
     type: 'MicrosoftMonitoringAgent'
@@ -150,7 +151,7 @@ resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/e
 resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/JsonADDomainExtension'
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
   properties: {
     forceUpdateTag: Timestamp
     publisher: 'Microsoft.Compute'
@@ -177,6 +178,7 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
 resource addToHostPool 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/HostPoolRegistration'
   location: Location
+  tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
   properties: {
     publisher: 'Microsoft.PowerShell'
     type: 'DSC'
@@ -200,7 +202,7 @@ resource addToHostPool 'Microsoft.Compute/virtualMachines/extensions@2023-03-01'
 resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if (!empty(PostDeployEndpoint)) {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
   properties: {
     publisher: 'Microsoft.Compute'
     type: 'CustomScriptExtension'
