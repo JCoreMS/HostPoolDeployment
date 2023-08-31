@@ -17,5 +17,6 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
     description: 'Provides User Identity ${UserIdentityName} read access for post deployment scripts.'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', Role.value.GUID)
     principalId: UserIdentityPrincipalId
+    principalType: 'ServicePrincipal'
   }
 }]

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "9648965937179875803"
+      "templateHash": "11433310716795153911"
     }
   },
   "parameters": {
@@ -387,7 +387,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.20.4.51522",
-              "templateHash": "9850008573693943313"
+              "templateHash": "163296594336953855"
             }
           },
           "parameters": {
@@ -449,7 +449,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.20.4.51522",
-                      "templateHash": "86351413185096813"
+                      "templateHash": "5150588030728637568"
                     }
                   },
                   "parameters": {
@@ -479,7 +479,8 @@
                       "properties": {
                         "description": "[format('Provides User Identity {0} read access for post deployment scripts.', parameters('UserIdentityName'))]",
                         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', items(parameters('RoleAssignments'))[copyIndex()].value.GUID)]",
-                        "principalId": "[parameters('UserIdentityPrincipalId')]"
+                        "principalId": "[parameters('UserIdentityPrincipalId')]",
+                        "principalType": "ServicePrincipal"
                       }
                     }
                   ]
