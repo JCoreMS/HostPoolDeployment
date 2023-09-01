@@ -15,6 +15,7 @@ param NumSessionHosts int
 param MarketPlaceGalleryWindows object
 param PostDeployEndpoint string
 param PostDeployScript string
+param PostDeployOption bool
 param Restart bool
 param Subnet string
 param Tags object
@@ -199,7 +200,7 @@ resource addToHostPool 'Microsoft.Compute/virtualMachines/extensions@2023-03-01'
   ]
 }]
 
-resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if (!empty(PostDeployEndpoint)) {
+resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if(PostDeployOption) {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
   location: Location
   tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}

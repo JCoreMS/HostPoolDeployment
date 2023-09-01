@@ -77,10 +77,9 @@ param LogAnalyticsSubId string
 param LogAnalyticsRG string
 param NumSessionHosts int
 param NumUsersPerHost int
-param PostDeployEndpoint string = ''
+param PostDeployContainerId string
+param PostDeployOption bool
 param PostDeployScript string
-param PostDeployStorName string
-param PostDeployStorRG string
 param Restart bool = true
 param Subnet string
 param Tags object = {}
@@ -136,6 +135,11 @@ var varKvNameDom = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[8] : 'non
 var varKvNameLoc = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[8] : 'none'
 var varKvDomRg = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[4] : 'none'
 var varKvLocRg = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[4] : 'none'
+
+var PostDeployContainerName = split(PostDeployContainerId, '/')[12]
+var PostDeployStorName = split(PostDeployContainerId, '/')[8]
+var PostDeployStorRG = split(PostDeployContainerId, '/')[4]
+var PostDeployEndpoint = 'https://${PostDeployStorName}.blob.${environment().suffixes.storage}/${PostDeployContainerName}'
 
 var RoleAssignments = {
   BlobDataRead: {
@@ -322,8 +326,9 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     NumSessionHosts: NumSessionHosts
     MarketPlaceGalleryWindows: useCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
     OUPath: OUPath
-    PostDeployEndpoint: PostDeployEndpoint
-    PostDeployScript: PostDeployScript
+    PostDeployEndpoint: PostDeployOption ? PostDeployEndpoint : ''
+    PostDeployScript: PostDeployOption ? PostDeployScript : ''
+    PostDeployOption: PostDeployOption
     Restart: Restart
     Subnet: Subnet
     Tags: Tags

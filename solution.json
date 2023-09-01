@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "11433310716795153911"
+      "templateHash": "1223621210637201130"
     }
   },
   "parameters": {
@@ -154,17 +154,13 @@
     "NumUsersPerHost": {
       "type": "int"
     },
-    "PostDeployEndpoint": {
-      "type": "string",
-      "defaultValue": ""
+    "PostDeployContainerId": {
+      "type": "string"
+    },
+    "PostDeployOption": {
+      "type": "bool"
     },
     "PostDeployScript": {
-      "type": "string"
-    },
-    "PostDeployStorName": {
-      "type": "string"
-    },
-    "PostDeployStorRG": {
       "type": "string"
     },
     "Restart": {
@@ -261,6 +257,10 @@
     "varKvNameLoc": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[8], 'none')]",
     "varKvDomRg": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[4], 'none')]",
     "varKvLocRg": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[4], 'none')]",
+    "PostDeployContainerName": "[split(parameters('PostDeployContainerId'), '/')[12]]",
+    "PostDeployStorName": "[split(parameters('PostDeployContainerId'), '/')[8]]",
+    "PostDeployStorRG": "[split(parameters('PostDeployContainerId'), '/')[4]]",
+    "PostDeployEndpoint": "[format('https://{0}.blob.{1}/{2}', variables('PostDeployStorName'), environment().suffixes.storage, variables('PostDeployContainerName'))]",
     "RoleAssignments": {
       "BlobDataRead": {
         "Name": "Blob-Data-Reader",
@@ -365,10 +365,10 @@
             "value": "[parameters('Location')]"
           },
           "PostDeployStorRG": {
-            "value": "[parameters('PostDeployStorRG')]"
+            "value": "[variables('PostDeployStorRG')]"
           },
           "PostDeployStorName": {
-            "value": "[parameters('PostDeployStorName')]"
+            "value": "[variables('PostDeployStorName')]"
           },
           "RoleAssignments": {
             "value": "[variables('RoleAssignments')]"
@@ -958,11 +958,10 @@
           "OUPath": {
             "value": "[parameters('OUPath')]"
           },
-          "PostDeployEndpoint": {
-            "value": "[parameters('PostDeployEndpoint')]"
-          },
-          "PostDeployScript": {
-            "value": "[parameters('PostDeployScript')]"
+          "PostDeployEndpoint": "[if(parameters('PostDeployOption'), createObject('value', variables('PostDeployEndpoint')), createObject('value', ''))]",
+          "PostDeployScript": "[if(parameters('PostDeployOption'), createObject('value', parameters('PostDeployScript')), createObject('value', ''))]",
+          "PostDeployOption": {
+            "value": "[parameters('PostDeployOption')]"
           },
           "Restart": {
             "value": "[parameters('Restart')]"
@@ -1015,7 +1014,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.20.4.51522",
-              "templateHash": "4006364967596795923"
+              "templateHash": "1996875798445646122"
             }
           },
           "parameters": {
@@ -1063,6 +1062,9 @@
             },
             "PostDeployScript": {
               "type": "string"
+            },
+            "PostDeployOption": {
+              "type": "bool"
             },
             "Restart": {
               "type": "bool"
@@ -1312,7 +1314,7 @@
                 "name": "extension_CustomScriptExtension",
                 "count": "[length(range(0, parameters('NumSessionHosts')))]"
               },
-              "condition": "[not(empty(parameters('PostDeployEndpoint')))]",
+              "condition": "[parameters('PostDeployOption')]",
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/CustomScriptExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
