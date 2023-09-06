@@ -6,18 +6,6 @@
       "value": ""
     },
     "AppGroupType": {},
-    "ComputeGalleryName": {
-      "value": ""
-    },
-    "ComputeGallerySubId": {
-      "value": ""
-    },
-    "ComputeGalleryRG": {
-      "value": ""
-    },
-    "ComputeGalleryImage": {
-      "value": ""
-    },
     "CustomRdpProperty": {
       "value": ""
     },
@@ -36,14 +24,17 @@
     "HostPoolName": {
       "value": ""
     },
-    "ResourceGroupVMs": {
-      "value": ""
-    },
     "HostPoolKind": {
       "value": ""
     },
     "HostPoolLBType": {
       "value": ""
+    },
+    "KeyVaultDomainOption": {
+      "value": false
+    },
+    "KeyVaultLocalOption": {
+      "value": false
     },
     "LogAnalyticsSubId": {
       "value": ""
@@ -57,13 +48,13 @@
     "NumUsersPerHost": {
       "value": 0
     },
+    "PostDeployContainerId": {
+      "value": ""
+    },
+    "PostDeployOption": {
+      "value": false
+    },
     "PostDeployScript": {
-      "value": ""
-    },
-    "PostDeployStorName": {
-      "value": ""
-    },
-    "PostDeployStorRG": {
       "value": ""
     },
     "Subnet": {
