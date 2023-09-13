@@ -255,7 +255,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 }
 
 module userIdentity 'modules/userIdentity.bicep' = if(PostDeployOption) {
-  scope: ResourceGroupHP == 'none' ? resourceGroup(ResourceGroupVMs) : resourceGroup(ResourceGroupHP)
+  scope: (HostPool == 'AltTenant') ? resourceGroup(ResourceGroupVMs) : resourceGroup(ResourceGroupHP)
   name: 'linked_UserIdentityCreateAssign'
   params: {
     Location: Location
@@ -266,7 +266,7 @@ module userIdentity 'modules/userIdentity.bicep' = if(PostDeployOption) {
     Tags: Tags
     UserIdentityName: UserIdentityName
   }
-  dependsOn: ResourceGroupHP == 'none' ? [
+  dependsOn: (HostPool == 'AltTenant') ? [
     resourceGroupVMs
   ] : [resourceGroupHP]
 }
