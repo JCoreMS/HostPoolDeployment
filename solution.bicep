@@ -255,7 +255,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 }
 
 module userIdentity 'modules/userIdentity.bicep' = if(PostDeployOption) {
-  scope: resourceGroup(DeployVMsTo)   // solves issue where alt tenant is selected given RG will be VM RG only
+  scope: HostPool == 'AltTenant' ?  resourceGroup(ResourceGroupVMs) : resourceGroup(ResourceGroupHP)  
   name: 'linked_UserIdentityCreateAssign'
   params: {
     Location: Location

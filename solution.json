@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "6413949733472465128"
+      "templateHash": "1948185618115698225"
     }
   },
   "parameters": {
@@ -391,7 +391,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_UserIdentityCreateAssign",
-      "resourceGroup": "[variables('DeployVMsTo')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1031,8 +1031,8 @@
           "useSharedImage": {
             "value": "[parameters('useCustomImage')]"
           },
-          "UserIdentityResId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployVMsTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value), createObject('value', ''))]",
-          "UserIdentityObjId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployVMsTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityObjId.value), createObject('value', ''))]",
+          "UserIdentityResId": "[if(parameters('PostDeployOption'), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value), createObject('value', ''))]",
+          "UserIdentityObjId": "[if(parameters('PostDeployOption'), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityObjId.value), createObject('value', ''))]",
           "VirtualNetwork": {
             "value": "[parameters('VirtualNetwork')]"
           },
@@ -1393,7 +1393,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployVMsTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
       ]
     }
   ]
