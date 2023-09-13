@@ -6,7 +6,10 @@ Param(
     $WindowsUpdate,
     [parameter(Mandatory)]
     [string]
-    $Restart
+    $Restart,
+    [parameter(Mandatory)]
+    [string]
+    $VOOT
 )
 
 ##############################################################
@@ -30,23 +33,6 @@ function Write-Log
     $Entry = '[' + $Timestamp + '] [' + $Type + '] ' + $Message
     $Entry | Out-File -FilePath $Path -Append
 }
-
-##############################################################
-#  Install LATEST AVD Agent - possibly conflict disabled
-##############################################################
-
-# Disabling this method for installing the AVD agent until AAD Join can completed successfully
-<# $BootInstaller = 'AVD-Bootloader.msi'
-Get-WebFile -FileName $BootInstaller -URL 'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH'
-Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $BootInstaller /quiet /qn /norestart /passive" -Wait -Passthru
-Write-Log -Message 'Installed AVD Bootloader' -Type 'INFO'
-Start-Sleep -Seconds 5
-
-$AgentInstaller = 'AVD-Agent.msi'
-Get-WebFile -FileName $AgentInstaller -URL 'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv'
-Start-Process -FilePath 'msiexec.exe' -ArgumentList "/i $AgentInstaller /quiet /qn /norestart /passive REGISTRATIONTOKEN=$HostPoolRegistrationToken" -Wait -PassThru
-Write-Log -Message 'Installed AVD Agent' -Type 'INFO'
-Start-Sleep -Seconds 5 #>
 
 ########################################################################################
 #                    WINDOWS AND APP UPDATES - issues with winget store app not being updated and unable to update during post config
@@ -74,9 +60,14 @@ if($WindowsUpdate.ToUpper() -eq 'TRUE'){
 ##############################################################
 #  Run VDOT
 ##############################################################
-
-
-
+If($VDOT.ToUpper() -eq 'TRUE'){
+    # Download VDOT 
+    Invoke-WebRequest -Uri https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool/archive/refs/heads/main.zip -OutFile C:\VDOT\VDOT.zip
+    # Extract Zip
+    Expand-Archive -Path C:\VDOT\VDOT.zip -DestinationPath C:\VDOT -Force
+    # Execute without Restart
+    C:\VDOT\Windows_VDOT.ps1 -Optimizations AppxPackages -AcceptEula -Verbose
+}
 ########################################################################################
 #                          REBOOT VM
 ########################################################################################

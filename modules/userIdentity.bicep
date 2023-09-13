@@ -1,6 +1,7 @@
 targetScope = 'resourceGroup'
 
 param Location string
+param PostDeployOption bool
 param PostDeployStorName string
 param PostDeployStorRG string
 param RoleAssignments object
@@ -9,13 +10,13 @@ param UserIdentityName string
 
 
 
-resource userIdentityCreate 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+resource userIdentityCreate 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = if(PostDeployOption) {
   name: UserIdentityName
   location: Location
   tags: contains(Tags, 'Microsoft.ManagedIdentity/userAssignedIdentities') ? Tags['Microsoft.ManagedIdentity/userAssignedIdentities'] : {}
 }
 
-module roleAssign 'usrId_RoleAssign.bicep' = {
+module roleAssign 'usrId_RoleAssign.bicep' = if(PostDeployOption) {
   name: 'linked_assignUserIDRole'
   scope: resourceGroup(PostDeployStorRG)
   params: {

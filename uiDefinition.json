@@ -129,6 +129,27 @@
                                     "visible": true
                                 },
                                 {
+                                    "name": "VDOT",
+                                    "type": "Microsoft.Common.OptionsGroup",
+                                    "label": "Configure Optimizations (VDOT)",
+                                    "defaultValue": "Yes",
+                                    "toolTip": "Deploys All Standard Optimizations per https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool",
+                                    "constraints": {
+                                        "required": true,
+                                        "allowedValues": [
+                                            {
+                                                "label": "Yes",
+                                                "value": true
+                                            },
+                                            {
+                                                "label": "No",
+                                                "value": false
+                                            }
+                                        ]
+                                    },
+                                    "visible": true
+                                },
+                                {
                                     "name": "restart",
                                     "type": "Microsoft.Common.OptionsGroup",
                                     "label": "Restart VMs after Post Config",
@@ -183,9 +204,9 @@
                     "label": "Host Pool",
                     "elements": [
                         {
-                            "name": "hostPoolNewExisting",
+                            "name": "hostPool",
                             "type": "Microsoft.Common.DropDown",
-                            "label": "New or Existing Host Pool",
+                            "label": "Host Pool",
                             "defaultValue": "Existing",
                             "toolTip": "",
                             "constraints": {
@@ -197,6 +218,10 @@
                                     {
                                         "label": "Existing",
                                         "value": "Existing"
+                                    },
+                                    {
+                                        "label": "Alternate Tenant",
+                                        "value": "AltTenant"
                                     }
                                 ],
                                 "required": true
@@ -206,7 +231,7 @@
                         {
                             "name": "hostPoolSelection",
                             "type": "Microsoft.Solutions.ResourceSelector",
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), true, false)]",
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'Existing'), true, false)]",
                             "label": "Host Pool Selection",
                             "resourceType": "Microsoft.DesktopVirtualization/hostPools",
                             "scope": {
@@ -214,7 +239,7 @@
                                 "location": "[steps('basics').resourceScope.location.name]"
                             },
                             "constraints": {
-                                "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), true, false)]"
+                                "required": "[if(equals(steps('hostPool').hostPool, 'Existing'), true, false)]"
                             }
                         },
                         {
@@ -241,11 +266,11 @@
                             "toolTip": "",
                             "placeholder": "hp-",
                             "constraints": {
-                                "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]",
+                                "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
                                 "regex": "",
                                 "validationMessage": ""
                             },
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                         },
                         {
                             "name": "rgNewExistingHP",
@@ -264,9 +289,9 @@
                                         "value": "Existing"
                                     }
                                 ],
-                                "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                                "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                             },
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                         },
                         {
                             "name": "hpRGExisting",
@@ -312,9 +337,9 @@
                                         "value": "Personal"
                                     }
                                 ],
-                                "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                                "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                             },
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                         },
                         {
                             "name": "hostPoolPooled",
@@ -338,9 +363,9 @@
                                                 "value": "BreadthFirst"
                                             }
                                         ],
-                                        "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                                        "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                                     },
-                                    "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                                    "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                                 },
                                 {
                                     "name": "AppGroupType",
@@ -349,7 +374,7 @@
                                     "defaultValue": "Full Desktop",
                                     "toolTip": "",
                                     "constraints": {
-                                        "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]",
+                                        "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
                                         "allowedValues": [
                                             {
                                                 "label": "Full Desktop",
@@ -361,7 +386,7 @@
                                             }
                                         ]
                                     },
-                                    "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                                    "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                                 },
                                 {
                                     "name": "NumUsersPerHost",
@@ -373,9 +398,9 @@
                                     "showStepMarkers": false,
                                     "toolTip": "",
                                     "constraints": {
-                                        "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                                        "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                                     },
-                                    "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                                    "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                                 }
                             ],
                             "visible": "[if(equals(steps('hostPool').hostPoolType, 'Pooled'), true, false)]"
@@ -431,7 +456,7 @@
                                 "required": false,
                                 "validationMessage": "This should be set for test and development environments."
                             },
-                            "visible": true
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), false, true)]"
                         },
                         {
                             "name": "WorkspaceName",
@@ -445,7 +470,7 @@
                                 "regex": "",
                                 "validationMessage": ""
                             },
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                         },
                         {
                             "name": "AppGroupName",
@@ -455,11 +480,11 @@
                             "toolTip": "",
                             "placeholder": "appgrp-",
                             "constraints": {
-                                "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]",
+                                "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
                                 "regex": "",
                                 "validationMessage": ""
                             },
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                         },
                         {
                             "name": "CustomRdpProperty",
@@ -469,11 +494,11 @@
                             "toolTip": "",
                             "placeholder": "audiocapturemode:i:1;camerastoredirect:s:*;use multimon:i:0;drivestoredirect:s:;",
                             "constraints": {
-                                "required": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]",
+                                "required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
                                 "regex": "",
                                 "validationMessage": ""
                             },
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
                         },
                         {
                             "name": "StartVmOnConnect",
@@ -484,7 +509,20 @@
                                 "required": false,
                                 "validationMessage": "Ideally you'd enable this for multisession when you have Scaling Plans or Personal Desktops in which VMs may be powered down."
                             },
-                            "visible": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), true, false)]"
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+                        },
+                        {
+                            "name": "CrossTenantHPToken",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Host Pool Token",
+                            "toolTip": "Valid Host Pool Token from alternate Tenant. Can be alternate Azure Cloud.",
+                            "multiLine": true,
+                            "constraints": {
+                                "required": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), true, false)]",
+                                "regex": "",
+                                "validationMessage": ""
+                            },
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), true, false)]"
                         }
                     ]
                 },
@@ -517,9 +555,19 @@
                             "type": "Microsoft.Common.InfoBox",
                             "visible": true,
                             "options": {
-                                "text": "Deployment will configured all required settings to use the AVD insights workbook.",
+                                "text": "Deployment will configure all required settings to use the AVD insights workbook.",
                                 "uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
                                 "style": "Info"
+                            }
+                        },
+                        {
+                            "name": "deployMonitoringInfo3",
+                            "type": "Microsoft.Common.InfoBox",
+                            "visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), true, false)]",
+                            "options": {
+                                "text": "You selected an Alternate Tenant or deploying Cross Cloud. Only the VM specific settings will be configured.",
+                                "uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
+                                "style": "Warning"
                             }
                         }
                     ]
@@ -978,24 +1026,26 @@
         },
         "outputs": {
             "parameters": {
-                "AppGroupName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').AppGroupName, steps('hostPool').hostPoolSelection.name)]",
-                "AppGroupType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
+                "AppGroupName": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').AppGroupName, steps('hostPool').hostPoolSelection.name)]",
+                "AppGroupType": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
                 "avdOsImage": "[steps('imageInfo').sessionHostsOsImage]",
                 "ComputeGalleryName": "[steps('imageInfo').computeGallerySelection.name]",
                 "ComputeGallerySubId": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),2))]",
                 "ComputeGalleryRG": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),4))]",
                 "ComputeGalleryImage": "[steps('imageInfo').imageSelection]",
-                "CustomRdpProperty": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').CustomRdpProperty, steps('hostPool').hostPoolApi.properties.customRdpProperty)]",
+                "CustomRdpProperty": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').CustomRdpProperty, steps('hostPool').hostPoolApi.properties.customRdpProperty)]",
                 "DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
                 "DomainName": "[steps('hostInfo').domainInformation.DomainName]",
                 "DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
                 "DomainPassword": "[if(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityDomainCredentials.DomainPassword)]",
-                "ResourceGroupHP": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)), if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), steps('hostPool').hpRGExisting, steps('hostPool').hpRGNameNew))]",
-                "HostPoolName": "[if(equals(steps('hostPool').hostPoolNewExisting, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
+                "ResourceGroupHP": "[if(equals(steps('hostPool').hostPool, 'Existing'), first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)), if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), steps('hostPool').hpRGExisting, steps('hostPool').hpRGNameNew))]",
+                "HostPool": "[steps('hostPool').hostPool]",
+                "HostPoolName": "[if(equals(steps('hostPool').hostPool, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
+                "HostPoolAltToken": "[steps('hostPool').CrossTenantHPToken]",
                 "HostPoolWorkspaceName": "[steps('hostPool').WorkspaceName]",
                 "ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
-                "HostPoolKind": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
-                "HostPoolLBType": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), if(equals(steps('hostPool').hostPoolType, 'Pooled'), steps('hostPool').hostPoolPooled.HostPoolBalance, steps('hostPool').hostPoolPersonal.PersonalAssignment), if(equals(steps('hostPool').hostPoolApi.properties.hostPoolType, 'Personal'), steps('hostPool').hostPoolApi.properties.personalDesktopAssignmentType, steps('hostPool').hostPoolApi.properties.loadBalancerType))]",
+                "HostPoolKind": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
+                "HostPoolLBType": "[if(equals(steps('hostPool').hostPool, 'New'), if(equals(steps('hostPool').hostPoolType, 'Pooled'), steps('hostPool').hostPoolPooled.HostPoolBalance, steps('hostPool').hostPoolPersonal.PersonalAssignment), if(equals(steps('hostPool').hostPoolApi.properties.hostPoolType, 'Personal'), steps('hostPool').hostPoolApi.properties.personalDesktopAssignmentType, steps('hostPool').hostPoolApi.properties.loadBalancerType))]",
                 "KeyVaultDomainOption": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]",
                 "KeyVaultLocalOption": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]",
                 "KeyVaultDomResId": "[steps('hostInfo').identityDomainCredentials.kvDomain.id]",
@@ -1007,18 +1057,20 @@
                 "LogAnalyticsWorkspaceName": "[steps('monitoring').alaWorkspaceExistingWorkspacesSelection.name]",
                 "Location": "[steps('basics').resourceScope.location.name]",
                 "NumSessionHosts": "[steps('hostPool').NumSessionHosts]",
-                "NumUsersPerHost": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').hostPoolPooled.NumUsersPerHost, steps('hostPool').hostPoolApi.properties.maxSessionLimit)]",
+                "NumUsersPerHost": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').hostPoolPooled.NumUsersPerHost, steps('hostPool').hostPoolApi.properties.maxSessionLimit)]",
                 "PostDeployOption": "[steps('basics').optionPostDeploy]",
                 "PostDeployContainerId": "[steps('basics').PostDeploySection.containerResourceId]",
                 "PostDeployScript": "[steps('basics').PostDeploySection.postScriptName]",
+                "PostDeployOptVDOT": "[steps('basics').PostDeploySection.VDOT]",
                 "Restart": "[steps('basics').PostDeploySection.restart]",
                 "Subnet": "[steps('networking').subnet]",
                 "Tags": "[steps('basics').TagsSection.Tags]",
                 "UpdateWindows": "[steps('basics').PostDeploySection.UpdateWindows]",
                 "useSharedImage": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
-                "StartVmOnConnect": "[if(equals(steps('hostPool').hostPoolNewExisting, 'New'), steps('hostPool').StartVmOnConnect, steps('hostPool').hostPoolApi.properties.startVMOnConnect)]",
+                "StartVmOnConnect": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').StartVmOnConnect, steps('hostPool').hostPoolApi.properties.startVMOnConnect)]",
                 "UserIdentityName": "[steps('basics').PostDeploySection.UserIdentityName]",
                 "OUPath": "[steps('hostInfo').domainInformation.OUPath]",
+                "VODT": "[steps('basics').PostDeploySection.VDOT]",
                 "VmIndexStart": "[steps('hostInfo').vmInformation.VmIndexStart]",
                 "VmPrefix": "[steps('hostInfo').vmInformation.VmPrefix]",
                 "ValidationEnvironment": "[steps('hostPool').ValidationEnvironment]",

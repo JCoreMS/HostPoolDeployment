@@ -4,16 +4,18 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.20.4.51522",
-      "templateHash": "1223621210637201130"
+      "version": "0.21.1.54444",
+      "templateHash": "1948185618115698225"
     }
   },
   "parameters": {
     "AppGroupName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "AppGroupType": {
       "type": "string",
+      "defaultValue": "Desktop",
       "allowedValues": [
         "Desktop",
         "RailApplications"
@@ -53,7 +55,8 @@
       "defaultValue": ""
     },
     "CustomRdpProperty": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "DiskSku": {
       "type": "string",
@@ -77,10 +80,12 @@
       "type": "securestring"
     },
     "ResourceGroupHP": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "HostPoolName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "HostPoolWorkspaceName": {
       "type": "string",
@@ -90,8 +95,20 @@
       "type": "string",
       "defaultValue": ""
     },
+    "HostPool": {
+      "type": "string",
+      "allowedValues": [
+        "New",
+        "Existing",
+        "AltTenant"
+      ],
+      "metadata": {
+        "description": "Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud."
+      }
+    },
     "HostPoolKind": {
       "type": "string",
+      "defaultValue": "Pooled",
       "allowedValues": [
         "Pooled",
         "Personal"
@@ -102,6 +119,7 @@
     },
     "HostPoolLBType": {
       "type": "string",
+      "defaultValue": "DepthFirst",
       "allowedValues": [
         "DepthFirst",
         "BreadthFirst",
@@ -111,6 +129,10 @@
       "metadata": {
         "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
       }
+    },
+    "HostPoolAltToken": {
+      "type": "securestring",
+      "defaultValue": ""
     },
     "KeyVaultDomainOption": {
       "type": "bool"
@@ -143,25 +165,35 @@
       "defaultValue": ""
     },
     "LogAnalyticsSubId": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "LogAnalyticsRG": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "NumSessionHosts": {
       "type": "int"
     },
     "NumUsersPerHost": {
-      "type": "int"
+      "type": "int",
+      "defaultValue": 0
     },
     "PostDeployContainerId": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "PostDeployOption": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue": false
     },
     "PostDeployScript": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
+    },
+    "PostDeployOptVDOT": {
+      "type": "bool",
+      "defaultValue": false
     },
     "Restart": {
       "type": "bool",
@@ -179,13 +211,16 @@
       "defaultValue": "[utcNow()]"
     },
     "UpdateWindows": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue": false
     },
     "UserIdentityName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "none"
     },
     "StartVmOnConnect": {
-      "type": "bool"
+      "type": "bool",
+      "defaultValue": true
     },
     "OUPath": {
       "type": "string"
@@ -257,10 +292,10 @@
     "varKvNameLoc": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[8], 'none')]",
     "varKvDomRg": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[4], 'none')]",
     "varKvLocRg": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[4], 'none')]",
-    "PostDeployContainerName": "[split(parameters('PostDeployContainerId'), '/')[12]]",
-    "PostDeployStorName": "[split(parameters('PostDeployContainerId'), '/')[8]]",
-    "PostDeployStorRG": "[split(parameters('PostDeployContainerId'), '/')[4]]",
-    "PostDeployEndpoint": "[format('https://{0}.blob.{1}/{2}', variables('PostDeployStorName'), environment().suffixes.storage, variables('PostDeployContainerName'))]",
+    "PostDeployContainerName": "[if(parameters('PostDeployOption'), split(parameters('PostDeployContainerId'), '/')[12], '')]",
+    "PostDeployStorName": "[if(parameters('PostDeployOption'), split(parameters('PostDeployContainerId'), '/')[8], '')]",
+    "PostDeployStorRG": "[if(parameters('PostDeployOption'), split(parameters('PostDeployContainerId'), '/')[4], '')]",
+    "PostDeployEndpoint": "[if(parameters('PostDeployOption'), format('https://{0}.blob.{1}/{2}', variables('PostDeployStorName'), environment().suffixes.storage, variables('PostDeployContainerName')), '')]",
     "RoleAssignments": {
       "BlobDataRead": {
         "Name": "Blob-Data-Reader",
@@ -336,6 +371,7 @@
   },
   "resources": [
     {
+      "condition": "[not(equals(parameters('ResourceGroupHP'), 'none'))]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
       "name": "[parameters('ResourceGroupHP')]",
@@ -351,10 +387,11 @@
       "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
     {
+      "condition": "[parameters('PostDeployOption')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_UserIdentityCreateAssign",
-      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -363,6 +400,9 @@
         "parameters": {
           "Location": {
             "value": "[parameters('Location')]"
+          },
+          "PostDeployOption": {
+            "value": "[parameters('PostDeployOption')]"
           },
           "PostDeployStorRG": {
             "value": "[variables('PostDeployStorRG')]"
@@ -386,13 +426,16 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "163296594336953855"
+              "version": "0.21.1.54444",
+              "templateHash": "8902579937101911225"
             }
           },
           "parameters": {
             "Location": {
               "type": "string"
+            },
+            "PostDeployOption": {
+              "type": "bool"
             },
             "PostDeployStorName": {
               "type": "string"
@@ -412,6 +455,7 @@
           },
           "resources": [
             {
+              "condition": "[parameters('PostDeployOption')]",
               "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
               "apiVersion": "2018-11-30",
               "name": "[parameters('UserIdentityName')]",
@@ -419,6 +463,7 @@
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), parameters('Tags')['Microsoft.ManagedIdentity/userAssignedIdentities'], createObject())]"
             },
             {
+              "condition": "[parameters('PostDeployOption')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "linked_assignUserIDRole",
@@ -448,8 +493,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.20.4.51522",
-                      "templateHash": "5150588030728637568"
+                      "version": "0.21.1.54444",
+                      "templateHash": "1493044573735749140"
                     }
                   },
                   "parameters": {
@@ -502,7 +547,11 @@
             }
           }
         }
-      }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none'))]"
+      ]
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -526,8 +575,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "15866775783442096083"
+              "version": "0.21.1.54444",
+              "templateHash": "491822644719585931"
             }
           },
           "parameters": {
@@ -546,6 +595,7 @@
       }
     },
     {
+      "condition": "[not(equals(parameters('HostPool'), 'AltTenant'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_HostPoolDeployment",
@@ -617,8 +667,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "7065400406753497577"
+              "version": "0.21.1.54444",
+              "templateHash": "6467201150142433098"
             }
           },
           "parameters": {
@@ -762,6 +812,7 @@
       ]
     },
     {
+      "condition": "[not(equals(parameters('HostPool'), 'AltTenant'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_Monitoring_Setup",
@@ -788,8 +839,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "6968171983583450524"
+              "version": "0.21.1.54444",
+              "templateHash": "11259218861282644875"
             }
           },
           "parameters": {
@@ -942,9 +993,7 @@
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
-          "HostPoolRegistrationToken": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value]"
-          },
+          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPool'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
           "Location": {
             "value": "[parameters('Location')]"
           },
@@ -960,6 +1009,7 @@
           },
           "PostDeployEndpoint": "[if(parameters('PostDeployOption'), createObject('value', variables('PostDeployEndpoint')), createObject('value', ''))]",
           "PostDeployScript": "[if(parameters('PostDeployOption'), createObject('value', parameters('PostDeployScript')), createObject('value', ''))]",
+          "PostDeployOptVDOT": "[if(parameters('PostDeployOption'), createObject('value', parameters('PostDeployOptVDOT')), createObject('value', false()))]",
           "PostDeployOption": {
             "value": "[parameters('PostDeployOption')]"
           },
@@ -981,12 +1031,8 @@
           "useSharedImage": {
             "value": "[parameters('useCustomImage')]"
           },
-          "UserIdentityResId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value]"
-          },
-          "UserIdentityObjId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityObjId.value]"
-          },
+          "UserIdentityResId": "[if(parameters('PostDeployOption'), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value), createObject('value', ''))]",
+          "UserIdentityObjId": "[if(parameters('PostDeployOption'), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityObjId.value), createObject('value', ''))]",
           "VirtualNetwork": {
             "value": "[parameters('VirtualNetwork')]"
           },
@@ -1013,8 +1059,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.20.4.51522",
-              "templateHash": "1996875798445646122"
+              "version": "0.21.1.54444",
+              "templateHash": "16206465816576209918"
             }
           },
           "parameters": {
@@ -1064,6 +1110,9 @@
               "type": "string"
             },
             "PostDeployOption": {
+              "type": "bool"
+            },
+            "PostDeployOptVDOT": {
               "type": "bool"
             },
             "Restart": {
@@ -1169,12 +1218,7 @@
               "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines'), parameters('Tags')['Microsoft.Compute/virtualMachines'], createObject())]",
-              "identity": {
-                "type": "UserAssigned",
-                "userAssignedIdentities": {
-                  "[format('{0}', parameters('UserIdentityResId'))]": {}
-                }
-              },
+              "identity": "[if(parameters('PostDeployOption'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserIdentityResId')), createObject())), null())]",
               "properties": {
                 "hardwareProfile": {
                   "vmSize": "[parameters('VmSize')]"
@@ -1335,7 +1379,7 @@
                   "managedIdentity": {
                     "objectId": "[parameters('UserIdentityObjId')]"
                   },
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} -WindowsUpdate {1} -Restart {2}', parameters('PostDeployScript'), parameters('UpdateWindows'), parameters('Restart'))]"
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} -WindowsUpdate {1} -Restart {2} -VDOT {3}', parameters('PostDeployScript'), parameters('UpdateWindows'), parameters('Restart'), parameters('PostDeployOptVDOT'))]"
                 }
               },
               "dependsOn": [
@@ -1349,7 +1393,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
       ]
     }
   ]

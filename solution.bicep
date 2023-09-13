@@ -1,12 +1,12 @@
 targetScope = 'subscription'
 
-param AppGroupName string
+param AppGroupName string = 'none'
 
 @allowed([
   'Desktop'
   'RailApplications'
 ])
-param AppGroupType string
+param AppGroupType string = 'Desktop'
 
 @allowed([
   'win10_21h2'
@@ -26,7 +26,7 @@ param ComputeGallerySubId string = ''
 param ComputeGalleryRG string = ''
 param ComputeGalleryImage string = ''
 
-param CustomRdpProperty string
+param CustomRdpProperty string = ''
 
 @allowed([
   'Standard_LRS'
@@ -42,18 +42,26 @@ param DomainUser string
 @secure()
 param DomainPassword string
 
-param ResourceGroupHP string
-param HostPoolName string
+param ResourceGroupHP string = 'none'
+param HostPoolName string = 'none'
 param HostPoolWorkspaceName string = 'none'
 
 param ResourceGroupVMs string = ''
+
+@allowed([
+  'New'
+  'Existing'
+  'AltTenant'
+])
+@description('Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud.')
+param HostPool string
 
 @allowed([
   'Pooled'
   'Personal'
 ])
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
-param HostPoolKind string
+param HostPoolKind string = 'Pooled'
 
 @allowed([
   'DepthFirst'
@@ -62,7 +70,10 @@ param HostPoolKind string
   'Direct'
 ])
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
-param HostPoolLBType string
+param HostPoolLBType string = 'DepthFirst'
+
+@secure()
+param HostPoolAltToken string = ''
 
 param KeyVaultDomainOption bool
 param KeyVaultLocalOption bool
@@ -73,20 +84,21 @@ param KeyVaultLocName string = ''
 
 param Location string = deployment().location
 param LogAnalyticsWorkspaceName string = ''
-param LogAnalyticsSubId string
-param LogAnalyticsRG string
+param LogAnalyticsSubId string = ''
+param LogAnalyticsRG string = ''
 param NumSessionHosts int
-param NumUsersPerHost int
-param PostDeployContainerId string
-param PostDeployOption bool
-param PostDeployScript string
+param NumUsersPerHost int = 0
+param PostDeployContainerId string = ''
+param PostDeployOption bool = false
+param PostDeployScript string = ''
+param PostDeployOptVDOT bool = false
 param Restart bool = true
 param Subnet string
 param Tags object = {}
 param Timestamp string = utcNow()
-param UpdateWindows bool
-param UserIdentityName string
-param StartVmOnConnect bool
+param UpdateWindows bool = false
+param UserIdentityName string = 'none'
+param StartVmOnConnect bool = true
 param OUPath string
 
 @description('Optional. Set to deploy image from Azure Compute Gallery. (Default: false)')
@@ -136,10 +148,10 @@ var varKvNameLoc = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[8] : 'none
 var varKvDomRg = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[4] : 'none'
 var varKvLocRg = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[4] : 'none'
 
-var PostDeployContainerName = split(PostDeployContainerId, '/')[12]
-var PostDeployStorName = split(PostDeployContainerId, '/')[8]
-var PostDeployStorRG = split(PostDeployContainerId, '/')[4]
-var PostDeployEndpoint = 'https://${PostDeployStorName}.blob.${environment().suffixes.storage}/${PostDeployContainerName}'
+var PostDeployContainerName = PostDeployOption ? split(PostDeployContainerId, '/')[12] : ''
+var PostDeployStorName = PostDeployOption ? split(PostDeployContainerId, '/')[8] : ''
+var PostDeployStorRG = PostDeployOption ? split(PostDeployContainerId, '/')[4] : ''
+var PostDeployEndpoint = PostDeployOption ? 'https://${PostDeployStorName}.blob.${environment().suffixes.storage}/${PostDeployContainerName}' : ''
 
 var RoleAssignments = {
   BlobDataRead: {
@@ -215,7 +227,7 @@ var varMarketPlaceGalleryWindows = {
   }
 }
 
-resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = if(ResourceGroupHP != 'none') {
   name: ResourceGroupHP
   location: Location
   tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
@@ -242,17 +254,21 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
   scope: resourceGroup(ComputeGallerySubId, ComputeGalleryRG) //scope to alternate subscription
 }
 
-module userIdentity 'modules/userIdentity.bicep' = {
-  scope: resourceGroup(ResourceGroupHP)
+module userIdentity 'modules/userIdentity.bicep' = if(PostDeployOption) {
+  scope: ResourceGroupHP == 'none' ? resourceGroup(ResourceGroupVMs) : resourceGroup(ResourceGroupHP)
   name: 'linked_UserIdentityCreateAssign'
   params: {
     Location: Location
+    PostDeployOption: PostDeployOption
     PostDeployStorRG: PostDeployStorRG
     PostDeployStorName: PostDeployStorName
     RoleAssignments: RoleAssignments
     Tags: Tags
     UserIdentityName: UserIdentityName
   }
+  dependsOn: ResourceGroupHP == 'none' ? [
+    resourceGroupVMs
+  ] : [resourceGroupHP]
 }
 
 module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
@@ -263,7 +279,7 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
   }
 }
 
-module hostPool 'modules/hostpool.bicep' = {
+module hostPool 'modules/hostpool.bicep' = if(HostPool != 'AltTenant'){
   name: 'linked_HostPoolDeployment'
   scope: resourceGroup(ResourceGroupHP)
   params: {
@@ -293,7 +309,7 @@ module hostPool 'modules/hostpool.bicep' = {
 
 // Monitoring Resources for AVD Insights
 // This module configures Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
-module monitoring 'modules/monitoring.bicep' = {
+module monitoring 'modules/monitoring.bicep' = if(HostPool != 'AltTenant'){
   name: 'linked_Monitoring_Setup'
   scope: resourceGroup(ResourceGroupHP) // Management Resource Group
   params: {
@@ -320,7 +336,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
     DomainName: DomainName
     HostPoolName: HostPoolName
-    HostPoolRegistrationToken: hostPool.outputs.HostPoolRegistrationToken
+    HostPoolRegistrationToken: HostPool != 'AltTenant' ? hostPool.outputs.HostPoolRegistrationToken : HostPoolAltToken
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
@@ -328,6 +344,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     OUPath: OUPath
     PostDeployEndpoint: PostDeployOption ? PostDeployEndpoint : ''
     PostDeployScript: PostDeployOption ? PostDeployScript : ''
+    PostDeployOptVDOT: PostDeployOption ? PostDeployOptVDOT : false
     PostDeployOption: PostDeployOption
     Restart: Restart
     Subnet: Subnet
@@ -335,8 +352,8 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Timestamp: Timestamp
     UpdateWindows: UpdateWindows
     useSharedImage: useCustomImage
-    UserIdentityResId: userIdentity.outputs.userIdentityResId
-    UserIdentityObjId: userIdentity.outputs.userIdentityObjId
+    UserIdentityResId: PostDeployOption ? userIdentity.outputs.userIdentityResId : ''
+    UserIdentityObjId: PostDeployOption ? userIdentity.outputs.userIdentityObjId : ''
     VirtualNetwork: VirtualNetwork
     VirtualNetworkResourceGroup: VirtualNetworkResourceGroup
     VmIndexStart: VmIndexStart
@@ -345,8 +362,10 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocName) : VmPassword
     VmPrefix: VmPrefix
   }
-  dependsOn: [
+  dependsOn: PostDeployOption ? [
     monitoring
     userIdentity
+  ] :[
+    monitoring
   ]
 }]

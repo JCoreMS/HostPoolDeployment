@@ -63,5 +63,5 @@ Write-Host "Complete URL copied to clipboard!" -ForegroundColor Yellow
 ## Deploy To Template spec
 
 ```PowerShell
-New-AzTemplateSpec -ResourceGroupName 'myRG' -Name 'myTemplateSpec' -Version 'v2.0' -Location 'West US' -TemplateFile 'myTemplateContent.json' -UIFormDefinitionFile 'myUIDefinition.json'
+New-AzTemplateSpec -ResourceGroupName 'myRG' -Name 'DeployHostPool-Custom-UI' -Version 'v1.0' -Location 'West US' -TemplateFile 'solution.json' -UIFormDefinitionFile 'uiDefinition.json'
 ```

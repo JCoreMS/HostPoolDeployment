@@ -16,6 +16,7 @@ param MarketPlaceGalleryWindows object
 param PostDeployEndpoint string
 param PostDeployScript string
 param PostDeployOption bool
+param PostDeployOptVDOT bool
 param Restart bool
 param Subnet string
 param Tags object
@@ -73,12 +74,12 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
   tags: contains(Tags, 'Microsoft.Compute/virtualMachines') ? Tags['Microsoft.Compute/virtualMachines'] : {}
-  identity: {
+  identity: PostDeployOption ? {
     type: 'UserAssigned'
     userAssignedIdentities: {
       '${UserIdentityResId}': {}
     }
-  }
+  } : null
   properties: {
     hardwareProfile: {
       vmSize: VmSize
@@ -217,7 +218,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     }
     protectedSettings: {
       managedIdentity: { objectId: UserIdentityObjId }
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${PostDeployScript} -WindowsUpdate ${UpdateWindows} -Restart ${Restart}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${PostDeployScript} -WindowsUpdate ${UpdateWindows} -Restart ${Restart} -VDOT ${PostDeployOptVDOT}'
     }
   }
   dependsOn: [
