@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "6538600842648726650"
+      "templateHash": "10126698639695985167"
     }
   },
   "parameters": {
@@ -372,7 +372,7 @@
   },
   "resources": [
     {
-      "condition": "[not(equals(parameters('ResourceGroupHP'), 'none'))]",
+      "condition": "[not(empty(parameters('ResourceGroupHP')))]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
       "name": "[parameters('ResourceGroupHP')]",

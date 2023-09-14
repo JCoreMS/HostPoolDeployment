@@ -228,7 +228,7 @@ var varMarketPlaceGalleryWindows = {
   }
 }
 
-resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = if(ResourceGroupHP != 'none') {
+resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = if(!empty(ResourceGroupHP)) {
   name: ResourceGroupHP
   location: Location
   tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
