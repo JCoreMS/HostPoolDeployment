@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "11804480257492981713"
+      "templateHash": "3252637871558764711"
     }
   },
   "parameters": {
@@ -375,7 +375,7 @@
       "condition": "[not(empty(parameters('ResourceGroupHP')))]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
-      "name": "[parameters('ResourceGroupHP')]",
+      "name": "[if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP')]",
       "location": "[parameters('Location')]",
       "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
@@ -383,7 +383,7 @@
       "condition": "[not(empty(parameters('ResourceGroupVMs')))]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
-      "name": "[parameters('ResourceGroupVMs')]",
+      "name": "[if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none-rgVMs')]",
       "location": "[if(not(empty(parameters('Location'))), parameters('Location'), 'none')]",
       "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
@@ -550,8 +550,8 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupVMs'))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none-rgVMs'))]"
       ]
     },
     {
@@ -809,7 +809,7 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]"
       ]
     },
     {
@@ -959,7 +959,7 @@
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('ResourceGroupHP'))]"
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]"
       ]
     },
     {
