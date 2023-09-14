@@ -140,6 +140,7 @@ var SessionHostBatchCount = DivisionRemainderValue > 0 ? DivisionValue + 1 : Div
 var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environment().suffixes.storage}/galleryartifacts/Configuration_09-08-2022.zip'
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
+var DeployIDTo = HostPool == 'AltTenant' ? ResourceGroupVMs : ResourceGroupHP
 
 var varKvDomSubId = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[2] : 'none'
 var varKvLocSubId = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[2] : 'none'
@@ -255,7 +256,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 }
 
 module userIdentity 'modules/userIdentity.bicep' = if(PostDeployOption) {
-  scope: resourceGroup(ResourceGroupHP)
+  scope: resourceGroup(DeployIDTo)
   name: 'linked_UserIdentityCreateAssign'
   params: {
     Location: Location
