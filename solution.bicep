@@ -268,9 +268,9 @@ module userIdentity 'modules/userIdentity.bicep' = if(PostDeployOption) {
     Tags: Tags
     UserIdentityName: UserIdentityName
   }
-  dependsOn: (HostPool == 'AltTenant') ? [
-    resourceGroupVMs
-  ] : [resourceGroupHP]
+  dependsOn: [
+    resourceGroup(DeployIDTo)
+  ]
 }
 
 module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
@@ -305,7 +305,7 @@ module hostPool 'modules/hostpool.bicep' = if(HostPool != 'AltTenant'){
     HostPoolWorkspaceName: HostPoolWorkspaceName
   }
   dependsOn: [
-    resourceGroupHP
+    resourceGroup(DeployHPTo)
   ]
 }
 
@@ -321,7 +321,7 @@ module monitoring 'modules/monitoring.bicep' = if(HostPool != 'AltTenant'){
   }
   dependsOn: [
     logAnalyticsWorkspace
-    resourceGroupHP
+    resourceGroup(DeployHPTo)
     hostPool
   ]
 }

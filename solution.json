@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "3048166718950602758"
+      "templateHash": "4404678170265174394"
     }
   },
   "parameters": {
@@ -549,11 +549,7 @@
             }
           }
         }
-      },
-      "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none-rgVMs'))]"
-      ]
+      }
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -808,10 +804,7 @@
             }
           }
         }
-      },
-      "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]"
-      ]
+      }
     },
     {
       "condition": "[not(equals(parameters('HostPool'), 'AltTenant'))]",
@@ -959,8 +952,7 @@
       },
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]"
       ]
     },
     {
