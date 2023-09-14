@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "7854435654435686105"
+      "templateHash": "6538600842648726650"
     }
   },
   "parameters": {
@@ -81,7 +81,7 @@
     },
     "ResourceGroupHP": {
       "type": "string",
-      "defaultValue": "none"
+      "defaultValue": ""
     },
     "HostPoolName": {
       "type": "string",
@@ -286,7 +286,7 @@
     "varAvdAgentPackageLocation": "[format('https://wvdportalstorageblob.blob.{0}/galleryartifacts/Configuration_09-08-2022.zip', environment().suffixes.storage)]",
     "HostPoolType": "[format('{0} {1}', parameters('HostPoolKind'), parameters('HostPoolLBType'))]",
     "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]",
-    "DeployIDTo": "[if(equals(parameters('HostPool'), 'AltTenant'), parameters('ResourceGroupVMs'), parameters('ResourceGroupHP'))]",
+    "DeployIDTo": "[if(empty(parameters('ResourceGroupHP')), parameters('ResourceGroupVMs'), parameters('ResourceGroupHP'))]",
     "varKvDomSubId": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[2], 'none')]",
     "varKvLocSubId": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[2], 'none')]",
     "varKvNameDom": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[8], 'none')]",

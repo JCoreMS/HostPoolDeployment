@@ -42,7 +42,7 @@ param DomainUser string
 @secure()
 param DomainPassword string
 
-param ResourceGroupHP string = 'none'
+param ResourceGroupHP string = ''
 param HostPoolName string = 'none'
 param HostPoolWorkspaceName string = 'none'
 
@@ -140,7 +140,7 @@ var SessionHostBatchCount = DivisionRemainderValue > 0 ? DivisionValue + 1 : Div
 var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environment().suffixes.storage}/galleryartifacts/Configuration_09-08-2022.zip'
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
-var DeployIDTo = HostPool == 'AltTenant' ? ResourceGroupVMs : ResourceGroupHP
+var DeployIDTo = empty(ResourceGroupHP) ? ResourceGroupVMs : ResourceGroupHP
 
 var varKvDomSubId = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[2] : 'none'
 var varKvLocSubId = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[2] : 'none'
