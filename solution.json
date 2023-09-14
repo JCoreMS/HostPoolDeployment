@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "12855039310917756062"
+      "templateHash": "8712960996705698318"
     }
   },
   "parameters": {
@@ -287,6 +287,7 @@
     "HostPoolType": "[format('{0} {1}', parameters('HostPoolKind'), parameters('HostPoolLBType'))]",
     "DeployVMsTo": "[if(empty(parameters('ResourceGroupVMs')), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]",
     "DeployIDTo": "[if(empty(parameters('ResourceGroupHP')), parameters('ResourceGroupVMs'), parameters('ResourceGroupHP'))]",
+    "DeployHPTo": "[if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), parameters('ResourceGroupVMs'))]",
     "varKvDomSubId": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[2], 'none')]",
     "varKvLocSubId": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[2], 'none')]",
     "varKvNameDom": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[8], 'none')]",
@@ -600,7 +601,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_HostPoolDeployment",
-      "location": "[deployment().location]",
+      "resourceGroup": "[variables('DeployHPTo')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -957,7 +958,7 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]"
       ]
@@ -994,7 +995,7 @@
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
-          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPool'), 'AltTenant')), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
+          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPool'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
           "Location": {
             "value": "[parameters('Location')]"
           },
@@ -1391,7 +1392,7 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployIDTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"

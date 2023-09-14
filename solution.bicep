@@ -141,6 +141,7 @@ var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environmen
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
 var DeployIDTo = empty(ResourceGroupHP) ? ResourceGroupVMs : ResourceGroupHP
+var DeployHPTo = !empty(ResourceGroupHP) ? ResourceGroupHP : ResourceGroupVMs
 
 var varKvDomSubId = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[2] : 'none'
 var varKvLocSubId = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[2] : 'none'
@@ -282,7 +283,7 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
 
 module hostPool 'modules/hostpool.bicep' = if(HostPool != 'AltTenant'){
   name: 'linked_HostPoolDeployment'
-  scope: !empty(ResourceGroupHP) ? resourceGroup(ResourceGroupHP) : resourceGroup(ResourceGroupVMs)
+  scope: resourceGroup(DeployHPTo)
   params: {
     AppGroupName: AppGroupName
     AppGroupType: AppGroupType
