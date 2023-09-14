@@ -282,7 +282,7 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
 
 module hostPool 'modules/hostpool.bicep' = if(HostPool != 'AltTenant'){
   name: 'linked_HostPoolDeployment'
-  scope: resourceGroup(ResourceGroupHP)
+  scope: !empty(ResourceGroupHP) ? resourceGroup(ResourceGroupHP) : resourceGroup(ResourceGroupVMs)
   params: {
     AppGroupName: AppGroupName
     AppGroupType: AppGroupType

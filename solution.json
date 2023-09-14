@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "3252637871558764711"
+      "templateHash": "12855039310917756062"
     }
   },
   "parameters": {
@@ -600,7 +600,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_HostPoolDeployment",
-      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -957,7 +957,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP'))]"
       ]
@@ -994,7 +994,7 @@
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
-          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPool'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
+          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPool'), 'AltTenant')), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
           "Location": {
             "value": "[parameters('Location')]"
           },
@@ -1391,7 +1391,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployIDTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
