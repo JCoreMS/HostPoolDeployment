@@ -313,7 +313,7 @@ module hostPool 'modules/hostpool.bicep' = if(HostPool != 'AltTenant'){
 // This module configures Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
 module monitoring 'modules/monitoring.bicep' = if(HostPool != 'AltTenant'){
   name: 'linked_Monitoring_Setup'
-  scope: resourceGroup(ResourceGroupHP) // Management Resource Group
+  scope: resourceGroup(DeployHPTo) // Management Resource Group
   params: {
     HostPoolName: HostPoolName
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId

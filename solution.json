@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "8712960996705698318"
+      "templateHash": "3048166718950602758"
     }
   },
   "parameters": {
@@ -818,7 +818,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_Monitoring_Setup",
-      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "resourceGroup": "[variables('DeployHPTo')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1394,7 +1394,7 @@
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_Monitoring_Setup')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployIDTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
       ]
     }
