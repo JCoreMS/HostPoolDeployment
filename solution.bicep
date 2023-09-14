@@ -245,7 +245,7 @@ resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultLo
 }
 
 resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (!empty(ResourceGroupVMs)) {
-  name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none'
+  name: ResourceGroupVMs
   location: !empty(Location) ? Location : 'none'
   tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
 }
