@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "4404678170265174394"
+      "templateHash": "3200978797999038049"
     }
   },
   "parameters": {
@@ -1054,7 +1054,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.21.1.54444",
-              "templateHash": "16206465816576209918"
+              "templateHash": "16472992851652311869"
             }
           },
           "parameters": {
@@ -1365,7 +1365,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                   "fileUris": [
-                    "[format('{0}{1}', parameters('PostDeployEndpoint'), parameters('PostDeployScript'))]"
+                    "[format('{0}/{1}', parameters('PostDeployEndpoint'), parameters('PostDeployScript'))]"
                   ],
                   "timestamp": "[parameters('Timestamp')]"
                 },

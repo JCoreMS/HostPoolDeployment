@@ -212,7 +212,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        '${PostDeployEndpoint}${PostDeployScript}'
+        '${PostDeployEndpoint}/${PostDeployScript}'
       ]
       timestamp: Timestamp
     }
