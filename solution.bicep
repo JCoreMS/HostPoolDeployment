@@ -137,7 +137,7 @@ var DivisionRemainderValue = NumSessionHosts % MaxResourcesPerTemplateDeployment
 var SessionHostBatchCount = DivisionRemainderValue > 0 ? DivisionValue + 1 : DivisionValue // This determines the total number of batches needed, whether full and / or partial.
 /*  END BATCHING SESSION HOSTS */
 
-var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environment().suffixes.storage}/galleryartifacts/Configuration_09-08-2022.zip'
+var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environment().suffixes.storage}/galleryartifacts/Configuration_1.0.02454.213.zip'
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
 var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
 var DeployIDTo = empty(ResourceGroupHP) ? ResourceGroupVMs : ResourceGroupHP

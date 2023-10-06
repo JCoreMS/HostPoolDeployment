@@ -9,7 +9,7 @@ Param(
     $Restart,
     [parameter(Mandatory)]
     [string]
-    $VOOT
+    $VDOT
 )
 
 ##############################################################
