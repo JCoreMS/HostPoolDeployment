@@ -45,6 +45,7 @@ var securityProfileJson = {
   }
   securityType: SecurityType
 }
+
 var imageToUse = useSharedImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
@@ -75,11 +76,13 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
   location: Location
   tags: contains(Tags, 'Microsoft.Compute/virtualMachines') ? Tags['Microsoft.Compute/virtualMachines'] : {}
   identity: PostDeployOption ? {
-    type: 'UserAssigned'
+    type: 'SystemAssigned, UserAssigned'
     userAssignedIdentities: {
       '${UserIdentityResId}': {}
     }
-  } : null
+  } : {
+    type: 'SystemAssigned'
+  }
   properties: {
     hardwareProfile: {
       vmSize: VmSize

@@ -18,8 +18,7 @@ param AppGroupType string = 'Desktop'
   'win11_22h2'
   'win11_22h2_office'
 ])
-@description('Optional. AVD OS image SKU. (Default: win11-21h2)')
-param avdOsImage string = 'win11_22h2'
+param avdOsImage string
 
 param ComputeGalleryName string = ''
 param ComputeGallerySubId string = ''
