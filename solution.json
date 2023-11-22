@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.23.1.45101",
-      "templateHash": "12246094875863439273"
+      "templateHash": "3351140534887766380"
     }
   },
   "parameters": {
@@ -1051,7 +1051,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.23.1.45101",
-              "templateHash": "4248508674945792192"
+              "templateHash": "6467326441440107144"
             }
           },
           "parameters": {
@@ -1246,7 +1246,6 @@
                     }
                   ]
                 },
-                "securityProfile": "[if(equals(variables('SecurityType'), 'TrustedLaunch'), variables('securityProfileJson'), null())]",
                 "diagnosticsProfile": {
                   "bootDiagnostics": {
                     "enabled": false
