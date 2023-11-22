@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.23.1.45101",
-      "templateHash": "2672517365440205893"
+      "templateHash": "12246094875863439273"
     }
   },
   "parameters": {
@@ -23,6 +23,7 @@
     },
     "avdOsImage": {
       "type": "string",
+      "defaultValue": "win11_22h2_office",
       "allowedValues": [
         "win10_21h2",
         "win10_21h2_office",

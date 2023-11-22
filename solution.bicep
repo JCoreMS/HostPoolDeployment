@@ -18,7 +18,7 @@ param AppGroupType string = 'Desktop'
   'win11_22h2'
   'win11_22h2_office'
 ])
-param avdOsImage string
+param avdOsImage string = 'win11_22h2_office'
 
 param ComputeGalleryName string = ''
 param ComputeGallerySubId string = ''
