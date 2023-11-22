@@ -1066,7 +1066,7 @@
                 "Subnet": "[steps('networking').subnet]",
                 "Tags": "[steps('basics').TagsSection.Tags]",
                 "UpdateWindows": "[steps('basics').PostDeploySection.UpdateWindows]",
-                "useCustomImage": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
+                "UseCustomImage": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
                 "StartVmOnConnect": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').StartVmOnConnect, steps('hostPool').hostPoolApi.properties.startVMOnConnect)]",
                 "UserIdentityName": "[steps('basics').PostDeploySection.UserIdentityName]",
                 "OUPath": "[steps('hostInfo').domainInformation.OUPath]",
