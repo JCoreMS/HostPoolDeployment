@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.22.6.54827",
-      "templateHash": "2173222238880334302"
+      "version": "0.23.1.45101",
+      "templateHash": "11764514687804434172"
     }
   },
   "parameters": {
@@ -428,8 +428,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "11901466216085378585"
+              "version": "0.23.1.45101",
+              "templateHash": "9051365286795933699"
             }
           },
           "parameters": {
@@ -495,8 +495,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "13155276434924376209"
+                      "version": "0.23.1.45101",
+                      "templateHash": "11963529521073143423"
                     }
                   },
                   "parameters": {
@@ -573,8 +573,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "385675957939305845"
+              "version": "0.23.1.45101",
+              "templateHash": "4832555743731800132"
             }
           },
           "parameters": {
@@ -665,8 +665,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "4336532184007484821"
+              "version": "0.23.1.45101",
+              "templateHash": "4062270006869312728"
             }
           },
           "parameters": {
@@ -834,8 +834,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "8761998514623493014"
+              "version": "0.23.1.45101",
+              "templateHash": "3312399604223769718"
             }
           },
           "parameters": {
@@ -1053,8 +1053,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "9104868863361639478"
+              "version": "0.23.1.45101",
+              "templateHash": "9908135431606028114"
             }
           },
           "parameters": {
@@ -1163,7 +1163,7 @@
           },
           "variables": {
             "SharedImageSecType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType')))[0].value, 'Standard')]",
-            "SecurityType": "[if(parameters('useSharedImage'), variables('SharedImageSecType'), 'TrustedLaunch')]",
+            "SecurityType": "[if(equals(variables('SharedImageSecType'), 'TrustedLaunchSupported'), 'TrustedLaunch', variables('SharedImageSecType'))]",
             "securityProfileJson": {
               "uefiSettings": {
                 "secureBootEnabled": true,
