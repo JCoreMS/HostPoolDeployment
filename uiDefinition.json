@@ -689,7 +689,7 @@
                                     "defaultValue": "Standard",
                                     "toolTip": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS.",
                                     "constraints": {
-                                        "required": false,
+                                        "required": true,
                                         "allowedValues": [
                                             {
                                                 "label": "Standard HDD (Not Recommended for Production)",
