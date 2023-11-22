@@ -101,7 +101,7 @@ param StartVmOnConnect bool = true
 param OUPath string
 
 @description('Optional. Set to deploy image from Azure Compute Gallery. (Default: false)')
-param useCustomImage bool = false
+param UseCustomImage bool = false
 
 @maxValue(99)
 param VmIndexStart int
@@ -296,7 +296,7 @@ module hostPool 'modules/hostpool.bicep' = if(HostPool != 'AltTenant'){
     NumUsersPerHost: NumUsersPerHost
     StartVmOnConnect: StartVmOnConnect
     Tags: Tags
-    UseCustomImage: useCustomImage
+    UseCustomImage: UseCustomImage
     ValidationEnvironment: ValidationEnvironment
     vmImage: varMarketPlaceGalleryWindows[avdOsImage]
     VmPrefix: VmPrefix
@@ -331,8 +331,8 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   scope: resourceGroup(DeployVMsTo)
   params: {
     AgentPackageLocation: varAvdAgentPackageLocation
-    ComputeGalleryImageId: useCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
-    ComputeGalleryProperties: useCustomImage ? computeGalleryImage.properties : {}
+    ComputeGalleryImageId: UseCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
+    ComputeGalleryProperties: UseCustomImage ? computeGalleryImage.properties : {}
     DomainUser: DomainUser
     DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
     DomainName: DomainName
@@ -341,7 +341,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Location: Location
     LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
     NumSessionHosts: NumSessionHosts
-    MarketPlaceGalleryWindows: useCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
+    MarketPlaceGalleryWindows: UseCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
     OUPath: OUPath
     PostDeployEndpoint: PostDeployOption ? PostDeployEndpoint : ''
     PostDeployScript: PostDeployOption ? PostDeployScript : ''
@@ -352,7 +352,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     Tags: Tags
     Timestamp: Timestamp
     UpdateWindows: UpdateWindows
-    useSharedImage: useCustomImage
+    UseCustomImage: UseCustomImage
     UserIdentityResId: PostDeployOption ? userIdentity.outputs.userIdentityResId : ''
     UserIdentityObjId: PostDeployOption ? userIdentity.outputs.userIdentityObjId : ''
     VirtualNetwork: VirtualNetwork

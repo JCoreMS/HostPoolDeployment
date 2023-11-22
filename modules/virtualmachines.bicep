@@ -23,7 +23,7 @@ param Tags object
 param Timestamp string
 param UpdateWindows bool
 @description('Optional. Set to deploy image from Azure Compute Gallery. (Default: false)')
-param useSharedImage bool
+param UseCustomImage bool
 param UserIdentityResId string
 param UserIdentityObjId string
 param OUPath string
@@ -46,7 +46,7 @@ var securityProfileJson = {
   securityType: SecurityType
 }
 
-var imageToUse = useSharedImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
+var imageToUse = UseCustomImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
