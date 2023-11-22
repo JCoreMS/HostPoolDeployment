@@ -48,6 +48,8 @@ var securityProfileJson = {
 
 var imageToUse = UseCustomImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
 
+
+
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
@@ -119,7 +121,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
         }
       ]
     }
-    //securityProfile: ((SecurityType == 'TrustedLaunch') ? securityProfileJson : null)
+    securityProfile: ((SecurityType == 'TrustedLaunch') ? securityProfileJson : null)
     diagnosticsProfile: {
       bootDiagnostics: {
         enabled: false
