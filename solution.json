@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.23.1.45101",
-      "templateHash": "15339447918777293635"
+      "templateHash": "11919495751719152805"
     }
   },
   "parameters": {
@@ -1051,7 +1051,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.23.1.45101",
-              "templateHash": "8429983242168183678"
+              "templateHash": "14576358274520554103"
             }
           },
           "parameters": {
@@ -1159,7 +1159,7 @@
             }
           },
           "variables": {
-            "SharedImageSecType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('features', equals(lambdaVariables('features').name, 'SecurityType'))).value, 'Standard')]",
+            "SharedImageSecType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').featured, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType'))).value, 'Standard')]",
             "SecurityType": "[if(equals(variables('SharedImageSecType'), 'TrustedLaunchSupported'), 'TrustedLaunch', variables('SharedImageSecType'))]",
             "securityProfileJson": {
               "uefiSettings": {
