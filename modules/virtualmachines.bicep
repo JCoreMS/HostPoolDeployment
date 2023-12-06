@@ -36,7 +36,7 @@ param VmUsername string
 @secure()
 param VmPassword string
 
-var SharedImageSecType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType')[0].value : 'Standard'
+var SharedImageSecType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, features => features.name == 'SecurityType').value : 'Standard'
 var SecurityType = SharedImageSecType =='TrustedLaunchSupported' ? 'TrustedLaunch' : SharedImageSecType
 var securityProfileJson = {
   uefiSettings: {
