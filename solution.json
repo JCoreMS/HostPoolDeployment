@@ -1246,7 +1246,7 @@
                     }
                   ]
                 },
-                "securityProfile": "[if(equals(variables('SecurityType'), 'TrustedLaunch'), variables('securityProfileJson'), null())]",
+                "securityProfile": "[if(equals(variables('SecurityType'), 'TrustedLaunch'), variables('securityProfileJson'), '{}')]",
                 "diagnosticsProfile": {
                   "bootDiagnostics": {
                     "enabled": false
