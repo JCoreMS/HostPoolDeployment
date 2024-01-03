@@ -121,7 +121,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
         }
       ]
     }
-    securityProfile: ((SecurityType == 'TrustedLaunch') ? securityProfileJson : null)
+    securityProfile: ((SecurityType == 'TrustedLaunch') ? securityProfileJson : '{}')
     diagnosticsProfile: {
       bootDiagnostics: {
         enabled: false
