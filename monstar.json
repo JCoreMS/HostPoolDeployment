@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "12553030426993878458"
+      "templateHash": "9138496932852410214"
     }
   },
   "parameters": {
@@ -10331,7 +10331,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "12475625187765598204"
+              "templateHash": "3140367156545240445"
             }
           },
           "parameters": {
@@ -30003,7 +30003,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "14711233387269558661"
+                      "templateHash": "12347501298269208516"
                     }
                   },
                   "parameters": {
@@ -31485,7 +31485,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "5612458001425641765"
+                              "templateHash": "11055148943582193162"
                             }
                           },
                           "parameters": {
@@ -31634,7 +31634,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "2464450536670012407"
+                                      "templateHash": "7759152718371110140"
                                     }
                                   },
                                   "parameters": {
@@ -31668,46 +31668,8 @@
                                         "autoMitigate": true,
                                         "evaluationFrequency": "PT15M",
                                         "windowSize": "PT15M",
-                                        "query": "Custom",
                                         "alertType": "rows",
-                                        "criteria": {
-                                          "allOf": [
-                                            {
-                                              "query": "          Perf\n          | where TimeGenerated > ago(15m)\n          | where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\"\n          | where InstanceName !contains \"D:\"\n          | where InstanceName  !contains \"_Total\"| where CounterValue <= 10.00\n          | parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" ResourceGroup \"/providers/microsoft.compute/virtualmachines/\" ComputerName\n          | extend ComputerName=tolower(ComputerName)\n          | project ComputerName, CounterValue, subscription, ResourceGroup, TimeGenerated\n          | join kind = leftouter\n          (\n              WVDAgentHealthStatus\n              | where TimeGenerated > ago(15m)\n              | where _ResourceId contains \"xHostPoolNamex\"\n              | parse _ResourceId with \"/subscriptions/\" subscriptionAgentHealth \"/resourcegroups/\" ResourceGroupAgentHealth \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n              | parse SessionHostResourceId with \"/subscriptions/\" VMsubscription \"/resourceGroups/\" VMresourceGroup \"/providers/Microsoft.Compute/virtualMachines/\" ComputerName\n              | extend ComputerName=tolower(ComputerName)\n              | summarize arg_max(TimeGenerated,*) by ComputerName\n              | project VMresourceGroup, ComputerName, HostPool, _ResourceId\n              ) on ComputerName\n          ",
-                                              "timeAggregation": "Count",
-                                              "dimensions": [
-                                                {
-                                                  "name": "ComputerName",
-                                                  "operator": "Include",
-                                                  "values": [
-                                                    "*"
-                                                  ]
-                                                },
-                                                {
-                                                  "name": "VMresourceGroup",
-                                                  "operator": "Include",
-                                                  "values": [
-                                                    "*"
-                                                  ]
-                                                },
-                                                {
-                                                  "name": "HostPool",
-                                                  "operator": "Include",
-                                                  "values": [
-                                                    "*"
-                                                  ]
-                                                }
-                                              ],
-                                              "resourceIdColumn": "_ResourceId",
-                                              "operator": "GreaterThanOrEqual",
-                                              "threshold": 1,
-                                              "failingPeriods": {
-                                                "numberOfEvaluationPeriods": 1,
-                                                "minFailingPeriodsToAlert": 1
-                                              }
-                                            }
-                                          ]
-                                        }
+                                        "query": "    Perf\n    | where TimeGenerated > ago(15m)\n    | where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\"\n    | where InstanceName !contains \"D:\"\n    | where InstanceName  !contains \"_Total\"| where CounterValue <= 10.00\n    | parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" ResourceGroup \"/providers/microsoft.compute/virtualmachines/\" ComputerName\n    | extend ComputerName=tolower(ComputerName)\n    | project ComputerName, CounterValue, subscription, ResourceGroup, TimeGenerated\n    | join kind = leftouter\n    (\n        WVDAgentHealthStatus\n        | where TimeGenerated > ago(15m)\n        | where _ResourceId contains \"xHostPoolNamex\"\n        | parse _ResourceId with \"/subscriptions/\" subscriptionAgentHealth \"/resourcegroups/\" ResourceGroupAgentHealth \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n        | parse SessionHostResourceId with \"/subscriptions/\" VMsubscription \"/resourceGroups/\" VMresourceGroup \"/providers/Microsoft.Compute/virtualMachines/\" ComputerName\n        | extend ComputerName=tolower(ComputerName)\n        | summarize arg_max(TimeGenerated,*) by ComputerName\n        | project VMresourceGroup, ComputerName, HostPool, _ResourceId\n        ) on ComputerName\n    "
                                       },
                                       {
                                         "alertRuleDescription": "VM is available for use but one of the dependent resources is in a failed state.",
@@ -31717,52 +31679,8 @@
                                         "autoMitigate": true,
                                         "evaluationFrequency": "PT15M",
                                         "windowSize": "PT15M",
-                                        "query": "Custom",
                                         "alertType": "rows",
-                                        "criteria": {
-                                          "allOf": [
-                                            {
-                                              "query": "// HealthChecks of SessionHost \n// Renders a summary of SessionHost health status. \nlet MapToDesc = (idx: long) {\n    case(idx == 0, \"DomainJoin\",\n    idx == 1, \"DomainTrust\",\n    idx == 2, \"FSLogix\",\n    idx == 3, \"SxSStack\",\n    idx == 4, \"URLCheck\",\n    idx == 5, \"GenevaAgent\",\n    idx == 6, \"DomainReachable\",\n    idx == 7, \"WebRTCRedirector\",\n    idx == 8, \"SxSStackEncryption\",\n    idx == 9, \"IMDSReachable\",\n    idx == 10, \"MSIXPackageStaging\",\n    \"InvalidIndex\")\n};\nWVDAgentHealthStatus\n| where TimeGenerated > ago(10m)\n| where Status != 'Available'\n| where AllowNewSessions = True\n| extend CheckFailed = parse_json(SessionHostHealthCheckResult)\n| mv-expand CheckFailed\n| where CheckFailed.AdditionalFailureDetails.ErrorCode != 0\n| extend HealthCheckName = tolong(CheckFailed.HealthCheckName)\n| extend HealthCheckResult = tolong(CheckFailed.HealthCheckResult)\n| extend HealthCheckDesc = MapToDesc(HealthCheckName)\n| where HealthCheckDesc != 'InvalidIndex'\n| where _ResourceId contains \"xHostPoolNamex\"\n| parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" HostPoolResourceGroup \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n| parse SessionHostResourceId with \"/subscriptions/\" HostSubscription \"/resourceGroups/\" SessionHostRG \" /providers/Microsoft.Compute/virtualMachines/\" SessionHostName\n",
-                                              "timeAggregation": "Count",
-                                              "dimensions": [
-                                                {
-                                                  "name": "SessionHostName",
-                                                  "operator": "Include",
-                                                  "values": [
-                                                    "*"
-                                                  ]
-                                                },
-                                                {
-                                                  "name": "HealthCheckDesc",
-                                                  "operator": "Include",
-                                                  "values": [
-                                                    "*"
-                                                  ]
-                                                },
-                                                {
-                                                  "name": "HostPool",
-                                                  "operator": "Include",
-                                                  "values": [
-                                                    "*"
-                                                  ]
-                                                },
-                                                {
-                                                  "name": "SessionHostRG",
-                                                  "operator": "Include",
-                                                  "values": [
-                                                    "*"
-                                                  ]
-                                                }
-                                              ],
-                                              "operator": "GreaterThanOrEqual",
-                                              "threshold": 1,
-                                              "failingPeriods": {
-                                                "numberOfEvaluationPeriods": 1,
-                                                "minFailingPeriodsToAlert": 1
-                                              }
-                                            }
-                                          ]
-                                        }
+                                        "query": "// HealthChecks of SessionHost \n// Renders a summary of SessionHost health status. \nlet MapToDesc = (idx: long) {\n    case(idx == 0, \"DomainJoin\",\n    idx == 1, \"DomainTrust\",\n    idx == 2, \"FSLogix\",\n    idx == 3, \"SxSStack\",\n    idx == 4, \"URLCheck\",\n    idx == 5, \"GenevaAgent\",\n    idx == 6, \"DomainReachable\",\n    idx == 7, \"WebRTCRedirector\",\n    idx == 8, \"SxSStackEncryption\",\n    idx == 9, \"IMDSReachable\",\n    idx == 10, \"MSIXPackageStaging\",\n    \"InvalidIndex\")\n};\nWVDAgentHealthStatus\n| where TimeGenerated > ago(10m)\n| where Status != 'Available'\n| where AllowNewSessions = True\n| extend CheckFailed = parse_json(SessionHostHealthCheckResult)\n| mv-expand CheckFailed\n| where CheckFailed.AdditionalFailureDetails.ErrorCode != 0\n| extend HealthCheckName = tolong(CheckFailed.HealthCheckName)\n| extend HealthCheckResult = tolong(CheckFailed.HealthCheckResult)\n| extend HealthCheckDesc = MapToDesc(HealthCheckName)\n| where HealthCheckDesc != 'InvalidIndex'\n| where _ResourceId contains \"xHostPoolNamex\"\n| parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" HostPoolResourceGroup \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n| parse SessionHostResourceId with \"/subscriptions/\" HostSubscription \"/resourceGroups/\" SessionHostRG \" /providers/Microsoft.Compute/virtualMachines/\" SessionHostName\n"
                                       }
                                     ]
                                   },
