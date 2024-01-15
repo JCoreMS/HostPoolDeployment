@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "9138496932852410214"
+      "templateHash": "7622254148538414560"
     }
   },
   "parameters": {
@@ -10331,7 +10331,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "3140367156545240445"
+              "templateHash": "16515663903752118792"
             }
           },
           "parameters": {
@@ -30003,7 +30003,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "12347501298269208516"
+                      "templateHash": "6954292897844479766"
                     }
                   },
                   "parameters": {
@@ -31485,7 +31485,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "11055148943582193162"
+                              "templateHash": "3627324788328044672"
                             }
                           },
                           "parameters": {
@@ -31565,14 +31565,7 @@
                               "solutionVersion": "[parameters('solutionVersion')]"
                             },
                             "Tags": "[if(equals(parameters('customerTags'), createObject()), variables('tempTags'), union(variables('tempTags'), parameters('customerTags').All))]",
-                            "xPathQueries": [
-                              "*[System[Provider[@Name='Microsoft-Windows-TerminalServices-RemoteConnectionManager'] and (Level=2 or Level=3 or Level=4 or Level=0)] and EventData[Data[@Name='Channel'] = 'Admin']]",
-                              "*[System[Provider[@Name='Microsoft-Windows-TerminalServices-LocalSessionManager'] and (Level=2 or Level=3 or Level=4 or Level=0)] and EventData[Data[@Name='Channel'] = 'Operational']]",
-                              "*[System[Provider[@Name='Microsoft-FSLogix-Apps'] and (Level=2 or Level=3 or Level=4 or Level=0)] and EventData[Data[@Name='Channel'] = 'Operational']]",
-                              "*[System[Provider[@Name='Microsoft-FSLogix-Apps'] and (Level=2 or Level=3 or Level=4 or Level=0)] and EventData[Data[@Name='Channel'] = 'Admin']]",
-                              "*[System]",
-                              "*[System[Provider[@Name='Application'] and (Level=2 or Level=3)]]"
-                            ],
+                            "xPathQueries": [],
                             "performanceCounters30": [
                               "\\LogicalDisk(C:)\\Avg. Disk Queue Length",
                               "\\LogicalDisk(C:)\\Current Disk Queue Length",
