@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "1891225092688191272"
+      "templateHash": "2598019753267661051"
     }
   },
   "parameters": {
@@ -36,6 +36,21 @@
       "type": "bool"
     },
     "existingLogAnalyticsWSId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "seperateLAWforAVD": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "newLogAnalyticsWSNameAVD": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "createNewLogAnalyticsWSAVD": {
+      "type": "bool"
+    },
+    "existingLogAnalyticsWSIdAVD": {
       "type": "string",
       "defaultValue": ""
     },
@@ -422,6 +437,91 @@
           },
           "createNewLogAnalyticsWS": {
             "value": "[parameters('createNewLogAnalyticsWS')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.24.24.22086",
+              "templateHash": "16093610926045067730"
+            }
+          },
+          "parameters": {
+            "logAnalyticsWorkspaceName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "newLogAnalyticsWSName": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "createNewLogAnalyticsWS": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[parameters('logAnalyticsWorkspaceName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('Tags')]",
+              "properties": {
+                "sku": {
+                  "name": "PerGB2018"
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "customerId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName')), '2022-10-01').customerId]"
+            },
+            "lawresourceid": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId(parameters('subscriptionId'), 'Microsoft.Resources/deployments', 'resourceGroup-Deployment')]"
+      ]
+    },
+    {
+      "condition": "[parameters('createNewLogAnalyticsWSAVD')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "logAnalytics-Deployment",
+      "subscriptionId": "[parameters('subscriptionId')]",
+      "resourceGroup": "[parameters('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "logAnalyticsWorkspaceName": {
+            "value": "[parameters('newLogAnalyticsWSNameAVD')]"
+          },
+          "Tags": {
+            "value": "[variables('Tags')]"
+          },
+          "createNewLogAnalyticsWS": {
+            "value": "[parameters('createNewLogAnalyticsWSAVD')]"
           }
         },
         "template": {
@@ -10288,6 +10388,7 @@
             "value": "[reference(extensionResourceId(managementGroup().id, 'Microsoft.Resources/deployments', 'MonitoringPacks-backend'), '2022-09-01').outputs.packsUserManagedResourceId.value]"
           },
           "workspaceId": "[if(parameters('createNewLogAnalyticsWS'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment'), '2022-09-01').outputs.lawresourceid.value), createObject('value', parameters('existingLogAnalyticsWSId')))]",
+          "workspaceIdAVD": "[if(parameters('seperateLAWforAVD'), if(parameters('createNewLogAnalyticsWSAVD'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment'), '2022-09-01').outputs.lawresourceid.value), createObject('value', parameters('existingLogAnalyticsWSIdAVD'))), createObject('value', ''))]",
           "actionGroupName": {
             "value": "[parameters('actionGroupName')]"
           },
@@ -10331,7 +10432,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "5142693172116622712"
+              "templateHash": "11972249700283473837"
             }
           },
           "parameters": {
@@ -10382,6 +10483,9 @@
               "metadata": {
                 "description": "Full resource ID of the log analytics workspace to be used for the deployment."
               }
+            },
+            "workspaceIdAVD": {
+              "type": "string"
             },
             "solutionTag": {
               "type": "string"
@@ -30027,6 +30131,9 @@
                   "workspaceId": {
                     "value": "[parameters('workspaceId')]"
                   },
+                  "workspaceIdAVD": {
+                    "value": "[parameters('workspaceIdAVD')]"
+                  },
                   "solutionTag": {
                     "value": "[parameters('solutionTag')]"
                   },
@@ -30066,7 +30173,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "8364330387809318891"
+                      "templateHash": "2032591311448874249"
                     }
                   },
                   "parameters": {
@@ -30084,6 +30191,9 @@
                       "metadata": {
                         "description": "Full resource ID of the log analytics workspace to be used for the deployment."
                       }
+                    },
+                    "workspaceIdAVD": {
+                      "type": "string"
                     },
                     "solutionTag": {
                       "type": "string"
@@ -31525,9 +31635,7 @@
                           "userManagedIdentityResourceId": {
                             "value": "[parameters('userManagedIdentityResourceId')]"
                           },
-                          "workspaceId": {
-                            "value": "[parameters('workspaceId')]"
-                          },
+                          "workspaceId": "[if(not(empty(parameters('workspaceIdAVD'))), createObject('value', parameters('workspaceIdAVD')), createObject('value', parameters('workspaceId')))]",
                           "packtag": {
                             "value": "Avd"
                           },
@@ -48095,6 +48203,7 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'azureManagedGrafana')]",
         "[extensionResourceId(managementGroup().id, 'Microsoft.Resources/deployments', 'MonitoringPacks-backend')]",
         "[extensionResourceId(managementGroup().id, 'Microsoft.Resources/deployments', 'DeployDiscovery')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment')]",
         "[subscriptionResourceId(parameters('subscriptionId'), 'Microsoft.Resources/deployments', 'resourceGroup-Deployment')]"
       ]
