@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "7622254148538414560"
+      "templateHash": "2823245402334697102"
     }
   },
   "parameters": {
@@ -10331,7 +10331,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "16515663903752118792"
+              "templateHash": "8202688608586117870"
             }
           },
           "parameters": {
@@ -30003,7 +30003,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "6954292897844479766"
+                      "templateHash": "4822086726515146590"
                     }
                   },
                   "parameters": {
@@ -31485,7 +31485,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "3627324788328044672"
+                              "templateHash": "12669118700572459634"
                             }
                           },
                           "parameters": {
@@ -31565,7 +31565,14 @@
                               "solutionVersion": "[parameters('solutionVersion')]"
                             },
                             "Tags": "[if(equals(parameters('customerTags'), createObject()), variables('tempTags'), union(variables('tempTags'), parameters('customerTags').All))]",
-                            "xPathQueries": [],
+                            "xPathQueries": [
+                              "Microsoft-Windows-TerminalServices-RemoteConnectionManager/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0) ]]",
+                              "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                              "System!*",
+                              "Microsoft-FSLogix-Apps/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                              "Application!*[System[(Level=2 or Level=3)]]",
+                              "Microsoft-FSLogix-Apps/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]"
+                            ],
                             "performanceCounters30": [
                               "\\LogicalDisk(C:)\\Avg. Disk Queue Length",
                               "\\LogicalDisk(C:)\\Current Disk Queue Length",
@@ -32298,7 +32305,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "11913852047986750054"
+                                      "templateHash": "1692296767494163247"
                                     }
                                   },
                                   "parameters": {
@@ -32353,17 +32360,18 @@
                                       "kind": "[parameters('kind')]",
                                       "properties": {
                                         "dataCollectionEndpointId": "[parameters('dceId')]",
-                                        "description": "[format('Data Collection Rule for {0}}} - {1}}}', parameters('kind'), parameters('rulename'))]",
-                                        "destinations": {
-                                          "logAnalytics": [
-                                            {
-                                              "workspaceResourceId": "[parameters('workspaceId')]",
-                                              "name": "[parameters('wsfriendlyname')]"
-                                            }
-                                          ]
-                                        },
+                                        "dataFlows": [
+                                          {
+                                            "streams": [
+                                              "Microsoft-Perf",
+                                              "Microsoft-Event"
+                                            ],
+                                            "destinations": [
+                                              "[parameters('wsfriendlyname')]"
+                                            ]
+                                          }
+                                        ],
                                         "dataSources": {
-                                          "windowsEventLogs": "[if(empty(parameters('xPathQueries')), json('null'), createArray(createObject('streams', createArray('Microsoft-Event'), 'xPathQueries', createArray(parameters('xPathQueries')), 'name', 'eventLogsDataSource')))]",
                                           "performanceCounters": [
                                             {
                                               "streams": [
@@ -32371,7 +32379,7 @@
                                               ],
                                               "samplingFrequencyInSeconds": 30,
                                               "counterSpecifiers": "[parameters('counterSpecifiers30')]",
-                                              "name": "perfCountersDataSource30"
+                                              "name": "perfCounterDataSource10"
                                             },
                                             {
                                               "streams": [
@@ -32379,21 +32387,29 @@
                                               ],
                                               "samplingFrequencyInSeconds": 60,
                                               "counterSpecifiers": "[parameters('counterSpecifiers60')]",
-                                              "name": "perfCountersDataSource60"
+                                              "name": "perfCounterDataSource30"
+                                            }
+                                          ],
+                                          "windowsEventLogs": [
+                                            {
+                                              "streams": [
+                                                "Microsoft-Event"
+                                              ],
+                                              "xPathQueries": "[parameters('xPathQueries')]",
+                                              "name": "eventLogsDataSource"
                                             }
                                           ]
                                         },
-                                        "dataFlows": [
-                                          {
-                                            "streams": [
-                                              "Microsoft-Event",
-                                              "Microsoft-Perf"
-                                            ],
-                                            "destinations": [
-                                              "[parameters('wsfriendlyname')]"
-                                            ]
-                                          }
-                                        ]
+                                        "description": "[format('Data Collection Rule for {0}}} - {1}}}', parameters('kind'), parameters('rulename'))]",
+                                        "destinations": {
+                                          "logAnalytics": [
+                                            {
+                                              "name": "[parameters('wsfriendlyname')]",
+                                              "workspaceResourceId": "[parameters('workspaceId')]"
+                                            }
+                                          ]
+                                        },
+                                        "streamDeclarations": {}
                                       }
                                     }
                                   ],
@@ -32401,14 +32417,6 @@
                                     "dcrId": {
                                       "type": "string",
                                       "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('rulename'))]"
-                                    },
-                                    "countersSpecifiers30": {
-                                      "type": "array",
-                                      "value": "[parameters('counterSpecifiers30')]"
-                                    },
-                                    "countersSpecifiers60": {
-                                      "type": "array",
-                                      "value": "[parameters('counterSpecifiers60')]"
                                     }
                                   }
                                 }
