@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "15945620752735543427"
+      "templateHash": "24585450211237417"
     }
   },
   "parameters": {
@@ -10331,7 +10331,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "14940389410835301833"
+              "templateHash": "4561187135125474103"
             }
           },
           "parameters": {
@@ -10583,7 +10583,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "17005736595899489650"
+                      "templateHash": "10736892000306641783"
                     }
                   },
                   "parameters": {
@@ -13369,7 +13369,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "13058435459071262396"
+                              "templateHash": "17773203986114118172"
                             }
                           },
                           "parameters": {
@@ -13588,7 +13588,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "7133006022261894461"
+                                      "templateHash": "5479326000887681221"
                                     }
                                   },
                                   "parameters": {
@@ -13722,7 +13722,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -13796,7 +13796,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -15211,7 +15211,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "6015536589229420221"
+                              "templateHash": "6988943845254056490"
                             }
                           },
                           "parameters": {
@@ -15433,7 +15433,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "11837032681764544367"
+                                      "templateHash": "6335823947292416770"
                                     }
                                   },
                                   "parameters": {
@@ -15567,7 +15567,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -15641,7 +15641,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -17056,7 +17056,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "1672013106303452713"
+                              "templateHash": "11873095695089284430"
                             }
                           },
                           "parameters": {
@@ -17234,7 +17234,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "7233432748551834922"
+                                      "templateHash": "13687183487295332233"
                                     }
                                   },
                                   "parameters": {
@@ -17599,7 +17599,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -17673,7 +17673,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -20264,7 +20264,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "15159720108122372392"
+                              "templateHash": "7160348908774019757"
                             }
                           },
                           "parameters": {
@@ -20464,7 +20464,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "14985256667733801526"
+                                      "templateHash": "16297598544916573814"
                                     }
                                   },
                                   "parameters": {
@@ -20829,7 +20829,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -20903,7 +20903,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -23494,7 +23494,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "7683665587616917082"
+                              "templateHash": "8926655386318046340"
                             }
                           },
                           "parameters": {
@@ -23742,7 +23742,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "808125826247203093"
+                                      "templateHash": "12759889288480854817"
                                     }
                                   },
                                   "parameters": {
@@ -24404,7 +24404,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -24478,7 +24478,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -26034,7 +26034,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "14288757968112732525"
+                              "templateHash": "11785220024114795860"
                             }
                           },
                           "parameters": {
@@ -27202,7 +27202,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "12574328061640273775"
+                                      "templateHash": "9405774638905541449"
                                     }
                                   },
                                   "parameters": {
@@ -27391,7 +27391,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -27465,7 +27465,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -27987,7 +27987,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "14425279770242845589"
+                              "templateHash": "10607085229683202072"
                             }
                           },
                           "parameters": {
@@ -28383,7 +28383,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "10370294286538589667"
+                                      "templateHash": "17745112129062741386"
                                     }
                                   },
                                   "parameters": {
@@ -28459,7 +28459,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -28533,7 +28533,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -30066,7 +30066,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "9688546464061427656"
+                      "templateHash": "3992728101226171014"
                     }
                   },
                   "parameters": {
@@ -31548,7 +31548,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "2220380204595591845"
+                              "templateHash": "13684879556913111418"
                             }
                           },
                           "parameters": {
@@ -31697,7 +31697,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "4227661348260944662"
+                                      "templateHash": "18137260204976616413"
                                     }
                                   },
                                   "parameters": {
@@ -31840,7 +31840,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "2112898646294364125"
+                                              "templateHash": "5198156494153838768"
                                             }
                                           },
                                           "parameters": {
@@ -31914,7 +31914,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
-                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
+                                                  "dimensions": "[if(contains(parameters('alertlist')[copyIndex()], parameters('alertlist')[copyIndex()].dimensions), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
