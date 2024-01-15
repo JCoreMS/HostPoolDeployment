@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "2823245402334697102"
+      "templateHash": "15945620752735543427"
     }
   },
   "parameters": {
@@ -10331,7 +10331,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "8202688608586117870"
+              "templateHash": "14940389410835301833"
             }
           },
           "parameters": {
@@ -10583,7 +10583,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "16532998476454793138"
+                      "templateHash": "17005736595899489650"
                     }
                   },
                   "parameters": {
@@ -13369,7 +13369,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "4233804039991240089"
+                              "templateHash": "13058435459071262396"
                             }
                           },
                           "parameters": {
@@ -13588,7 +13588,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "8912632904718408860"
+                                      "templateHash": "7133006022261894461"
                                     }
                                   },
                                   "parameters": {
@@ -13722,7 +13722,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -13796,6 +13796,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -13816,7 +13817,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -13862,6 +13863,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -13935,6 +13948,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -13949,7 +13965,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -13989,6 +14005,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -14022,15 +14041,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -14098,6 +14109,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -14118,7 +14132,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -14157,6 +14171,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -14206,15 +14223,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
@@ -15202,7 +15211,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "10939793689161249174"
+                              "templateHash": "6015536589229420221"
                             }
                           },
                           "parameters": {
@@ -15424,7 +15433,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "3360869436804015677"
+                                      "templateHash": "11837032681764544367"
                                     }
                                   },
                                   "parameters": {
@@ -15558,7 +15567,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -15632,6 +15641,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -15652,7 +15662,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -15698,6 +15708,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -15771,6 +15793,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -15785,7 +15810,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -15825,6 +15850,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -15858,15 +15886,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -15934,6 +15954,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -15954,7 +15977,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -15993,6 +16016,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -16042,15 +16068,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
@@ -17038,7 +17056,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "12648297441435297132"
+                              "templateHash": "1672013106303452713"
                             }
                           },
                           "parameters": {
@@ -17216,7 +17234,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "2382447421487698253"
+                                      "templateHash": "7233432748551834922"
                                     }
                                   },
                                   "parameters": {
@@ -17581,7 +17599,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -17655,6 +17673,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -17675,7 +17694,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -17721,6 +17740,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -17794,6 +17825,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -17808,7 +17842,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -17848,6 +17882,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -17881,15 +17918,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -17957,6 +17986,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -17977,7 +18009,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -18016,6 +18048,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -18065,15 +18100,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
@@ -20237,7 +20264,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "5295097952485395018"
+                              "templateHash": "15159720108122372392"
                             }
                           },
                           "parameters": {
@@ -20437,7 +20464,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "6634514698146563559"
+                                      "templateHash": "14985256667733801526"
                                     }
                                   },
                                   "parameters": {
@@ -20802,7 +20829,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -20876,6 +20903,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -20896,7 +20924,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -20942,6 +20970,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -21015,6 +21055,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -21029,7 +21072,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -21069,6 +21112,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -21102,15 +21148,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -21178,6 +21216,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -21198,7 +21239,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -21237,6 +21278,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -21286,15 +21330,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
@@ -23458,7 +23494,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "5456869879090908452"
+                              "templateHash": "7683665587616917082"
                             }
                           },
                           "parameters": {
@@ -23706,7 +23742,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "12256080643636054489"
+                                      "templateHash": "808125826247203093"
                                     }
                                   },
                                   "parameters": {
@@ -24368,7 +24404,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -24442,6 +24478,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -24462,7 +24499,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -24508,6 +24545,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -24581,6 +24630,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -24595,7 +24647,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -24635,6 +24687,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -24668,15 +24723,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -24744,6 +24791,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -24764,7 +24814,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -24803,6 +24853,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -24852,15 +24905,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
@@ -25989,7 +26034,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "13635127294564821797"
+                              "templateHash": "14288757968112732525"
                             }
                           },
                           "parameters": {
@@ -27157,7 +27202,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "7877400579630152047"
+                                      "templateHash": "12574328061640273775"
                                     }
                                   },
                                   "parameters": {
@@ -27346,7 +27391,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -27420,6 +27465,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -27440,7 +27486,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -27486,6 +27532,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -27559,6 +27617,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -27573,7 +27634,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -27613,6 +27674,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -27646,15 +27710,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -27722,6 +27778,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -27742,7 +27801,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -27781,6 +27840,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -27830,15 +27892,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
@@ -27933,7 +27987,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "5282850567010587533"
+                              "templateHash": "14425279770242845589"
                             }
                           },
                           "parameters": {
@@ -28329,7 +28383,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "13547556811128035608"
+                                      "templateHash": "10370294286538589667"
                                     }
                                   },
                                   "parameters": {
@@ -28405,7 +28459,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -28479,6 +28533,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -28499,7 +28554,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -28545,6 +28600,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -28618,6 +28685,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -28632,7 +28702,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -28672,6 +28742,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -28705,15 +28778,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -28781,6 +28846,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -28801,7 +28869,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -28840,6 +28908,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -28889,15 +28960,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
@@ -30003,7 +30066,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "4822086726515146590"
+                      "templateHash": "9688546464061427656"
                     }
                   },
                   "parameters": {
@@ -31485,7 +31548,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "12669118700572459634"
+                              "templateHash": "2220380204595591845"
                             }
                           },
                           "parameters": {
@@ -31634,7 +31697,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "7759152718371110140"
+                                      "templateHash": "4227661348260944662"
                                     }
                                   },
                                   "parameters": {
@@ -31669,7 +31732,30 @@
                                         "evaluationFrequency": "PT15M",
                                         "windowSize": "PT15M",
                                         "alertType": "rows",
-                                        "query": "    Perf\n    | where TimeGenerated > ago(15m)\n    | where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\"\n    | where InstanceName !contains \"D:\"\n    | where InstanceName  !contains \"_Total\"| where CounterValue <= 10.00\n    | parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" ResourceGroup \"/providers/microsoft.compute/virtualmachines/\" ComputerName\n    | extend ComputerName=tolower(ComputerName)\n    | project ComputerName, CounterValue, subscription, ResourceGroup, TimeGenerated\n    | join kind = leftouter\n    (\n        WVDAgentHealthStatus\n        | where TimeGenerated > ago(15m)\n        | where _ResourceId contains \"xHostPoolNamex\"\n        | parse _ResourceId with \"/subscriptions/\" subscriptionAgentHealth \"/resourcegroups/\" ResourceGroupAgentHealth \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n        | parse SessionHostResourceId with \"/subscriptions/\" VMsubscription \"/resourceGroups/\" VMresourceGroup \"/providers/Microsoft.Compute/virtualMachines/\" ComputerName\n        | extend ComputerName=tolower(ComputerName)\n        | summarize arg_max(TimeGenerated,*) by ComputerName\n        | project VMresourceGroup, ComputerName, HostPool, _ResourceId\n        ) on ComputerName\n    "
+                                        "query": "    Perf\n    | where TimeGenerated > ago(15m)\n    | where ObjectName == \"LogicalDisk\" and CounterName == \"% Free Space\"\n    | where InstanceName !contains \"D:\"\n    | where InstanceName  !contains \"_Total\"| where CounterValue <= 10.00\n    | parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" ResourceGroup \"/providers/microsoft.compute/virtualmachines/\" ComputerName\n    | extend ComputerName=tolower(ComputerName)\n    | project ComputerName, CounterValue, subscription, ResourceGroup, TimeGenerated\n    | join kind = leftouter\n    (\n        WVDAgentHealthStatus\n        | where TimeGenerated > ago(15m)\n        | where _ResourceId contains \"xHostPoolNamex\"\n        | parse _ResourceId with \"/subscriptions/\" subscriptionAgentHealth \"/resourcegroups/\" ResourceGroupAgentHealth \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n        | parse SessionHostResourceId with \"/subscriptions/\" VMsubscription \"/resourceGroups/\" VMresourceGroup \"/providers/Microsoft.Compute/virtualMachines/\" ComputerName\n        | extend ComputerName=tolower(ComputerName)\n        | summarize arg_max(TimeGenerated,*) by ComputerName\n        | project VMresourceGroup, ComputerName, HostPool, _ResourceId\n        ) on ComputerName\n    ",
+                                        "dimensions": [
+                                          {
+                                            "name": "ComputerName",
+                                            "operator": "Include",
+                                            "values": [
+                                              "*"
+                                            ]
+                                          },
+                                          {
+                                            "name": "VMresourceGroup",
+                                            "operator": "Include",
+                                            "values": [
+                                              "*"
+                                            ]
+                                          },
+                                          {
+                                            "name": "HostPool",
+                                            "operator": "Include",
+                                            "values": [
+                                              "*"
+                                            ]
+                                          }
+                                        ]
                                       },
                                       {
                                         "alertRuleDescription": "VM is available for use but one of the dependent resources is in a failed state.",
@@ -31680,7 +31766,37 @@
                                         "evaluationFrequency": "PT15M",
                                         "windowSize": "PT15M",
                                         "alertType": "rows",
-                                        "query": "// HealthChecks of SessionHost \n// Renders a summary of SessionHost health status. \nlet MapToDesc = (idx: long) {\n    case(idx == 0, \"DomainJoin\",\n    idx == 1, \"DomainTrust\",\n    idx == 2, \"FSLogix\",\n    idx == 3, \"SxSStack\",\n    idx == 4, \"URLCheck\",\n    idx == 5, \"GenevaAgent\",\n    idx == 6, \"DomainReachable\",\n    idx == 7, \"WebRTCRedirector\",\n    idx == 8, \"SxSStackEncryption\",\n    idx == 9, \"IMDSReachable\",\n    idx == 10, \"MSIXPackageStaging\",\n    \"InvalidIndex\")\n};\nWVDAgentHealthStatus\n| where TimeGenerated > ago(10m)\n| where Status != 'Available'\n| where AllowNewSessions = True\n| extend CheckFailed = parse_json(SessionHostHealthCheckResult)\n| mv-expand CheckFailed\n| where CheckFailed.AdditionalFailureDetails.ErrorCode != 0\n| extend HealthCheckName = tolong(CheckFailed.HealthCheckName)\n| extend HealthCheckResult = tolong(CheckFailed.HealthCheckResult)\n| extend HealthCheckDesc = MapToDesc(HealthCheckName)\n| where HealthCheckDesc != 'InvalidIndex'\n| where _ResourceId contains \"xHostPoolNamex\"\n| parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" HostPoolResourceGroup \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n| parse SessionHostResourceId with \"/subscriptions/\" HostSubscription \"/resourceGroups/\" SessionHostRG \" /providers/Microsoft.Compute/virtualMachines/\" SessionHostName\n"
+                                        "query": "// HealthChecks of SessionHost \n// Renders a summary of SessionHost health status. \nlet MapToDesc = (idx: long) {\n    case(idx == 0, \"DomainJoin\",\n    idx == 1, \"DomainTrust\",\n    idx == 2, \"FSLogix\",\n    idx == 3, \"SxSStack\",\n    idx == 4, \"URLCheck\",\n    idx == 5, \"GenevaAgent\",\n    idx == 6, \"DomainReachable\",\n    idx == 7, \"WebRTCRedirector\",\n    idx == 8, \"SxSStackEncryption\",\n    idx == 9, \"IMDSReachable\",\n    idx == 10, \"MSIXPackageStaging\",\n    \"InvalidIndex\")\n};\nWVDAgentHealthStatus\n| where TimeGenerated > ago(10m)\n| where Status != 'Available'\n| where AllowNewSessions = True\n| extend CheckFailed = parse_json(SessionHostHealthCheckResult)\n| mv-expand CheckFailed\n| where CheckFailed.AdditionalFailureDetails.ErrorCode != 0\n| extend HealthCheckName = tolong(CheckFailed.HealthCheckName)\n| extend HealthCheckResult = tolong(CheckFailed.HealthCheckResult)\n| extend HealthCheckDesc = MapToDesc(HealthCheckName)\n| where HealthCheckDesc != 'InvalidIndex'\n| where _ResourceId contains \"xHostPoolNamex\"\n| parse _ResourceId with \"/subscriptions/\" subscription \"/resourcegroups/\" HostPoolResourceGroup \"/providers/microsoft.desktopvirtualization/hostpools/\" HostPool\n| parse SessionHostResourceId with \"/subscriptions/\" HostSubscription \"/resourceGroups/\" SessionHostRG \" /providers/Microsoft.Compute/virtualMachines/\" SessionHostName\n",
+                                        "dimensions": [
+                                          {
+                                            "name": "SessionHostName",
+                                            "operator": "Include",
+                                            "values": [
+                                              "*"
+                                            ]
+                                          },
+                                          {
+                                            "name": "HealthCheckDesc",
+                                            "operator": "Include",
+                                            "values": [
+                                              "*"
+                                            ]
+                                          },
+                                          {
+                                            "name": "HostPool",
+                                            "operator": "Include",
+                                            "values": [
+                                              "*"
+                                            ]
+                                          },
+                                          {
+                                            "name": "SessionHostRG",
+                                            "operator": "Include",
+                                            "values": [
+                                              "*"
+                                            ]
+                                          }
+                                        ]
                                       }
                                     ]
                                   },
@@ -31724,7 +31840,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17536287573894223140"
+                                              "templateHash": "2112898646294364125"
                                             }
                                           },
                                           "parameters": {
@@ -31798,6 +31914,7 @@
                                                   "query": {
                                                     "value": "[parameters('alertlist')[copyIndex()].query]"
                                                   },
+                                                  "dimensions": "[if(not(empty(parameters('alertlist')[copyIndex()].dimensions)), createObject('value', parameters('alertlist')[copyIndex()].dimensions), createObject('value', null()))]",
                                                   "packtag": {
                                                     "value": "[parameters('packtag')]"
                                                   },
@@ -31818,7 +31935,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "9837742695841187202"
+                                                      "templateHash": "6905703637144815509"
                                                     }
                                                   },
                                                   "parameters": {
@@ -31864,6 +31981,18 @@
                                                     },
                                                     "query": {
                                                       "type": "string"
+                                                    },
+                                                    "dimensions": {
+                                                      "type": "array",
+                                                      "defaultValue": [
+                                                        {
+                                                          "name": "Computer",
+                                                          "operator": "Include",
+                                                          "values": [
+                                                            "*"
+                                                          ]
+                                                        }
+                                                      ]
                                                     },
                                                     "packtag": {
                                                       "type": "string"
@@ -31937,6 +32066,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "packtag": {
                                                             "value": "[parameters('packtag')]"
                                                           },
@@ -31951,7 +32083,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "16469545219685589973"
+                                                              "templateHash": "6621497933671763313"
                                                             }
                                                           },
                                                           "parameters": {
@@ -31991,6 +32123,9 @@
                                                             "query": {
                                                               "type": "string"
                                                             },
+                                                            "dimensions": {
+                                                              "type": "array"
+                                                            },
                                                             "packtag": {
                                                               "type": "string"
                                                             },
@@ -32024,15 +32159,7 @@
                                                                     {
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
@@ -32100,6 +32227,9 @@
                                                           "query": {
                                                             "value": "[parameters('query')]"
                                                           },
+                                                          "dimensions": {
+                                                            "value": "[parameters('dimensions')]"
+                                                          },
                                                           "Tags": {
                                                             "value": "[parameters('Tags')]"
                                                           },
@@ -32120,7 +32250,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "1156119325376562570"
+                                                              "templateHash": "8385095855954346430"
                                                             }
                                                           },
                                                           "parameters": {
@@ -32159,6 +32289,9 @@
                                                             },
                                                             "query": {
                                                               "type": "string"
+                                                            },
+                                                            "dimensions": {
+                                                              "type": "array"
                                                             },
                                                             "threshold": {
                                                               "type": "int"
@@ -32208,15 +32341,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
-                                                                      "dimensions": [
-                                                                        {
-                                                                          "name": "Computer",
-                                                                          "operator": "Include",
-                                                                          "values": [
-                                                                            "*"
-                                                                          ]
-                                                                        }
-                                                                      ],
+                                                                      "dimensions": "[parameters('dimensions')]",
                                                                       "resourceIdColumn": "_ResourceId",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
