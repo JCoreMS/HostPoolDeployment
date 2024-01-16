@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "2598019753267661051"
+      "templateHash": "4252797537669377243"
     }
   },
   "parameters": {
@@ -502,7 +502,7 @@
       "condition": "[parameters('createNewLogAnalyticsWSAVD')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "logAnalytics-Deployment",
+      "name": "logAnalytics-AVD-Deployment",
       "subscriptionId": "[parameters('subscriptionId')]",
       "resourceGroup": "[parameters('resourceGroupName')]",
       "properties": {
@@ -10388,7 +10388,7 @@
             "value": "[reference(extensionResourceId(managementGroup().id, 'Microsoft.Resources/deployments', 'MonitoringPacks-backend'), '2022-09-01').outputs.packsUserManagedResourceId.value]"
           },
           "workspaceId": "[if(parameters('createNewLogAnalyticsWS'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment'), '2022-09-01').outputs.lawresourceid.value), createObject('value', parameters('existingLogAnalyticsWSId')))]",
-          "workspaceIdAVD": "[if(parameters('seperateLAWforAVD'), if(parameters('createNewLogAnalyticsWSAVD'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment'), '2022-09-01').outputs.lawresourceid.value), createObject('value', parameters('existingLogAnalyticsWSIdAVD'))), createObject('value', ''))]",
+          "workspaceIdAVD": "[if(parameters('seperateLAWforAVD'), if(parameters('createNewLogAnalyticsWSAVD'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-AVD-Deployment'), '2022-09-01').outputs.lawresourceid.value), createObject('value', parameters('existingLogAnalyticsWSIdAVD'))), createObject('value', ''))]",
           "actionGroupName": {
             "value": "[parameters('actionGroupName')]"
           },
@@ -10432,7 +10432,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "11972249700283473837"
+              "templateHash": "1497164255746070591"
             }
           },
           "parameters": {
@@ -30173,7 +30173,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "2032591311448874249"
+                      "templateHash": "603815826612236543"
                     }
                   },
                   "parameters": {
@@ -31656,10 +31656,24 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "16069081811662473675"
+                              "templateHash": "14922626693377019636"
                             }
                           },
                           "parameters": {
+                            "_artifactsLocation": {
+                              "type": "string",
+                              "defaultValue": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/",
+                              "metadata": {
+                                "description": "Location of needed scripts to deploy solution."
+                              }
+                            },
+                            "_ArtifactsLocationSasToken": {
+                              "type": "securestring",
+                              "defaultValue": "",
+                              "metadata": {
+                                "description": "SaS token if needed for script location."
+                              }
+                            },
                             "actionGroupResourceId": {
                               "type": "string"
                             },
@@ -31785,11 +31799,20 @@
                                   "location": {
                                     "value": "[parameters('location')]"
                                   },
+                                  "_artifactsLocation": {
+                                    "value": "[parameters('_artifactsLocation')]"
+                                  },
+                                  "_artifactsLocationSasToken": {
+                                    "value": "[parameters('_ArtifactsLocationSasToken')]"
+                                  },
                                   "workspaceId": {
                                     "value": "[parameters('workspaceId')]"
                                   },
                                   "AGId": {
                                     "value": "[parameters('actionGroupResourceId')]"
+                                  },
+                                  "userManagedIdentityResourceId": {
+                                    "value": "[parameters('userManagedIdentityResourceId')]"
                                   },
                                   "packtag": {
                                     "value": "[parameters('packtag')]"
@@ -31805,17 +31828,26 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "8174281868637569423"
+                                      "templateHash": "12872908229697509972"
                                     }
                                   },
                                   "parameters": {
                                     "location": {
                                       "type": "string"
                                     },
+                                    "_artifactsLocation": {
+                                      "type": "string"
+                                    },
+                                    "_artifactsLocationSasToken": {
+                                      "type": "securestring"
+                                    },
                                     "workspaceId": {
                                       "type": "string"
                                     },
                                     "AGId": {
+                                      "type": "string"
+                                    },
+                                    "userManagedIdentityResourceId": {
                                       "type": "string"
                                     },
                                     "packtag": {
@@ -31909,6 +31941,92 @@
                                     ]
                                   },
                                   "resources": [
+                                    {
+                                      "type": "Microsoft.Resources/deployments",
+                                      "apiVersion": "2022-09-01",
+                                      "name": "linked_deployscript-AVDHostMapping",
+                                      "properties": {
+                                        "expressionEvaluationOptions": {
+                                          "scope": "inner"
+                                        },
+                                        "mode": "Incremental",
+                                        "parameters": {
+                                          "location": {
+                                            "value": "[parameters('location')]"
+                                          },
+                                          "_artifactsLocation": {
+                                            "value": "[parameters('_artifactsLocation')]"
+                                          },
+                                          "_artifactsLocationSasToken": {
+                                            "value": "[parameters('_artifactsLocationSasToken')]"
+                                          },
+                                          "userManagedIdentityResourceId": {
+                                            "value": "[parameters('userManagedIdentityResourceId')]"
+                                          },
+                                          "Tags": {
+                                            "value": "[parameters('Tags')]"
+                                          }
+                                        },
+                                        "template": {
+                                          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                                          "contentVersion": "1.0.0.0",
+                                          "metadata": {
+                                            "_generator": {
+                                              "name": "bicep",
+                                              "version": "0.24.24.22086",
+                                              "templateHash": "18104847805700784116"
+                                            }
+                                          },
+                                          "parameters": {
+                                            "location": {
+                                              "type": "string"
+                                            },
+                                            "_artifactsLocation": {
+                                              "type": "string"
+                                            },
+                                            "_artifactsLocationSasToken": {
+                                              "type": "securestring"
+                                            },
+                                            "userManagedIdentityResourceId": {
+                                              "type": "string"
+                                            },
+                                            "Tags": {
+                                              "type": "object"
+                                            }
+                                          },
+                                          "resources": [
+                                            {
+                                              "type": "Microsoft.Resources/deploymentScripts",
+                                              "apiVersion": "2020-10-01",
+                                              "name": "deployscript-AVDHostMapping",
+                                              "tags": "[parameters('Tags')]",
+                                              "location": "[parameters('location')]",
+                                              "identity": {
+                                                "type": "userAssigned",
+                                                "userAssignedIdentities": {
+                                                  "[format('{0}', parameters('userManagedIdentityResourceId'))]": {}
+                                                }
+                                              },
+                                              "kind": "AzurePowerShell",
+                                              "properties": {
+                                                "azPowerShellVersion": "7.0",
+                                                "arguments": "[format('-Environment {0} -TenantId {1} -SubscriptionId {2}', environment().name, subscription().tenantId, subscription().subscriptionId)]",
+                                                "timeout": "PT10M",
+                                                "retentionInterval": "PT2H",
+                                                "primaryScriptUri": "[format('{0}AVDHostMapping.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]",
+                                                "cleanupPreference": "OnExpiration"
+                                              }
+                                            }
+                                          ],
+                                          "outputs": {
+                                            "AVDHostMap": {
+                                              "type": "object",
+                                              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'deployscript-AVDHostMapping'), '2020-10-01').outputs]"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
                                     {
                                       "type": "Microsoft.Resources/deployments",
                                       "apiVersion": "2022-09-01",
@@ -48204,7 +48322,7 @@
         "[extensionResourceId(managementGroup().id, 'Microsoft.Resources/deployments', 'MonitoringPacks-backend')]",
         "[extensionResourceId(managementGroup().id, 'Microsoft.Resources/deployments', 'DeployDiscovery')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-Deployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('subscriptionId'), parameters('resourceGroupName')), 'Microsoft.Resources/deployments', 'logAnalytics-AVD-Deployment')]",
         "[subscriptionResourceId(parameters('subscriptionId'), 'Microsoft.Resources/deployments', 'resourceGroup-Deployment')]"
       ]
     }
