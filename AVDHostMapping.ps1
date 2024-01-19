@@ -42,7 +42,7 @@ Param(
 $ErrorActionPreference = 'Stop'
 $WarningPreference = 'SilentlyContinue'
 
-$Alertlist = $Alertlist | ConvertTo-Json
+
 $templateUri = $_artifactsLocation + "alerts.json" + $env:Artifact_Location_Sas_Token
 $query = @"
 resources
