@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "7882745488424989891"
+      "templateHash": "5204145055540046421"
     }
   },
   "parameters": {
@@ -10446,7 +10446,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "14468306177162479968"
+              "templateHash": "11878472471694011569"
             }
           },
           "parameters": {
@@ -30199,7 +30199,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "12394677530611051814"
+                      "templateHash": "11516597157221699820"
                     }
                   },
                   "parameters": {
@@ -31694,7 +31694,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "9546782804893319690"
+                              "templateHash": "17801081345887350773"
                             }
                           },
                           "parameters": {
@@ -31784,7 +31784,7 @@
                             "kind": "Windows",
                             "tempTags": {
                               "[format('{0}', parameters('solutionTag'))]": "[parameters('packtag')]",
-                              "MonitoringPackType": "IaaS",
+                              "MonitoringPackType": "PaaS",
                               "solutionVersion": "[parameters('solutionVersion')]"
                             },
                             "Tags": "[if(equals(parameters('customerTags'), createObject()), variables('tempTags'), union(variables('tempTags'), parameters('customerTags').All))]",
@@ -31866,7 +31866,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "17638638713464096217"
+                                      "templateHash": "12634009206539761438"
                                     }
                                   },
                                   "parameters": {
@@ -32703,7 +32703,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "3878413433982349560"
+                                              "templateHash": "13984158028894227323"
                                             }
                                           },
                                           "parameters": {
@@ -32738,6 +32738,9 @@
                                               "type": "object"
                                             }
                                           },
+                                          "variables": {
+                                            "dsArguments": "[format('-Environment {0} -TenantId {1} -SubscriptionId {2} -ResourceGroup {3} -ArtifactsLocation {4} -AlertList {5} -AGId {6} -ModulePrefix {7} -PackTag {8} -WorkspaceId {9}', environment().name, subscription().tenantId, subscription().subscriptionId, resourceGroup().name, parameters('_artifactsLocation'), parameters('alertlist'), parameters('AGId'), parameters('moduleprefix'), parameters('packtag'), parameters('workpaceId'))]"
+                                          },
                                           "resources": [
                                             {
                                               "type": "Microsoft.Resources/deploymentScripts",
@@ -32754,9 +32757,15 @@
                                               "kind": "AzurePowerShell",
                                               "properties": {
                                                 "azPowerShellVersion": "7.0",
-                                                "arguments": "[format('-Environment {0} -TenantId {1} -SubscriptionId {2} -ResourceGroup {3} -ArtifactsLocation {4} -ArtifactsLocationSasToken {5} -AlertList {6} -AGId {7} -ModulePrefix {8} -PackTag {9} -WorkspaceId {10}', environment().name, subscription().tenantId, subscription().subscriptionId, resourceGroup().name, parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'), parameters('alertlist'), parameters('AGId'), parameters('moduleprefix'), parameters('packtag'), parameters('workpaceId'))]",
+                                                "arguments": "[variables('dsArguments')]",
                                                 "timeout": "PT10M",
                                                 "retentionInterval": "PT2H",
+                                                "environmentVariables": [
+                                                  {
+                                                    "name": "Artifact_Location_Sas_Token",
+                                                    "secureValue": "[parameters('_artifactsLocationSasToken')]"
+                                                  }
+                                                ],
                                                 "primaryScriptUri": "[format('{0}AVDHostMapping.ps1{1}', parameters('_artifactsLocation'), parameters('_artifactsLocationSasToken'))]",
                                                 "cleanupPreference": "OnExpiration"
                                               }
