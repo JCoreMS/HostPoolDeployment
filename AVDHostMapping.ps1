@@ -19,7 +19,7 @@ Param(
     $_artifactsLocation,
 
     [parameter(Mandatory=$false)]
-    [string]
+    [SecureString]
     $_artifactsLocationSasToken,
 
     [parameter(Mandatory)]
