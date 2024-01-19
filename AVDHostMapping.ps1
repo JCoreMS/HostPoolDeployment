@@ -46,6 +46,8 @@ Param(
 $ErrorActionPreference = 'Stop'
 $WarningPreference = 'SilentlyContinue'
 
+$Alertlist = $Alertlist | ConvertTo-Json
+
 $query = @"
 resources
 | where type =~ "microsoft.desktopvirtualization/hostpools"
