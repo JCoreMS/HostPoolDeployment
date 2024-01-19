@@ -127,7 +127,7 @@ try {
     $Mapping = Search-AzGraph -Query $query
 
     $params = @{
-        'alertlist'    = $alertList
+        'alertlist'    = $AlertList
         'location'     = $location
         'workspaceId'  = $workspaceId
         'AGId'         = $AGId
@@ -139,7 +139,7 @@ try {
     Foreach ($hostPool in $Mapping) {
         $deployname = "Alerts-AVD-Testing-" + $hostpool.HostPoolName
         $hostpoolname = $hostpool.HostPoolName
-        $alertListHP = $alertList
+        $alertListHP = $AlertList
 
     
         #replace alert list items with xHostPoolNamex 
@@ -158,12 +158,11 @@ try {
             $j = 0
         }
     
-        $params.alertlist = $alertListHP
+        $params.Alertlist = $alertListHP
                      
         New-AzResourceGroupDeployment -Name $deployname -ResourceGroupName $resourceGroup -TemplateUri $templateUri -TemplateParameterObject $params
         $params.alertlist = $null
         $alertListHP = $null
-        $alertList = Get-Content -Path "C:\GitRepo\AzureMonitorStarterPacks-svcMonitoring\Packs\PaaS\AVD\AVDalerts.json" | ConvertFrom-Json
     }
     $DeploymentScriptOutputs = @{}
     $DeploymentScriptOutputs['AVDHostMap'] = $Mapping
