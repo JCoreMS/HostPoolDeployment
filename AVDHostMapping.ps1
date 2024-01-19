@@ -23,7 +23,7 @@ Param(
     $_artifactsLocationSasToken,
 
     [parameter(Mandatory)]
-    [object]
+    [array]
     $alertlist,
 
     [parameter(Mandatory)]
