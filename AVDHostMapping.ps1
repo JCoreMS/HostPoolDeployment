@@ -24,7 +24,7 @@ Param(
 
     [parameter(Mandatory)]
     [array]
-    $alertlist,
+    $Alertlist,
 
     [parameter(Mandatory)]
     [string]
