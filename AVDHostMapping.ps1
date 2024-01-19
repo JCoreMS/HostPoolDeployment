@@ -19,7 +19,7 @@ Param(
     $_artifactsLocation,
 
     [parameter(Mandatory)]
-    [array[object]]
+    [array]
     $Alertlist,
 
     [parameter(Mandatory)]
