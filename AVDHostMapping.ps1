@@ -43,14 +43,17 @@ Param(
     $workspaceId
 
     [parameter(Mandatory)]
-    [object]
+    [string]
     $Tags
 )
 
 $ErrorActionPreference = 'Stop'
 $WarningPreference = 'SilentlyContinue'
+
 Install-Module -Name Az.ResourceGraph -Force
 Import-Module -Name Az.ResourceGraph -Force
+
+$Tags = 
 $alertList = (Invoke-WebRequest -Uri $avdLogAlertsUri).Content | ConvertFrom-Json
 $query = @"
 resources
