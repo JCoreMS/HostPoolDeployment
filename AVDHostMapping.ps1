@@ -25,6 +25,10 @@ Param(
     [parameter(Mandatory)]
     [string]
     $AGId,
+    
+    [parameter(Mandatory)]
+    [string]
+    $location,
 
     [parameter(Mandatory)]
     [string]
