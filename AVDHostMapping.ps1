@@ -38,7 +38,7 @@ Param(
 $ErrorActionPreference = 'Stop'
 $WarningPreference = 'SilentlyContinue'
 
-$alertList = Get-Content -Path $avdLogAlertsUri | ConvertFrom-Json
+$alertList = (Invoke-WebRequest -Uri $avdLogAlertsUri).Content | ConvertFrom-Json
 $query = @"
 resources
 | where type =~ "microsoft.desktopvirtualization/hostpools"
