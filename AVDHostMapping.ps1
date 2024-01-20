@@ -20,6 +20,10 @@ Param(
 
     [parameter(Mandatory)]
     [string]
+    $templateUri,
+
+    [parameter(Mandatory)]
+    [string]
     $AGId,
 
     [parameter(Mandatory)]
