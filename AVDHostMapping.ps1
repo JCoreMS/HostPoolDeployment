@@ -32,7 +32,7 @@ Param(
 
     [parameter(Mandatory)]
     [string]
-    $workpaceId
+    $workspaceId
 )
 
 $ErrorActionPreference = 'Stop'
