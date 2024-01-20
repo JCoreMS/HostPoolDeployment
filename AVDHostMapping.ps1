@@ -16,11 +16,7 @@ Param(
 
     [parameter(Mandatory)]
     [string]
-    $_artifactsLocation,
-
-    [parameter(Mandatory)]
-    [string]
-    $Alertlist,
+    $avdLogAlertsUri,
 
     [parameter(Mandatory)]
     [string]
@@ -41,10 +37,8 @@ Param(
 
 $ErrorActionPreference = 'Stop'
 $WarningPreference = 'SilentlyContinue'
-# Convert Alert List from a JSON array to a PowerShell array
-[array]$Alertlist = $Alertlist.Replace("'",'"') | ConvertFrom-Json
 
-$templateUri = $_artifactsLocation + "alerts.json" + $env:Artifact_Location_Sas_Token
+$alertList = Get-Content -Path $avdLogAlertsUri | ConvertFrom-Json
 $query = @"
 resources
 | where type =~ "microsoft.desktopvirtualization/hostpools"
@@ -126,7 +120,7 @@ try {
     $Mapping = Search-AzGraph -Query $query
 
     $params = @{
-        'alertlist'    = $AlertList
+        'alertlist'    = $alertList
         'location'     = $location
         'workspaceId'  = $workspaceId
         'AGId'         = $AGId
@@ -138,7 +132,7 @@ try {
     Foreach ($hostPool in $Mapping) {
         $deployname = "Alerts-AVD-Testing-" + $hostpool.HostPoolName
         $hostpoolname = $hostpool.HostPoolName
-        $alertListHP = $AlertList
+        $alertListHP = $alertList
 
     
         #replace alert list items with xHostPoolNamex 
@@ -157,7 +151,7 @@ try {
             $j = 0
         }
     
-        $params.Alertlist = $alertListHP
+        $params.alertlist = $alertListHP
                      
         New-AzResourceGroupDeployment -Name $deployname -ResourceGroupName $resourceGroup -TemplateUri $templateUri -TemplateParameterObject $params
         $params.alertlist = $null
