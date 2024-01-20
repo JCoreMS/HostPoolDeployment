@@ -41,6 +41,10 @@ Param(
     [parameter(Mandatory)]
     [string]
     $workspaceId
+
+    [parameter(Mandatory)]
+    [object]
+    $Tags
 )
 
 $ErrorActionPreference = 'Stop'
