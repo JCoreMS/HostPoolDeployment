@@ -43,7 +43,7 @@ Param(
     $workspaceId,
 
     [parameter(Mandatory)]
-    [string]
+    [object]
     $Tags
 )
 
