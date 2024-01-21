@@ -40,7 +40,7 @@ Param(
 
     [parameter(Mandatory)]
     [string]
-    $workspaceId
+    $workspaceId,
 
     [parameter(Mandatory)]
     [string]
