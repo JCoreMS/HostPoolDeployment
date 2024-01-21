@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "12080302975264259917"
+      "templateHash": "6414956602042635870"
     }
   },
   "parameters": {
@@ -10446,7 +10446,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "787364745164361990"
+              "templateHash": "2953726610849565654"
             }
           },
           "parameters": {
@@ -30199,7 +30199,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "4700867126389292904"
+                      "templateHash": "1017558526637790729"
                     }
                   },
                   "parameters": {
@@ -31673,7 +31673,7 @@
                           "userManagedIdentityResourceId": {
                             "value": "[parameters('userManagedIdentityResourceId')]"
                           },
-                          "workspaceId": "[if(not(empty(parameters('workspaceIdAVD'))), createObject('value', parameters('workspaceIdAVD')), createObject('value', parameters('workspaceId')))]",
+                          "workspaceId": "[if(empty(parameters('workspaceIdAVD')), createObject('value', parameters('workspaceId')), createObject('value', parameters('workspaceIdAVD')))]",
                           "packtag": {
                             "value": "Avd"
                           },
@@ -31694,7 +31694,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "7391447922853256851"
+                              "templateHash": "1877391193674331452"
                             }
                           },
                           "parameters": {
@@ -31780,6 +31780,7 @@
                           "variables": {
                             "avdLogAlertsUri": "[format('{0}LogAlertsHostPool.json{1}', parameters('_artifactsLocation'), parameters('_ArtifactsLocationSasToken'))]",
                             "primaryScriptUri": "[format('{0}AVDHostMapping.ps1{1}', parameters('_artifactsLocation'), parameters('_ArtifactsLocationSasToken'))]",
+                            "templateUri": "[format('{0}alerts.json{1}', parameters('_artifactsLocation'), parameters('_ArtifactsLocationSasToken'))]",
                             "workspaceFriendlyName": "[split(parameters('workspaceId'), '/')[8]]",
                             "ruleshortname": "AVD",
                             "resourceGroupName": "[split(parameters('resourceGroupId'), '/')[4]]",
@@ -31848,6 +31849,9 @@
                                   "AGId": {
                                     "value": "[parameters('actionGroupResourceId')]"
                                   },
+                                  "templateUri": {
+                                    "value": "[variables('templateUri')]"
+                                  },
                                   "userManagedIdentityResourceId": {
                                     "value": "[parameters('userManagedIdentityResourceId')]"
                                   },
@@ -31868,7 +31872,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "10507198560915213096"
+                                      "templateHash": "16390514920454073596"
                                     }
                                   },
                                   "parameters": {
@@ -31895,6 +31899,9 @@
                                     },
                                     "Tags": {
                                       "type": "object"
+                                    },
+                                    "templateUri": {
+                                      "type": "string"
                                     },
                                     "moduleprefix": {
                                       "type": "string",
@@ -31930,7 +31937,10 @@
                                           "primaryScriptUri": {
                                             "value": "[parameters('primaryScriptUri')]"
                                           },
-                                          "workpaceId": {
+                                          "templateUri": {
+                                            "value": "[parameters('templateUri')]"
+                                          },
+                                          "workspaceId": {
                                             "value": "[parameters('workspaceId')]"
                                           },
                                           "userManagedIdentityResourceId": {
@@ -31947,13 +31957,12 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "17208500077032705918"
+                                              "templateHash": "6513382679466670255"
                                             }
                                           },
                                           "parameters": {
                                             "location": {
-                                              "type": "string",
-                                              "defaultValue": "eastus2"
+                                              "type": "string"
                                             },
                                             "avdLogAlertsUri": {
                                               "type": "string"
@@ -31962,24 +31971,22 @@
                                               "type": "string"
                                             },
                                             "AGId": {
-                                              "type": "string",
-                                              "defaultValue": "/subscriptions/8A0ECEBC-0E1D-4E8F-8CB8-8A92F49455B9/resourceGroups/rg-eastus2-AVDAlerts/providers/microsoft.insights/actionGroups/ag-avdmetrics-p-eastus2"
+                                              "type": "string"
                                             },
                                             "moduleprefix": {
-                                              "type": "string",
-                                              "defaultValue": "AMSP-AVD"
+                                              "type": "string"
                                             },
                                             "packtag": {
-                                              "type": "string",
-                                              "defaultValue": "Avd"
+                                              "type": "string"
                                             },
-                                            "workpaceId": {
-                                              "type": "string",
-                                              "defaultValue": "/subscriptions/8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9/resourceGroups/rg-eastus2-Monitoring/providers/Microsoft.OperationalInsights/workspaces/law-eastus2-monitoring"
+                                            "templateUri": {
+                                              "type": "string"
+                                            },
+                                            "workspaceId": {
+                                              "type": "string"
                                             },
                                             "userManagedIdentityResourceId": {
-                                              "type": "string",
-                                              "defaultValue": "/subscriptions/8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9/resourceGroups/rg-eastus2-Monitoring/providers/Microsoft.ManagedIdentity/userAssignedIdentities/packsUserManagedIdentity"
+                                              "type": "string"
                                             },
                                             "Tags": {
                                               "type": "object",
@@ -31991,13 +31998,13 @@
                                             }
                                           },
                                           "variables": {
-                                            "dsArguments": "[format('-Environment {0} -TenantId {1} -SubscriptionId {2} -ResourceGroup {3} -avdLogAlertsUri {4} -AGId {5} -ModulePrefix {6} -PackTag {7} -WorkspaceId {8}', environment().name, subscription().tenantId, subscription().subscriptionId, resourceGroup().name, parameters('avdLogAlertsUri'), parameters('AGId'), parameters('moduleprefix'), parameters('packtag'), parameters('workpaceId'))]"
+                                            "dsArguments": "[format('-Environment {0} -TenantId {1} -resourceGroup {2} -avdLogAlertsUri {3} -templateUri {4} -Tags {5} -AGId {6} -modulePrefix {7} -packtag {8} -workspaceId {9} -location {10}', environment().name, subscription().tenantId, resourceGroup().name, parameters('avdLogAlertsUri'), parameters('templateUri'), string(parameters('Tags')), parameters('AGId'), parameters('moduleprefix'), parameters('packtag'), parameters('workspaceId'), parameters('location'))]"
                                           },
                                           "resources": [
                                             {
                                               "type": "Microsoft.Resources/deploymentScripts",
                                               "apiVersion": "2020-10-01",
-                                              "name": "deployscript-AVDHostMapping-TEST-Direct",
+                                              "name": "deployscript-AVDHostMapping",
                                               "tags": "[parameters('Tags')]",
                                               "location": "[parameters('location')]",
                                               "identity": {
@@ -32020,7 +32027,7 @@
                                           "outputs": {
                                             "AVDHostMap": {
                                               "type": "object",
-                                              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'deployscript-AVDHostMapping-TEST-Direct'), '2020-10-01').outputs]"
+                                              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'deployscript-AVDHostMapping'), '2020-10-01').outputs]"
                                             }
                                           }
                                         }
