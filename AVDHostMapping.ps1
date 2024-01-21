@@ -53,7 +53,9 @@ $WarningPreference = 'SilentlyContinue'
 Install-Module -Name Az.ResourceGraph -Force
 Import-Module -Name Az.ResourceGraph -Force
 
-[object]$Tags = $Tags.Replace("'", '""')
+# [object]$Tags = $Tags.Replace("'", '""')
+$Tags = $Tags | ConvertFrom-Json
+
 $alertList = (Invoke-WebRequest -Uri $avdLogAlertsUri).Content | ConvertFrom-Json
 $query = @"
 resources
@@ -75,8 +77,6 @@ resources
 
 try {
     Connect-AzAccount -Environment $Environment -Tenant $TenantId -Identity | Out-Null
-    # Install the Resource Graph module from PowerShell Gallery
-    Install-Module -Name Az.ResourceGraph
   
     function ConvertTo-Hashtable {
         <#
@@ -146,7 +146,7 @@ try {
     }
 
     Foreach ($hostPool in $Mapping) {
-        $deployname = "Alerts-AVD-Testing-" + $hostpool.HostPoolName
+        $deployname = "Alerts-AVD-" + $hostpool.HostPoolName
         $hostpoolname = $hostpool.HostPoolName
         $alertListHP = $alertList
 
@@ -166,7 +166,7 @@ try {
             $i++
             $j = 0
         }
-    
+        $params.Tags = $Tags | ConvertTo-Hashtable
         $params.alertlist = $alertListHP
                      
         New-AzResourceGroupDeployment -Name $deployname -ResourceGroupName $resourceGroup -TemplateUri $templateUri -TemplateParameterObject $params
