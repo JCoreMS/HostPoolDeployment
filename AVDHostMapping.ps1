@@ -53,7 +53,7 @@ $WarningPreference = 'SilentlyContinue'
 Install-Module -Name Az.ResourceGraph -Force
 Import-Module -Name Az.ResourceGraph -Force
 
-[object]$Tags = $Tags.Replace("'", '""')
+[object]$Tags = $Tags.Replace("'", '"')
 $Tags = $Tags | ConvertFrom-Json
 
 $alertList = (Invoke-WebRequest -Uri $avdLogAlertsUri).Content | ConvertFrom-Json
