@@ -166,7 +166,6 @@ try {
             $i++
             $j = 0
         }
-        $params.Tags = $Tags | ConvertTo-Hashtable
         $params.alertlist = $alertListHP
                      
         New-AzResourceGroupDeployment -Name $deployname -ResourceGroupName $resourceGroup -TemplateUri $templateUri -TemplateParameterObject $params
