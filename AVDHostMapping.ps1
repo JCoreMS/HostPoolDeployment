@@ -54,7 +54,7 @@ Install-Module -Name Az.ResourceGraph -Force
 Import-Module -Name Az.ResourceGraph -Force
 
 [object]$Tags = $Tags.Replace("'", '"')
-$Tags = $Tags | ConvertFrom-Json
+$Tags = ConvertFrom-Json $Tags -AsHashtable
 
 $alertList = (Invoke-WebRequest -Uri $avdLogAlertsUri).Content | ConvertFrom-Json
 $query = @"
