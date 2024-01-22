@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "1158876901055462518"
+      "templateHash": "8088400665741792247"
     }
   },
   "parameters": {
@@ -100,7 +100,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "6905703637144815509"
+              "templateHash": "1413888379096327590"
             }
           },
           "parameters": {
@@ -248,7 +248,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "6621497933671763313"
+                      "templateHash": "12143918929234692664"
                     }
                   },
                   "parameters": {
@@ -325,7 +325,7 @@
                               "query": "[parameters('query')]",
                               "timeAggregation": "Count",
                               "dimensions": "[parameters('dimensions')]",
-                              "resourceIdColumn": "_ResourceId",
+                              "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                               "operator": "GreaterThan",
                               "threshold": 0,
                               "failingPeriods": {
@@ -415,7 +415,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "8385095855954346430"
+                      "templateHash": "3889684486127695540"
                     }
                   },
                   "parameters": {
@@ -507,7 +507,7 @@
                               "timeAggregation": "Average",
                               "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                               "dimensions": "[parameters('dimensions')]",
-                              "resourceIdColumn": "_ResourceId",
+                              "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                               "operator": "[parameters('operator')]",
                               "threshold": "[parameters('threshold')]",
                               "failingPeriods": {
