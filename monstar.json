@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.24.24.22086",
-      "templateHash": "6414956602042635870"
+      "templateHash": "10049707491374055988"
     }
   },
   "parameters": {
@@ -10446,7 +10446,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.24.24.22086",
-              "templateHash": "2953726610849565654"
+              "templateHash": "18057731746895639255"
             }
           },
           "parameters": {
@@ -10707,7 +10707,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "8335262070349581192"
+                      "templateHash": "3780840269389236921"
                     }
                   },
                   "parameters": {
@@ -13493,7 +13493,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "9315387074541683503"
+                              "templateHash": "9152349539856392254"
                             }
                           },
                           "parameters": {
@@ -13712,7 +13712,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "1359086406860655472"
+                                      "templateHash": "2285190755786737437"
                                     }
                                   },
                                   "parameters": {
@@ -13846,7 +13846,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "1158876901055462518"
+                                              "templateHash": "8088400665741792247"
                                             }
                                           },
                                           "parameters": {
@@ -13941,7 +13941,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "6905703637144815509"
+                                                      "templateHash": "1413888379096327590"
                                                     }
                                                   },
                                                   "parameters": {
@@ -14089,7 +14089,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "6621497933671763313"
+                                                              "templateHash": "12143918929234692664"
                                                             }
                                                           },
                                                           "parameters": {
@@ -14166,7 +14166,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
                                                                       "failingPeriods": {
@@ -14256,7 +14256,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "8385095855954346430"
+                                                              "templateHash": "3889684486127695540"
                                                             }
                                                           },
                                                           "parameters": {
@@ -14348,7 +14348,7 @@
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
                                                                       "failingPeriods": {
@@ -15335,7 +15335,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "12274547203883425300"
+                              "templateHash": "10973343002051022331"
                             }
                           },
                           "parameters": {
@@ -15557,7 +15557,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "12299627456014260025"
+                                      "templateHash": "14474708939917878573"
                                     }
                                   },
                                   "parameters": {
@@ -15691,7 +15691,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "1158876901055462518"
+                                              "templateHash": "8088400665741792247"
                                             }
                                           },
                                           "parameters": {
@@ -15786,7 +15786,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "6905703637144815509"
+                                                      "templateHash": "1413888379096327590"
                                                     }
                                                   },
                                                   "parameters": {
@@ -15934,7 +15934,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "6621497933671763313"
+                                                              "templateHash": "12143918929234692664"
                                                             }
                                                           },
                                                           "parameters": {
@@ -16011,7 +16011,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
                                                                       "failingPeriods": {
@@ -16101,7 +16101,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "8385095855954346430"
+                                                              "templateHash": "3889684486127695540"
                                                             }
                                                           },
                                                           "parameters": {
@@ -16193,7 +16193,7 @@
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
                                                                       "failingPeriods": {
@@ -17180,7 +17180,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "10830973767519171567"
+                              "templateHash": "17380172012610328566"
                             }
                           },
                           "parameters": {
@@ -17358,7 +17358,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "12412736392851682723"
+                                      "templateHash": "1338154352088635694"
                                     }
                                   },
                                   "parameters": {
@@ -17723,7 +17723,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "1158876901055462518"
+                                              "templateHash": "8088400665741792247"
                                             }
                                           },
                                           "parameters": {
@@ -17818,7 +17818,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "6905703637144815509"
+                                                      "templateHash": "1413888379096327590"
                                                     }
                                                   },
                                                   "parameters": {
@@ -17966,7 +17966,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "6621497933671763313"
+                                                              "templateHash": "12143918929234692664"
                                                             }
                                                           },
                                                           "parameters": {
@@ -18043,7 +18043,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
                                                                       "failingPeriods": {
@@ -18133,7 +18133,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "8385095855954346430"
+                                                              "templateHash": "3889684486127695540"
                                                             }
                                                           },
                                                           "parameters": {
@@ -18225,7 +18225,7 @@
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
                                                                       "failingPeriods": {
@@ -20388,7 +20388,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "4422604288153257035"
+                              "templateHash": "16396039081703652221"
                             }
                           },
                           "parameters": {
@@ -20588,7 +20588,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "7720092327904101039"
+                                      "templateHash": "12943501274012373011"
                                     }
                                   },
                                   "parameters": {
@@ -20953,7 +20953,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "1158876901055462518"
+                                              "templateHash": "8088400665741792247"
                                             }
                                           },
                                           "parameters": {
@@ -21048,7 +21048,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "6905703637144815509"
+                                                      "templateHash": "1413888379096327590"
                                                     }
                                                   },
                                                   "parameters": {
@@ -21196,7 +21196,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "6621497933671763313"
+                                                              "templateHash": "12143918929234692664"
                                                             }
                                                           },
                                                           "parameters": {
@@ -21273,7 +21273,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
                                                                       "failingPeriods": {
@@ -21363,7 +21363,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "8385095855954346430"
+                                                              "templateHash": "3889684486127695540"
                                                             }
                                                           },
                                                           "parameters": {
@@ -21455,7 +21455,7 @@
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
                                                                       "failingPeriods": {
@@ -23618,7 +23618,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "16784773119748615441"
+                              "templateHash": "12531253992454346072"
                             }
                           },
                           "parameters": {
@@ -23866,7 +23866,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "1573213770692939390"
+                                      "templateHash": "11773339756246935886"
                                     }
                                   },
                                   "parameters": {
@@ -24528,7 +24528,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "1158876901055462518"
+                                              "templateHash": "8088400665741792247"
                                             }
                                           },
                                           "parameters": {
@@ -24623,7 +24623,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "6905703637144815509"
+                                                      "templateHash": "1413888379096327590"
                                                     }
                                                   },
                                                   "parameters": {
@@ -24771,7 +24771,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "6621497933671763313"
+                                                              "templateHash": "12143918929234692664"
                                                             }
                                                           },
                                                           "parameters": {
@@ -24848,7 +24848,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
                                                                       "failingPeriods": {
@@ -24938,7 +24938,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "8385095855954346430"
+                                                              "templateHash": "3889684486127695540"
                                                             }
                                                           },
                                                           "parameters": {
@@ -25030,7 +25030,7 @@
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
                                                                       "failingPeriods": {
@@ -26158,7 +26158,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "9934010138665155927"
+                              "templateHash": "1889919393126492259"
                             }
                           },
                           "parameters": {
@@ -27326,7 +27326,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "9158178557829480769"
+                                      "templateHash": "15811016274199207888"
                                     }
                                   },
                                   "parameters": {
@@ -27515,7 +27515,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "1158876901055462518"
+                                              "templateHash": "8088400665741792247"
                                             }
                                           },
                                           "parameters": {
@@ -27610,7 +27610,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "6905703637144815509"
+                                                      "templateHash": "1413888379096327590"
                                                     }
                                                   },
                                                   "parameters": {
@@ -27758,7 +27758,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "6621497933671763313"
+                                                              "templateHash": "12143918929234692664"
                                                             }
                                                           },
                                                           "parameters": {
@@ -27835,7 +27835,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
                                                                       "failingPeriods": {
@@ -27925,7 +27925,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "8385095855954346430"
+                                                              "templateHash": "3889684486127695540"
                                                             }
                                                           },
                                                           "parameters": {
@@ -28017,7 +28017,7 @@
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
                                                                       "failingPeriods": {
@@ -28111,7 +28111,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "11594489559848387259"
+                              "templateHash": "13366848433882361482"
                             }
                           },
                           "parameters": {
@@ -28507,7 +28507,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "17824370234468229881"
+                                      "templateHash": "15408850211212019244"
                                     }
                                   },
                                   "parameters": {
@@ -28583,7 +28583,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "1158876901055462518"
+                                              "templateHash": "8088400665741792247"
                                             }
                                           },
                                           "parameters": {
@@ -28678,7 +28678,7 @@
                                                     "_generator": {
                                                       "name": "bicep",
                                                       "version": "0.24.24.22086",
-                                                      "templateHash": "6905703637144815509"
+                                                      "templateHash": "1413888379096327590"
                                                     }
                                                   },
                                                   "parameters": {
@@ -28826,7 +28826,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "6621497933671763313"
+                                                              "templateHash": "12143918929234692664"
                                                             }
                                                           },
                                                           "parameters": {
@@ -28903,7 +28903,7 @@
                                                                       "query": "[parameters('query')]",
                                                                       "timeAggregation": "Count",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "GreaterThan",
                                                                       "threshold": 0,
                                                                       "failingPeriods": {
@@ -28993,7 +28993,7 @@
                                                             "_generator": {
                                                               "name": "bicep",
                                                               "version": "0.24.24.22086",
-                                                              "templateHash": "8385095855954346430"
+                                                              "templateHash": "3889684486127695540"
                                                             }
                                                           },
                                                           "parameters": {
@@ -29085,7 +29085,7 @@
                                                                       "timeAggregation": "Average",
                                                                       "metricMeasureColumn": "[parameters('metricMeasureColumn')]",
                                                                       "dimensions": "[parameters('dimensions')]",
-                                                                      "resourceIdColumn": "_ResourceId",
+                                                                      "resourceIdColumn": "[if(empty(parameters('dimensions')), '_ResourceId', null())]",
                                                                       "operator": "[parameters('operator')]",
                                                                       "threshold": "[parameters('threshold')]",
                                                                       "failingPeriods": {
@@ -30199,7 +30199,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.24.24.22086",
-                      "templateHash": "1017558526637790729"
+                      "templateHash": "11678663253209035761"
                     }
                   },
                   "parameters": {
@@ -31694,7 +31694,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.24.24.22086",
-                              "templateHash": "1877391193674331452"
+                              "templateHash": "4799181396824867080"
                             }
                           },
                           "parameters": {
@@ -31872,7 +31872,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.24.24.22086",
-                                      "templateHash": "16390514920454073596"
+                                      "templateHash": "7292318257102436223"
                                     }
                                   },
                                   "parameters": {
@@ -31957,7 +31957,7 @@
                                             "_generator": {
                                               "name": "bicep",
                                               "version": "0.24.24.22086",
-                                              "templateHash": "6513382679466670255"
+                                              "templateHash": "157045750046456142"
                                             }
                                           },
                                           "parameters": {
@@ -31998,7 +31998,7 @@
                                             }
                                           },
                                           "variables": {
-                                            "dsArguments": "[format('-Environment {0} -TenantId {1} -resourceGroup {2} -avdLogAlertsUri {3} -templateUri {4} -Tags {5} -AGId {6} -modulePrefix {7} -packtag {8} -workspaceId {9} -location {10}', environment().name, subscription().tenantId, resourceGroup().name, parameters('avdLogAlertsUri'), parameters('templateUri'), string(parameters('Tags')), parameters('AGId'), parameters('moduleprefix'), parameters('packtag'), parameters('workspaceId'), parameters('location'))]"
+                                            "dsArguments": "[format('-Environment {0} -TenantId {1} -resourceGroup {2} -avdLogAlertsUri {3} -templateUri {4} -Tags ''{5}'' -AGId {6} -modulePrefix {7} -packtag {8} -workspaceId {9} -location {10}', environment().name, subscription().tenantId, resourceGroup().name, parameters('avdLogAlertsUri'), parameters('templateUri'), parameters('Tags'), parameters('AGId'), parameters('moduleprefix'), parameters('packtag'), parameters('workspaceId'), parameters('location'))]"
                                           },
                                           "resources": [
                                             {
