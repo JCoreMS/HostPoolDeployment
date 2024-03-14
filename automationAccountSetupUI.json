@@ -284,8 +284,8 @@
 		},
 		"outputs": {
 			"parameters": {
-				"_ArtifactsLocation": "[steps('AutoAcctConfig').CustomScriptInfo._ArtifactsLocation]",
-				"_ArtifactsLocationSasToken": "[steps('AutoAcctConfig').CustomScriptInfo._ArtifactsLocationSasToken]",
+				"_artifactsLocation": "[steps('AutoAcctConfig').CustomScriptInfo._ArtifactsLocation]",
+				"_artifactsLocationSasToken": "[steps('AutoAcctConfig').CustomScriptInfo._ArtifactsLocationSasToken]",
 				"AllResourcesSameRG": "[if(steps('AutoAcctConfig').optionVMMetrics, false, true)]",
 				"AVDResourceGroupId": "[steps('AutoAcctConfig').AVDResourceGroupId]",
 				"HostPoolInfo": "[steps('AutoAcctConfig').hostPoolInfo]",
