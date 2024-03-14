@@ -12,12 +12,7 @@
 						{
 							"name": "resourceScope",
 							"type": "Microsoft.Common.ResourceScope",
-							"instanceDetailsLabel": "AVD Alerts Deployment Prerequisites",
-							"subscription": {
-								"constraints": {
-									"validations": []
-								}
-							}
+							"instanceDetailsLabel": "AVD Alerts Deployment Prerequisites"
 						},
 						{
 							"name": "HostPoolsApi",
