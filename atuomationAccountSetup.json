@@ -5,15 +5,17 @@
     "_generator": {
       "name": "bicep",
       "version": "0.25.53.49325",
-      "templateHash": "15384094877465090932"
+      "templateHash": "4342268698873434765"
     }
   },
   "parameters": {
     "_artifactsLocation": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "https://github.com/Azure/azure-monitor-baseline-alerts/blob/main/patterns/avd/scripts/"
     },
     "_artifactsLocationSasToken": {
-      "type": "securestring"
+      "type": "securestring",
+      "defaultValue": ""
     },
     "AllResourcesSameRG": {
       "type": "bool"
