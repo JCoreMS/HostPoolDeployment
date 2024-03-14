@@ -89,7 +89,7 @@
 									"subLabel": "",
 									"toolTip": "Blob Storage Location/ URL container with Get-HostPoolInfo.ps1 and Get-StorAcctInfov2.ps1 needed for deployment and automation account setup.",
 									"constraints": {
-										"required": false,
+										"required": "[equals(steps('AutoAcctConfig').optionCustomScriptLocation, true)]",
 										"regex": "",
 										"validationMessage": ""
 									},
@@ -295,9 +295,9 @@
 				"StorageAccountResourceIds": "[steps('AutoAcctConfig').StorageAccountResourceIds]",
 				"Tags": "[steps('AutoAcctConfig').Tags]"
 			},
-			"kind": "ManagementGroup",
+			"kind": "Subscription",
 			"location": "[steps('basics').resourceScope.location.name]",
-			"managementGroupId": "[steps('basics').resourceScope.managementGroup.id]"
+			"subscriptionId": "[steps('basics').resourceScope.subscription.id]"
 		}
 	}
 }
