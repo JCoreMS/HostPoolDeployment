@@ -291,7 +291,7 @@
 				"HostPoolInfo": "[steps('AutoAcctConfig').hostPoolInfo]",
 				"Location": "[steps('basics').resourceScope.location.name]",
 				"LogAnalyticsWorkspaceResourceId": "[steps('AutoAcctConfig').LogAnalyticsWorkspaceResource.id]",
-				"ResourceGroupName": "[steps('AutoAcctConfig').resourceGroupNameExisting]",
+				"ResourceGroupId": "[steps('AutoAcctConfig').resourceGroupNameExisting]",
 				"StorageAccountResourceIds": "[steps('AutoAcctConfig').StorageAccountResourceIds]",
 				"Tags": "[steps('AutoAcctConfig').Tags]"
 			},
