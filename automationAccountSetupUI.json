@@ -289,6 +289,7 @@
 				"AllResourcesSameRG": "[if(steps('AutoAcctConfig').optionVMMetrics, false, true)]",
 				"AVDResourceGroupId": "[steps('AutoAcctConfig').AVDResourceGroupId]",
 				"HostPoolInfo": "[steps('AutoAcctConfig').hostPoolInfo]",
+				"Location": "[steps('basics').resourceScope.location.name]",
 				"LogAnalyticsWorkspaceResourceId": "[steps('AutoAcctConfig').LogAnalyticsWorkspaceResource.id]",
 				"ResourceGroupName": "[steps('AutoAcctConfig').resourceGroupNameExisting]",
 				"StorageAccountResourceIds": "[steps('AutoAcctConfig').StorageAccountResourceIds]",
