@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "4559701847009686608"
+      "templateHash": "14787558812667709150"
     }
   },
   "parameters": {
@@ -980,7 +980,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "16572926689478872995"
+              "templateHash": "11177404491320518906"
             }
           },
           "parameters": {
@@ -1005,10 +1005,6 @@
             "HGFaultDomainCount": {
               "type": "int",
               "value": "[reference(resourceId('Microsoft.Compute/hostGroups', variables('DedicatedHostGroupName')), '2020-12-01').platformFaultDomainCount]"
-            },
-            "DHPlatFaultDom": {
-              "type": "int",
-              "value": "[reference(resourceId('Microsoft.Compute/hostGroups/hosts', split(variables('DedicatedHostName'), '/')[0], split(variables('DedicatedHostName'), '/')[1]), '2023-09-01').platformFaultDomain]"
             },
             "DedicatedHostSku": {
               "type": "string",

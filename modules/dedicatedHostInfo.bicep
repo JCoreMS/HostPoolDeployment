@@ -17,6 +17,5 @@ resource DedicatedHost 'Microsoft.Compute/hostGroups/hosts@2023-09-01' existing 
 output Hosts array = HostGroup.properties.hosts
 output Zones array = HostGroup.zones
 output HGFaultDomainCount int = HostGroup.properties.platformFaultDomainCount
-output DHPlatFaultDom int = DedicatedHost.properties.platformFaultDomain
 output DedicatedHostSku string = DedicatedHost.sku.name
 output DHVirtualMachines array = DedicatedHost.properties.virtualMachines
