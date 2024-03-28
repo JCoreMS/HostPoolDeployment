@@ -1,0 +1,849 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.25.53.49325",
+      "templateHash": "4342268698873434765"
+    }
+  },
+  "parameters": {
+    "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": "https://github.com/Azure/azure-monitor-baseline-alerts/blob/main/patterns/avd/scripts/"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "AllResourcesSameRG": {
+      "type": "bool"
+    },
+    "AVDResourceGroupId": {
+      "type": "string"
+    },
+    "HostPoolInfo": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "Array of objects with the Resource ID for colHostPoolName and colVMresGroup for each Host Pool."
+      }
+    },
+    "Location": {
+      "type": "string"
+    },
+    "LogAnalyticsWorkspaceResourceId": {
+      "type": "string"
+    },
+    "ResourceGroupId": {
+      "type": "string"
+    },
+    "StorageAccountResourceIds": {
+      "type": "array"
+    },
+    "Tags": {
+      "type": "object"
+    }
+  },
+  "variables": {
+    "AutomationAccountName": "aa-avdmetrics-hostpool-storage",
+    "CloudEnvironment": "[environment().name]",
+    "ResourceGroupName": "[split(parameters('ResourceGroupId'), '/')[4]]",
+    "RunbookNameGetStorage": "AvdStorageLogData",
+    "RunbookNameGetHostPool": "AvdHostPoolLogData",
+    "RunbookScriptGetStorage": "[format('Get-StorAcctInfo.ps1{0}', parameters('_artifactsLocationSasToken'))]",
+    "RunbookScriptGetHostPool": "[format('Get-HostPoolInfo.ps1{0}', parameters('_artifactsLocationSasToken'))]",
+    "SubscriptionId": "[split(parameters('ResourceGroupId'), '/')[2]]",
+    "RoleAssignments": {
+      "DesktopVirtualizationRead": {
+        "Name": "Desktop-Virtualization-Reader",
+        "GUID": "49a72310-ab8d-41df-bbb0-79b649203868"
+      },
+      "StoreAcctContrib": {
+        "Name": "Storage-Account-Contributor",
+        "GUID": "17d1049b-9a84-46fb-8f53-869881c3d3ab"
+      },
+      "LogAnalyticsContributor": {
+        "Name": "LogAnalytics-Contributor",
+        "GUID": "92aaf0da-9dab-42b6-94a3-d43ce8d16293"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_AutomationAccountCreation",
+      "subscriptionId": "[variables('SubscriptionId')]",
+      "resourceGroup": "[variables('ResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "LogAnalyticsWorkspaceResourceId": {
+            "value": "[parameters('LogAnalyticsWorkspaceResourceId')]"
+          },
+          "AutomationAccountName": {
+            "value": "[variables('AutomationAccountName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "13144731157999222219"
+            }
+          },
+          "parameters": {
+            "AutomationAccountName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "LogAnalyticsWorkspaceResourceId": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Automation/automationAccounts",
+              "apiVersion": "2023-11-01",
+              "name": "[parameters('AutomationAccountName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "sku": {
+                  "name": "Free"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.Automation/automationAccounts/{0}', parameters('AutomationAccountName'))]",
+              "name": "automationAccountDiagnosticSettings",
+              "properties": {
+                "workspaceId": "[parameters('LogAnalyticsWorkspaceResourceId')]",
+                "logs": [
+                  {
+                    "category": "JobLogs",
+                    "enabled": true
+                  },
+                  {
+                    "category": "JobStreams",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "automationAccountResourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName'))]"
+            },
+            "automationAccountPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Automation/automationAccounts', parameters('AutomationAccountName')), '2023-11-01', 'full').identity.principalId]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_AutomationAccountSetupHostPool",
+      "subscriptionId": "[variables('SubscriptionId')]",
+      "resourceGroup": "[variables('ResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "RunbookNameGetHostPool": {
+            "value": "[variables('RunbookNameGetHostPool')]"
+          },
+          "RunbookScriptGetHostPool": {
+            "value": "[variables('RunbookScriptGetHostPool')]"
+          },
+          "CloudEnvironment": {
+            "value": "[variables('CloudEnvironment')]"
+          },
+          "SubscriptionId": {
+            "value": "[variables('SubscriptionId')]"
+          },
+          "AutomationAccountName": {
+            "value": "[variables('AutomationAccountName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "8405954199875306201"
+            }
+          },
+          "parameters": {
+            "_artifactsLocation": {
+              "type": "string"
+            },
+            "CloudEnvironment": {
+              "type": "string"
+            },
+            "SubscriptionId": {
+              "type": "string"
+            },
+            "RunbookScriptGetHostPool": {
+              "type": "securestring"
+            },
+            "RunbookNameGetHostPool": {
+              "type": "string"
+            },
+            "AutomationAccountName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            },
+            "time": {
+              "type": "string",
+              "defaultValue": "[utcNow()]"
+            }
+          },
+          "variables": {
+            "varScheduleName": "AVD_Chk-",
+            "varTimeIncrement": [
+              "PT15M",
+              "PT30M",
+              "PT45M",
+              "PT60M"
+            ],
+            "varTimeZones": {
+              "australiacentral": "AUS Eastern Standard Time",
+              "australiacentral2": "AUS Eastern Standard Time",
+              "australiaeast": "AUS Eastern Standard Time",
+              "australiasoutheast": "AUS Eastern Standard Time",
+              "brazilsouth": "E. South America Standard Time",
+              "brazilsoutheast": "E. South America Standard Time",
+              "canadacentral": "Eastern Standard Time",
+              "canadaeast": "Eastern Standard Time",
+              "centralindia": "India Standard Time",
+              "centralus": "Central Standard Time",
+              "chinaeast": "China Standard Time",
+              "chinaeast2": "China Standard Time",
+              "chinanorth": "China Standard Time",
+              "chinanorth2": "China Standard Time",
+              "eastasia": "China Standard Time",
+              "eastus": "Eastern Standard Time",
+              "eastus2": "Eastern Standard Time",
+              "francecentral": "Central Europe Standard Time",
+              "francesouth": "Central Europe Standard Time",
+              "germanynorth": "Central Europe Standard Time",
+              "germanywestcentral": "Central Europe Standard Time",
+              "japaneast": "Tokyo Standard Time",
+              "japanwest": "Tokyo Standard Time",
+              "jioindiacentral": "India Standard Time",
+              "jioindiawest": "India Standard Time",
+              "koreacentral": "Korea Standard Time",
+              "koreasouth": "Korea Standard Time",
+              "northcentralus": "Central Standard Time",
+              "northeurope": "GMT Standard Time",
+              "norwayeast": "Central Europe Standard Time",
+              "norwaywest": "Central Europe Standard Time",
+              "southafricanorth": "South Africa Standard Time",
+              "southafricawest": "South Africa Standard Time",
+              "southcentralus": "Central Standard Time",
+              "southindia": "India Standard Time",
+              "southeastasia": "Singapore Standard Time",
+              "swedencentral": "Central Europe Standard Time",
+              "switzerlandnorth": "Central Europe Standard Time",
+              "switzerlandwest": "Central Europe Standard Time",
+              "uaecentral": "Arabian Standard Time",
+              "uaenorth": "Arabian Standard Time",
+              "uksouth": "GMT Standard Time",
+              "ukwest": "GMT Standard Time",
+              "usdodcentral": "Central Standard Time",
+              "usdodeast": "Eastern Standard Time",
+              "usgovarizona": "Mountain Standard Time",
+              "usgoviowa": "Central Standard Time",
+              "usgovtexas": "Central Standard Time",
+              "usgovvirginia": "Eastern Standard Time",
+              "westcentralus": "Mountain Standard Time",
+              "westeurope": "Central Europe Standard Time",
+              "westindia": "India Standard Time",
+              "westus": "Pacific Standard Time",
+              "westus2": "Pacific Standard Time",
+              "westus3": "Mountain Standard Time"
+            },
+            "varTimeZone": "[variables('varTimeZones')[parameters('Location')]]",
+            "varJobScheduleParamsHostPool": {
+              "CloudEnvironment": "[parameters('CloudEnvironment')]",
+              "SubscriptionId": "[parameters('SubscriptionId')]"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Automation/automationAccounts/runbooks",
+              "apiVersion": "2023-11-01",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), parameters('RunbookNameGetHostPool'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]",
+              "properties": {
+                "runbookType": "PowerShell",
+                "description": "AVD Metrics Runbook for collecting related Host Pool statistics to store in Log Analytics for specified Alert Queries",
+                "publishContentLink": {
+                  "uri": "[format('{0}{1}', parameters('_artifactsLocation'), parameters('RunbookScriptGetHostPool'))]",
+                  "version": "7.2"
+                }
+              }
+            },
+            {
+              "copy": {
+                "name": "scheduleGetHostPool",
+                "count": "[length(range(0, length(variables('varTimeIncrement'))))]"
+              },
+              "type": "Microsoft.Automation/automationAccounts/schedules",
+              "apiVersion": "2023-11-01",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), format('{0}HostPool-{1}', variables('varScheduleName'), range(0, length(variables('varTimeIncrement')))[copyIndex()]))]",
+              "properties": {
+                "description": "AVD Metrics Schedule for collecting related Host Pool statistics to store in Log Analytics for specified Alert Queries",
+                "frequency": "Hour",
+                "interval": 1,
+                "startTime": "[dateTimeAdd(parameters('time'), variables('varTimeIncrement')[range(0, length(variables('varTimeIncrement')))[copyIndex()]])]",
+                "timeZone": "[variables('varTimeZone')]"
+              }
+            },
+            {
+              "copy": {
+                "name": "jobGetHostPool",
+                "count": "[length(range(0, length(variables('varTimeIncrement'))))]"
+              },
+              "type": "Microsoft.Automation/automationAccounts/jobSchedules",
+              "apiVersion": "2023-11-01",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), guid(format('setparams-HostPool-{0}', range(0, length(variables('varTimeIncrement')))[copyIndex()])))]",
+              "properties": {
+                "runbook": {
+                  "name": "[parameters('RunbookNameGetHostPool')]"
+                },
+                "schedule": {
+                  "name": "[format('{0}HostPool-{1}', variables('varScheduleName'), range(0, length(variables('varTimeIncrement')))[copyIndex()])]"
+                },
+                "parameters": "[variables('varJobScheduleParamsHostPool')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts/runbooks', parameters('AutomationAccountName'), parameters('RunbookNameGetHostPool'))]",
+                "scheduleGetHostPool"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation')]"
+      ]
+    },
+    {
+      "condition": "[not(empty(parameters('StorageAccountResourceIds')))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_AutomationAccountSetupStorage",
+      "subscriptionId": "[variables('SubscriptionId')]",
+      "resourceGroup": "[variables('ResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "AutomationAccountName": {
+            "value": "[variables('AutomationAccountName')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "RunbookNameGetStorage": {
+            "value": "[variables('RunbookNameGetStorage')]"
+          },
+          "RunbookScriptGetStorage": {
+            "value": "[variables('RunbookScriptGetStorage')]"
+          },
+          "CloudEnvironment": {
+            "value": "[variables('CloudEnvironment')]"
+          },
+          "SubscriptionId": {
+            "value": "[variables('SubscriptionId')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "4111629577636218162"
+            }
+          },
+          "parameters": {
+            "_artifactsLocation": {
+              "type": "string"
+            },
+            "CloudEnvironment": {
+              "type": "string"
+            },
+            "SubscriptionId": {
+              "type": "string"
+            },
+            "RunbookScriptGetStorage": {
+              "type": "securestring"
+            },
+            "RunbookNameGetStorage": {
+              "type": "string"
+            },
+            "AutomationAccountName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            },
+            "time": {
+              "type": "string",
+              "defaultValue": "[utcNow()]"
+            }
+          },
+          "variables": {
+            "varScheduleName": "AVD_Chk-",
+            "varTimeIncrement": [
+              "PT15M",
+              "PT30M",
+              "PT45M",
+              "PT60M"
+            ],
+            "varTimeZones": {
+              "australiacentral": "AUS Eastern Standard Time",
+              "australiacentral2": "AUS Eastern Standard Time",
+              "australiaeast": "AUS Eastern Standard Time",
+              "australiasoutheast": "AUS Eastern Standard Time",
+              "brazilsouth": "E. South America Standard Time",
+              "brazilsoutheast": "E. South America Standard Time",
+              "canadacentral": "Eastern Standard Time",
+              "canadaeast": "Eastern Standard Time",
+              "centralindia": "India Standard Time",
+              "centralus": "Central Standard Time",
+              "chinaeast": "China Standard Time",
+              "chinaeast2": "China Standard Time",
+              "chinanorth": "China Standard Time",
+              "chinanorth2": "China Standard Time",
+              "eastasia": "China Standard Time",
+              "eastus": "Eastern Standard Time",
+              "eastus2": "Eastern Standard Time",
+              "francecentral": "Central Europe Standard Time",
+              "francesouth": "Central Europe Standard Time",
+              "germanynorth": "Central Europe Standard Time",
+              "germanywestcentral": "Central Europe Standard Time",
+              "japaneast": "Tokyo Standard Time",
+              "japanwest": "Tokyo Standard Time",
+              "jioindiacentral": "India Standard Time",
+              "jioindiawest": "India Standard Time",
+              "koreacentral": "Korea Standard Time",
+              "koreasouth": "Korea Standard Time",
+              "northcentralus": "Central Standard Time",
+              "northeurope": "GMT Standard Time",
+              "norwayeast": "Central Europe Standard Time",
+              "norwaywest": "Central Europe Standard Time",
+              "southafricanorth": "South Africa Standard Time",
+              "southafricawest": "South Africa Standard Time",
+              "southcentralus": "Central Standard Time",
+              "southindia": "India Standard Time",
+              "southeastasia": "Singapore Standard Time",
+              "swedencentral": "Central Europe Standard Time",
+              "switzerlandnorth": "Central Europe Standard Time",
+              "switzerlandwest": "Central Europe Standard Time",
+              "uaecentral": "Arabian Standard Time",
+              "uaenorth": "Arabian Standard Time",
+              "uksouth": "GMT Standard Time",
+              "ukwest": "GMT Standard Time",
+              "usdodcentral": "Central Standard Time",
+              "usdodeast": "Eastern Standard Time",
+              "usgovarizona": "Mountain Standard Time",
+              "usgoviowa": "Central Standard Time",
+              "usgovtexas": "Central Standard Time",
+              "usgovvirginia": "Eastern Standard Time",
+              "westcentralus": "Mountain Standard Time",
+              "westeurope": "Central Europe Standard Time",
+              "westindia": "India Standard Time",
+              "westus": "Pacific Standard Time",
+              "westus2": "Pacific Standard Time",
+              "westus3": "Mountain Standard Time"
+            },
+            "varTimeZone": "[variables('varTimeZones')[parameters('Location')]]",
+            "varJobScheduleParamsAzFiles": {
+              "CloudEnvironment": "[parameters('CloudEnvironment')]",
+              "SubscriptionId": "[parameters('SubscriptionId')]"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Automation/automationAccounts/runbooks",
+              "apiVersion": "2023-11-01",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), parameters('RunbookNameGetStorage'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]",
+              "properties": {
+                "runbookType": "PowerShell",
+                "description": "AVD Metrics Runbook for collecting related Storage statistics to store in Log Analytics for specified Alert Queries",
+                "publishContentLink": {
+                  "uri": "[format('{0}{1}', parameters('_artifactsLocation'), parameters('RunbookScriptGetStorage'))]",
+                  "version": "7.2"
+                }
+              }
+            },
+            {
+              "copy": {
+                "name": "scheduleGetStorage",
+                "count": "[length(range(0, length(variables('varTimeIncrement'))))]"
+              },
+              "type": "Microsoft.Automation/automationAccounts/schedules",
+              "apiVersion": "2023-11-01",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), format('{0}Storage-{1}', variables('varScheduleName'), range(0, length(variables('varTimeIncrement')))[copyIndex()]))]",
+              "properties": {
+                "description": "AVD Metrics Schedule for collecting related Storage statistics to store in Log Analytics for specified Alert Queries",
+                "frequency": "Hour",
+                "interval": 1,
+                "startTime": "[dateTimeAdd(parameters('time'), variables('varTimeIncrement')[range(0, length(variables('varTimeIncrement')))[copyIndex()]])]",
+                "timeZone": "[variables('varTimeZone')]"
+              }
+            },
+            {
+              "copy": {
+                "name": "jobGetStorage",
+                "count": "[length(range(0, length(variables('varTimeIncrement'))))]"
+              },
+              "type": "Microsoft.Automation/automationAccounts/jobSchedules",
+              "apiVersion": "2023-11-01",
+              "name": "[format('{0}/{1}', parameters('AutomationAccountName'), guid(format('{0}Storage-{1}', variables('varScheduleName'), range(0, length(variables('varTimeIncrement')))[copyIndex()])))]",
+              "properties": {
+                "runbook": {
+                  "name": "[parameters('RunbookNameGetStorage')]"
+                },
+                "schedule": {
+                  "name": "[format('{0}Storage-{1}', variables('varScheduleName'), range(0, length(variables('varTimeIncrement')))[copyIndex()])]"
+                },
+                "parameters": "[variables('varJobScheduleParamsAzFiles')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Automation/automationAccounts/runbooks', parameters('AutomationAccountName'), parameters('RunbookNameGetStorage'))]",
+                "scheduleGetStorage"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "roleAssignDesktopReadMulti",
+        "count": "[length(parameters('HostPoolInfo'))]"
+      },
+      "condition": "[not(parameters('AllResourcesSameRG'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('linked_DsktpRead_VMRG_{0}', split(parameters('HostPoolInfo')[copyIndex()].colVMResGroup, '/')[4])]",
+      "subscriptionId": "[split(parameters('HostPoolInfo')[copyIndex()].colVMResGroup, '/')[2]]",
+      "resourceGroup": "[split(parameters('HostPoolInfo')[copyIndex()].colVMResGroup, '/')[4]]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AAPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation'), '2022-09-01').outputs.automationAccountPrincipalId.value]"
+          },
+          "RoleAssignmentId": {
+            "value": "[variables('RoleAssignments').DesktopVirtualizationRead.GUID]"
+          },
+          "RoleName": {
+            "value": "[variables('RoleAssignments').DesktopVirtualizationRead.Name]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "13499160716641100591"
+            }
+          },
+          "parameters": {
+            "AAPrincipalId": {
+              "type": "string"
+            },
+            "RoleAssignmentId": {
+              "type": "string"
+            },
+            "RoleName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(parameters('AAPrincipalId'), parameters('RoleAssignmentId'))]",
+              "properties": {
+                "principalId": "[parameters('AAPrincipalId')]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleAssignmentId'))]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation')]"
+      ]
+    },
+    {
+      "condition": "[parameters('AllResourcesSameRG')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('linked_DsktpRead_VMRG_{0}', split(parameters('AVDResourceGroupId'), '/')[4])]",
+      "subscriptionId": "[split(parameters('AVDResourceGroupId'), '/')[2]]",
+      "resourceGroup": "[split(parameters('AVDResourceGroupId'), '/')[4]]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AAPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation'), '2022-09-01').outputs.automationAccountPrincipalId.value]"
+          },
+          "RoleAssignmentId": {
+            "value": "[variables('RoleAssignments').DesktopVirtualizationRead.GUID]"
+          },
+          "RoleName": {
+            "value": "[variables('RoleAssignments').DesktopVirtualizationRead.Name]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "13499160716641100591"
+            }
+          },
+          "parameters": {
+            "AAPrincipalId": {
+              "type": "string"
+            },
+            "RoleAssignmentId": {
+              "type": "string"
+            },
+            "RoleName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(parameters('AAPrincipalId'), parameters('RoleAssignmentId'))]",
+              "properties": {
+                "principalId": "[parameters('AAPrincipalId')]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleAssignmentId'))]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('linked_LAWContrib_{0}', split(parameters('LogAnalyticsWorkspaceResourceId'), '/')[4])]",
+      "subscriptionId": "[split(parameters('LogAnalyticsWorkspaceResourceId'), '/')[2]]",
+      "resourceGroup": "[split(parameters('LogAnalyticsWorkspaceResourceId'), '/')[4]]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AAPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation'), '2022-09-01').outputs.automationAccountPrincipalId.value]"
+          },
+          "RoleAssignmentId": {
+            "value": "[variables('RoleAssignments').LogAnalyticsContributor.GUID]"
+          },
+          "RoleName": {
+            "value": "[variables('RoleAssignments').LogAnalyticsContributor.Name]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "13499160716641100591"
+            }
+          },
+          "parameters": {
+            "AAPrincipalId": {
+              "type": "string"
+            },
+            "RoleAssignmentId": {
+              "type": "string"
+            },
+            "RoleName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(parameters('AAPrincipalId'), parameters('RoleAssignmentId'))]",
+              "properties": {
+                "principalId": "[parameters('AAPrincipalId')]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleAssignmentId'))]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "roleAssignStorage",
+        "count": "[length(parameters('StorageAccountResourceIds'))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('linked_StorContrib_{0}', split(parameters('StorageAccountResourceIds')[copyIndex()], '/')[4])]",
+      "subscriptionId": "[split(parameters('StorageAccountResourceIds')[copyIndex()], '/')[2]]",
+      "resourceGroup": "[split(parameters('StorageAccountResourceIds')[copyIndex()], '/')[4]]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AAPrincipalId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation'), '2022-09-01').outputs.automationAccountPrincipalId.value]"
+          },
+          "RoleAssignmentId": {
+            "value": "[variables('RoleAssignments').StoreAcctContrib.GUID]"
+          },
+          "RoleName": {
+            "value": "[variables('RoleAssignments').StoreAcctContrib.Name]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.25.53.49325",
+              "templateHash": "13499160716641100591"
+            }
+          },
+          "parameters": {
+            "AAPrincipalId": {
+              "type": "string"
+            },
+            "RoleAssignmentId": {
+              "type": "string"
+            },
+            "RoleName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(parameters('AAPrincipalId'), parameters('RoleAssignmentId'))]",
+              "properties": {
+                "principalId": "[parameters('AAPrincipalId')]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleAssignmentId'))]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('SubscriptionId'), variables('ResourceGroupName')), 'Microsoft.Resources/deployments', 'linked_AutomationAccountCreation')]"
+      ]
+    }
+  ]
+}

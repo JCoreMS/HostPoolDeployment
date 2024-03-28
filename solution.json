@@ -25,8 +25,6 @@
       "type": "string",
       "defaultValue": "win11_22h2_office",
       "allowedValues": [
-        "win10_21h2",
-        "win10_21h2_office",
         "win10_22h2_g2",
         "win10_22h2_office_g2",
         "win11_21h2",
@@ -1325,7 +1323,7 @@
                     }
                   ]
                 },
-                "securityProfile": "[if(equals(variables('SecurityType'), 'TrustedLaunch'), variables('securityProfileJson'), null())]",
+                "securityProfile": "[if(equals(variables('SecurityType'), 'TrustedLaunch'), variables('securityProfileJson'), nul())]",
                 "diagnosticsProfile": {
                   "bootDiagnostics": {
                     "enabled": false
