@@ -1,6 +1,7 @@
 param AgentPackageLocation string
 param ComputeGalleryImageId string
 param ComputeGalleryProperties object
+param DedicatedHostResId string
 @secure()
 param DomainName string
 param DomainUser string
@@ -35,8 +36,10 @@ param VmSize string
 param VmUsername string
 @secure()
 param VmPassword string
+param Zones array
 
-var SharedImageSecType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType').value : 'Standard'
+
+var SharedImageSecType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features[0], feature => feature.name == 'SecurityType').value : 'Standard'
 var SecurityType = SharedImageSecType =='TrustedLaunchSupported' ? 'TrustedLaunch' : SharedImageSecType
 var securityProfileJson = {
   uefiSettings: {
@@ -47,8 +50,6 @@ var securityProfileJson = {
 }
 
 var imageToUse = UseCustomImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
-
-
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
@@ -73,6 +74,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [fo
   }
 }]
 
+// No OS Profile for Dedicated Host
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
@@ -111,6 +113,9 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
       secrets: []
       allowExtensionOperations: true
     }
+    host: !empty(DedicatedHostResId) ? {
+      id: DedicatedHostResId
+    } : null
     networkProfile: {
       networkInterfaces: [
         {
@@ -129,6 +134,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
     }
     licenseType: 'Windows_Client'
   }
+  zones: !empty(Zones) ? Zones : null
   dependsOn: [
     networkInterface
   ]

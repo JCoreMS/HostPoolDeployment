@@ -27,6 +27,8 @@ param ComputeGalleryImage string = ''
 
 param CustomRdpProperty string = ''
 
+param dedicatedHostId string = ''
+
 @allowed([
   'Standard_LRS'
   'StandardSSD_LRS'
@@ -153,6 +155,8 @@ var PostDeployContainerName = PostDeployOption ? split(PostDeployContainerId, '/
 var PostDeployStorName = PostDeployOption ? split(PostDeployContainerId, '/')[8] : ''
 var PostDeployStorRG = PostDeployOption ? split(PostDeployContainerId, '/')[4] : ''
 var PostDeployEndpoint = PostDeployOption ? 'https://${PostDeployStorName}.blob.${environment().suffixes.storage}/${PostDeployContainerName}' : ''
+
+var DedicatedHostRG = split (dedicatedHostId, '/')[4]
 
 var RoleAssignments = {
   BlobDataRead: {
@@ -324,6 +328,13 @@ module monitoring 'modules/monitoring.bicep' = if(HostPool != 'AltTenant'){
     hostPool
   ]
 }
+module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (!empty(dedicatedHostId)) {
+  name: 'linked_dedicatedHostInfo'
+  scope: resourceGroup(DedicatedHostRG)
+  params: {
+    dedicatedHostId: dedicatedHostId
+  }
+}
 
 @batchSize(1)
 module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
@@ -333,6 +344,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     AgentPackageLocation: varAvdAgentPackageLocation
     ComputeGalleryImageId: UseCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
     ComputeGalleryProperties: UseCustomImage ? computeGalleryImage.properties : {}
+    DedicatedHostResId: !empty(dedicatedHostId) ? dedicatedHostId : ''
     DomainUser: DomainUser
     DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
     DomainName: DomainName
@@ -362,6 +374,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
     VmUsername: VmUsername
     VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocName) : VmPassword
     VmPrefix: VmPrefix
+    Zones: !empty(dedicatedHostId) ? dedicatedHostInfo.outputs.Zones : []
   }
   dependsOn: PostDeployOption ? [
     monitoring
