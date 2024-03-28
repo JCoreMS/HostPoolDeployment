@@ -156,7 +156,7 @@ var PostDeployStorName = PostDeployOption ? split(PostDeployContainerId, '/')[8]
 var PostDeployStorRG = PostDeployOption ? split(PostDeployContainerId, '/')[4] : ''
 var PostDeployEndpoint = PostDeployOption ? 'https://${PostDeployStorName}.blob.${environment().suffixes.storage}/${PostDeployContainerName}' : ''
 
-var DedicatedHostRG = split (dedicatedHostId, '/')[4]
+var DedicatedHostRG = !empty(dedicatedHostId) ? split (dedicatedHostId, '/')[4] : ''
 
 var RoleAssignments = {
   BlobDataRead: {

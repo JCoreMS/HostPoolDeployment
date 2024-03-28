@@ -1087,7 +1087,7 @@
 				"ComputeGalleryRG": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),4))]",
 				"ComputeGalleryImage": "[steps('imageInfo').imageSelection]",
 				"CustomRdpProperty": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').CustomRdpProperty, steps('hostPool').hostPoolApi.properties.customRdpProperty)]",
-				"DedicatedHostResId": "[steps('hostInfo').vmInformation.dedicatedHost]",
+				"dedicatedHostId": "[steps('hostInfo').vmInformation.dedicatedHost]",
 				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
 				"DomainName": "[steps('hostInfo').domainInformation.DomainName]",
 				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
