@@ -17,8 +17,10 @@ param AppGroupType string = 'Desktop'
   'win11_21h2_office'
   'win11_22h2'
   'win11_22h2_office'
+  'win11_23h2'
+  'win11_23h2_office'
 ])
-param avdOsImage string = 'win11_22h2_office'
+param avdOsImage string = 'win11_23h2_office'
 
 param ComputeGalleryName string = ''
 param ComputeGallerySubId string = ''
@@ -154,9 +156,11 @@ var varKvLocRg = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[4] : 'none'
 var PostDeployContainerName = PostDeployOption ? split(PostDeployContainerId, '/')[12] : ''
 var PostDeployStorName = PostDeployOption ? split(PostDeployContainerId, '/')[8] : ''
 var PostDeployStorRG = PostDeployOption ? split(PostDeployContainerId, '/')[4] : ''
-var PostDeployEndpoint = PostDeployOption ? 'https://${PostDeployStorName}.blob.${environment().suffixes.storage}/${PostDeployContainerName}' : ''
+var PostDeployEndpoint = PostDeployOption
+  ? 'https://${PostDeployStorName}.blob.${environment().suffixes.storage}/${PostDeployContainerName}'
+  : ''
 
-var DedicatedHostRG = !empty(dedicatedHostId) ? split (dedicatedHostId, '/')[4] : ''
+var DedicatedHostRG = !empty(dedicatedHostId) ? split(dedicatedHostId, '/')[4] : ''
 
 var RoleAssignments = {
   BlobDataRead: {
@@ -171,110 +175,128 @@ var RoleAssignments = {
 
 var varMarketPlaceGalleryWindows = {
   win10_22h2_g2: {
-      publisher: 'MicrosoftWindowsDesktop'
-      offer: 'windows-10'
-      sku: 'win10-22h2-avd-g2'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'windows-10'
+    sku: 'win10-22h2-avd-g2'
+    version: 'latest'
   }
   win10_22h2_office_g2: {
-      publisher: 'MicrosoftWindowsDesktop'
-      offer: 'office-365'
-      sku: 'win10-21h2-avd-m365-g2'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win10-21h2-avd-m365-g2'
+    version: 'latest'
   }
   win11_21h2: {
-      publisher: 'MicrosoftWindowsDesktop'
-      offer: 'Windows-11'
-      sku: 'win11-21h2-avd'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-21h2-avd'
+    version: 'latest'
   }
   win11_21h2_office: {
-      publisher: 'MicrosoftWindowsDesktop'
-      offer: 'office-365'
-      sku: 'win11-21h2-avd-m365'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-21h2-avd-m365'
+    version: 'latest'
   }
   win11_22h2: {
-      publisher: 'MicrosoftWindowsDesktop'
-      offer: 'Windows-11'
-      sku: 'win11-22h2-avd'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-22h2-avd'
+    version: 'latest'
   }
   win11_22h2_office: {
-      publisher: 'MicrosoftWindowsDesktop'
-      offer: 'office-365'
-      sku: 'win11-22h2-avd-m365'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-22h2-avd-m365'
+    version: 'latest'
+  }
+  win11_23h2: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'Windows-11'
+    sku: 'win11-23h2-avd'
+    version: 'latest'
+  }
+  win11_23h2_office: {
+    publisher: 'MicrosoftWindowsDesktop'
+    offer: 'office-365'
+    sku: 'win11-23h2-avd-m365'
+    version: 'latest'
   }
   winServer_2022_Datacenter: {
-      publisher: 'MicrosoftWindowsServer'
-      offer: 'WindowsServer'
-      sku: '2022-datacenter'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter'
+    version: 'latest'
   }
   winServer_2022_datacenter_core: {
-      publisher: 'MicrosoftWindowsServer'
-      offer: 'WindowsServer'
-      sku: '2022-datacenter-core'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-core'
+    version: 'latest'
   }
   winServer_2022_datacenter_azure_edition_core: {
-      publisher: 'MicrosoftWindowsServer'
-      offer: 'WindowsServer'
-      sku: '2022-datacenter-azure-edition-core'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-azure-edition-core'
+    version: 'latest'
   }
   winServer_2022_Datacenter_core_smalldisk_g2: {
-      publisher: 'MicrosoftWindowsServer'
-      offer: 'WindowsServer'
-      sku: '2022-datacenter-core-smalldisk-g2'
-      version: 'latest'
+    publisher: 'MicrosoftWindowsServer'
+    offer: 'WindowsServer'
+    sku: '2022-datacenter-core-smalldisk-g2'
+    version: 'latest'
   }
 }
 
-resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' = if(!empty(ResourceGroupHP)) {
-  name: !empty(ResourceGroupHP) ? ResourceGroupHP : 'none-rgHP'
-  location: Location
-  tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
-}
-
-resource kvDomain 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultDomainOption) {
-  name: varKvNameDom
-  scope: resourceGroup(varKvDomSubId, varKvDomRg)
-}
-
-resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing = if(KeyVaultLocalOption) {
-  name: varKvNameLoc
-  scope: resourceGroup(varKvLocSubId, varKvLocRg)
-}
-
-resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' = if (!empty(ResourceGroupVMs)) {
-  name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none-rgVMs'
-  location: !empty(Location) ? Location : 'none'
-  tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
-}
-
-resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing = if(!empty(ComputeGalleryName)) {
-  name: '${ComputeGalleryName}/${ComputeGalleryImage}'
-  scope: resourceGroup(ComputeGallerySubId, ComputeGalleryRG) //scope to alternate subscription
-}
-
-module userIdentity 'modules/userIdentity.bicep' = if(PostDeployOption) {
-  scope: resourceGroup(DeployIDTo)
-  name: 'linked_UserIdentityCreateAssign'
-  params: {
-    Location: Location
-    PostDeployOption: PostDeployOption
-    PostDeployStorRG: PostDeployStorRG
-    PostDeployStorName: PostDeployStorName
-    RoleAssignments: RoleAssignments
-    Tags: Tags
-    UserIdentityName: UserIdentityName
+resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' =
+  if (!empty(ResourceGroupHP)) {
+    name: !empty(ResourceGroupHP) ? ResourceGroupHP : 'none-rgHP'
+    location: Location
+    tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
   }
-  dependsOn: [
-    resourceGroup(DeployIDTo)
-  ]
-}
+
+resource kvDomain 'Microsoft.KeyVault/vaults@2022-11-01' existing =
+  if (KeyVaultDomainOption) {
+    name: varKvNameDom
+    scope: resourceGroup(varKvDomSubId, varKvDomRg)
+  }
+
+resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing =
+  if (KeyVaultLocalOption) {
+    name: varKvNameLoc
+    scope: resourceGroup(varKvLocSubId, varKvLocRg)
+  }
+
+resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' =
+  if (!empty(ResourceGroupVMs)) {
+    name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none-rgVMs'
+    location: !empty(Location) ? Location : 'none'
+    tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
+  }
+
+resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing =
+  if (!empty(ComputeGalleryName)) {
+    name: '${ComputeGalleryName}/${ComputeGalleryImage}'
+    scope: resourceGroup(ComputeGallerySubId, ComputeGalleryRG) //scope to alternate subscription
+  }
+
+module userIdentity 'modules/userIdentity.bicep' =
+  if (PostDeployOption) {
+    scope: resourceGroup(DeployIDTo)
+    name: 'linked_UserIdentityCreateAssign'
+    params: {
+      Location: Location
+      PostDeployOption: PostDeployOption
+      PostDeployStorRG: PostDeployStorRG
+      PostDeployStorName: PostDeployStorName
+      RoleAssignments: RoleAssignments
+      Tags: Tags
+      UserIdentityName: UserIdentityName
+    }
+    dependsOn: [
+      resourceGroup(DeployIDTo)
+    ]
+  }
 
 module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
   scope: resourceGroup(LogAnalyticsSubId, LogAnalyticsRG)
@@ -284,102 +306,109 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
   }
 }
 
-module hostPool 'modules/hostpool.bicep' = if(HostPool != 'AltTenant'){
-  name: 'linked_HostPoolDeployment'
-  scope: resourceGroup(DeployHPTo)
-  params: {
-    AppGroupName: AppGroupName
-    AppGroupType: AppGroupType
-    ComputeGalleryImageId: computeGalleryImage.id
-    CustomRdpProperty: CustomRdpProperty
-    DiskSku: DiskSku
-    DomainName: DomainName
-    HostPoolName: HostPoolName
-    HostPoolType: HostPoolType
-    Location: Location
-    NumUsersPerHost: NumUsersPerHost
-    StartVmOnConnect: StartVmOnConnect
-    Tags: Tags
-    UseCustomImage: UseCustomImage
-    ValidationEnvironment: ValidationEnvironment
-    vmImage: varMarketPlaceGalleryWindows[avdOsImage]
-    VmPrefix: VmPrefix
-    VmSize: VmSize
-    HostPoolWorkspaceName: HostPoolWorkspaceName
+module hostPool 'modules/hostpool.bicep' =
+  if (HostPool != 'AltTenant') {
+    name: 'linked_HostPoolDeployment'
+    scope: resourceGroup(DeployHPTo)
+    params: {
+      AppGroupName: AppGroupName
+      AppGroupType: AppGroupType
+      ComputeGalleryImageId: computeGalleryImage.id
+      CustomRdpProperty: CustomRdpProperty
+      DiskSku: DiskSku
+      DomainName: DomainName
+      HostPoolName: HostPoolName
+      HostPoolType: HostPoolType
+      Location: Location
+      NumUsersPerHost: NumUsersPerHost
+      StartVmOnConnect: StartVmOnConnect
+      Tags: Tags
+      UseCustomImage: UseCustomImage
+      ValidationEnvironment: ValidationEnvironment
+      vmImage: varMarketPlaceGalleryWindows[avdOsImage]
+      VmPrefix: VmPrefix
+      VmSize: VmSize
+      HostPoolWorkspaceName: HostPoolWorkspaceName
+    }
+    dependsOn: [
+      resourceGroup(DeployHPTo)
+    ]
   }
-  dependsOn: [
-    resourceGroup(DeployHPTo)
-  ]
-}
 
 // Monitoring Resources for AVD Insights
 // This module configures Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
-module monitoring 'modules/monitoring.bicep' = if(HostPool != 'AltTenant'){
-  name: 'linked_Monitoring_Setup'
-  scope: resourceGroup(DeployHPTo) // Management Resource Group
-  params: {
-    HostPoolName: HostPoolName
-    LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
-    HostPoolWorkspaceName: HostPoolWorkspaceName
+module monitoring 'modules/monitoring.bicep' =
+  if (HostPool != 'AltTenant') {
+    name: 'linked_Monitoring_Setup'
+    scope: resourceGroup(DeployHPTo) // Management Resource Group
+    params: {
+      HostPoolName: HostPoolName
+      LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
+      HostPoolWorkspaceName: HostPoolWorkspaceName
+    }
+    dependsOn: [
+      logAnalyticsWorkspace
+      resourceGroup(DeployHPTo)
+      hostPool
+    ]
   }
-  dependsOn: [
-    logAnalyticsWorkspace
-    resourceGroup(DeployHPTo)
-    hostPool
-  ]
-}
-module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (!empty(dedicatedHostId)) {
-  name: 'linked_dedicatedHostInfo'
-  scope: resourceGroup(DedicatedHostRG)
-  params: {
-    dedicatedHostId: dedicatedHostId
+module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' =
+  if (!empty(dedicatedHostId)) {
+    name: 'linked_dedicatedHostInfo'
+    scope: resourceGroup(DedicatedHostRG)
+    params: {
+      dedicatedHostId: dedicatedHostId
+    }
   }
-}
 
 @batchSize(1)
-module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
-  name: 'linked_VirtualMachines_batch_${i - 1}'
-  scope: resourceGroup(DeployVMsTo)
-  params: {
-    AgentPackageLocation: varAvdAgentPackageLocation
-    ComputeGalleryImageId: UseCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
-    ComputeGalleryProperties: UseCustomImage ? computeGalleryImage.properties : {}
-    DedicatedHostResId: !empty(dedicatedHostId) ? dedicatedHostId : ''
-    DomainUser: DomainUser
-    DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
-    DomainName: DomainName
-    HostPoolName: HostPoolName
-    HostPoolRegistrationToken: HostPool != 'AltTenant' ? hostPool.outputs.HostPoolRegistrationToken : HostPoolAltToken
-    Location: Location
-    LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
-    NumSessionHosts: NumSessionHosts
-    MarketPlaceGalleryWindows: UseCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
-    OUPath: OUPath
-    PostDeployEndpoint: PostDeployOption ? PostDeployEndpoint : ''
-    PostDeployScript: PostDeployOption ? PostDeployScript : ''
-    PostDeployOptVDOT: PostDeployOption ? PostDeployOptVDOT : false
-    PostDeployOption: PostDeployOption
-    Restart: Restart
-    Subnet: Subnet
-    Tags: Tags
-    Timestamp: Timestamp
-    UpdateWindows: UpdateWindows
-    UseCustomImage: UseCustomImage
-    UserIdentityResId: PostDeployOption ? userIdentity.outputs.userIdentityResId : ''
-    UserIdentityObjId: PostDeployOption ? userIdentity.outputs.userIdentityObjId : ''
-    VirtualNetwork: VirtualNetwork
-    VirtualNetworkResourceGroup: VirtualNetworkResourceGroup
-    VmIndexStart: VmIndexStart
-    VmSize: VmSize
-    VmUsername: VmUsername
-    VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocName) : VmPassword
-    VmPrefix: VmPrefix
-    Zones: !empty(dedicatedHostId) ? dedicatedHostInfo.outputs.Zones : []
+module virtualMachines 'modules/virtualmachines.bicep' = [
+  for i in range(1, SessionHostBatchCount): {
+    name: 'linked_VirtualMachines_batch_${i - 1}'
+    scope: resourceGroup(DeployVMsTo)
+    params: {
+      AgentPackageLocation: varAvdAgentPackageLocation
+      ComputeGalleryImageId: UseCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
+      ComputeGalleryProperties: UseCustomImage ? computeGalleryImage.properties : {}
+      DedicatedHostResId: !empty(dedicatedHostId) ? dedicatedHostId : ''
+      DomainUser: DomainUser
+      DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
+      DomainName: DomainName
+      HostPoolName: HostPoolName
+      HostPoolRegistrationToken: HostPool != 'AltTenant' ? hostPool.outputs.HostPoolRegistrationToken : HostPoolAltToken
+      Location: Location
+      LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
+      NumSessionHosts: NumSessionHosts
+      MarketPlaceGalleryWindows: UseCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
+      OUPath: OUPath
+      PostDeployEndpoint: PostDeployOption ? PostDeployEndpoint : ''
+      PostDeployScript: PostDeployOption ? PostDeployScript : ''
+      PostDeployOptVDOT: PostDeployOption ? PostDeployOptVDOT : false
+      PostDeployOption: PostDeployOption
+      Restart: Restart
+      Subnet: Subnet
+      Tags: Tags
+      Timestamp: Timestamp
+      UpdateWindows: UpdateWindows
+      UseCustomImage: UseCustomImage
+      UserIdentityResId: PostDeployOption ? userIdentity.outputs.userIdentityResId : ''
+      UserIdentityObjId: PostDeployOption ? userIdentity.outputs.userIdentityObjId : ''
+      VirtualNetwork: VirtualNetwork
+      VirtualNetworkResourceGroup: VirtualNetworkResourceGroup
+      VmIndexStart: VmIndexStart
+      VmSize: VmSize
+      VmUsername: VmUsername
+      VmPassword: KeyVaultLocalOption ? kvLocal.getSecret(KeyVaultLocName) : VmPassword
+      VmPrefix: VmPrefix
+      Zones: !empty(dedicatedHostId) ? dedicatedHostInfo.outputs.Zones : []
+    }
+    dependsOn: PostDeployOption
+      ? [
+          monitoring
+          userIdentity
+        ]
+      : [
+          monitoring
+        ]
   }
-  dependsOn: PostDeployOption ? [
-    monitoring
-    userIdentity
-  ] :[
-    monitoring
-  ]
-}]
+]
