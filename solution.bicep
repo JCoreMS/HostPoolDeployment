@@ -30,6 +30,7 @@ param ComputeGalleryImage string = ''
 param CustomRdpProperty string = ''
 
 param dedicatedHostId string = ''
+param dedicatedHostTagName string = ''
 
 @allowed([
   'Standard_LRS'
@@ -371,6 +372,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [
       ComputeGalleryImageId: UseCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'
       ComputeGalleryProperties: UseCustomImage ? computeGalleryImage.properties : {}
       DedicatedHostResId: !empty(dedicatedHostId) ? dedicatedHostId : ''
+      DedicatedHostTagName: !empty(dedicatedHostTagName) ? dedicatedHostTagName : ''
       DomainUser: DomainUser
       DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
       DomainName: DomainName

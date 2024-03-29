@@ -549,13 +549,34 @@
 							}
 						},
 						{
+							"name": "lawNewExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "New or Existing Log Analytics",
+							"defaultValue": "Existing",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "New",
+										"value": "New"
+									},
+									{
+										"label": "Existing",
+										"value": "Existing"
+									}
+								],
+								"required": true
+							},
+							"visible": true
+						},
+						{
 							"name": "alaWorkspaceExistingWorkspacesSelection",
 							"type": "Microsoft.Solutions.ResourceSelector",
 							"visible": true,
 							"label": "Existing workspace",
 							"resourceType": "Microsoft.OperationalInsights/workspaces",
 							"constraints": {
-								"required": true
+								"required": "[if(equals(steps('monitoring').lawNewExisting), 'Existing')]"
 							}
 						},
 						{
@@ -714,51 +735,6 @@
 										]
 									},
 									"visible": true
-								},
-								{
-									"name": "vmDedicatedHostOpt",
-									"type": "Microsoft.Common.CheckBox",
-									"label": "Deploy VM(s) on Dedicated Host",
-									"toolTip": "Select this if you would like to deploy VMs on a Dedicated Azure Host already created. Ensuring the VM SKU and Host SKU match.",
-									"constraints": {
-										"required": false,
-										"validationMessage": "IF you have a hard requirement for Compute isolation like those noted for IL5, this may be an option to consider."
-									},
-									"visible": true
-								},
-								{
-									"name": "vmDedicatedHostGroup",
-									"type": "Microsoft.Common.DropDown",
-									"visible": "[steps('hostInfo').vmInformation.vmDedicatedHostOpt]",
-									"filter": true,
-									"label": "Select the Dedicated Host",
-									"defaultValue": "",
-									"toolTip": "",
-									"constraints": {
-										"allowedValues": "[map(steps('basics').hostGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
-										"required": "[steps('hostInfo').vmInformation.vmDedicatedHostOpt]"
-									}
-								},
-								{
-									"name": "dedicatedHostApi",
-									"type": "Microsoft.Solutions.ArmApiControl",
-									"request": {
-										"method": "GET",
-										"path": "[concat(steps('hostInfo').vmInformation.vmDedicatedHostGroup, '/hosts?api-version=2023-09-01')]"
-									}
-								},
-								{
-									"name": "dedicatedHost",
-									"type": "Microsoft.Common.DropDown",
-									"visible": "[steps('hostInfo').vmInformation.vmDedicatedHostOpt]",
-									"filter": true,
-									"label": "Select the Dedicated Host",
-									"defaultValue": "",
-									"toolTip": "",
-									"constraints": {
-										"allowedValues": "[map(steps('hostInfo').vmInformation.dedicatedHostApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
-										"required": "[steps('hostInfo').vmInformation.vmDedicatedHostOpt]"
-									}
 								}
 							]
 						},
@@ -932,6 +908,94 @@
 					]
 				},
 				{
+					"name": "dedicatedHostInfo",
+					"label": "Dedicated Host Option",
+					"elements": [
+						{
+							"name": "vmDedicatedHostOpt",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Deploy VM(s) on Dedicated Host",
+							"toolTip": "Select this if you would like to deploy VMs on a Dedicated Azure Host already created. Ensuring the VM SKU and Host SKU match.",
+							"constraints": {
+								"required": false,
+								"validationMessage": "IF you have a hard requirement for Compute isolation like those noted for IL5, this may be an option to consider."
+							},
+							"visible": true
+						},
+						{
+							"name": "dedicatedHostInfobox1",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": true,
+							"options": {
+								"text": "In some environments it is required to have a dedicated Azure Host or Server to isolate Compute. This is most common in IL5 type environments. Selecting this option will ensure the VMs are deployed on a pre-existing Dedicated Host. Click this box for more information.",
+								"uri": "https://learn.microsoft.com/en-us/azure/azure-government/documentation-government-impact-level-5#compute-isolation",
+								"style": "Info"
+							}
+						},
+						{
+							"name": "dedicatedHostConfig",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "Dedicated Host Configuration",
+							"elements": [
+								{
+									"name": "vmDedicatedHostGroup",
+									"type": "Microsoft.Common.DropDown",
+									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
+									"filter": true,
+									"label": "Select the Dedicated Host",
+									"defaultValue": "",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": "[map(steps('basics').hostGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+										"required": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]"
+									}
+								},
+								{
+									"name": "dedicatedHostApi",
+									"type": "Microsoft.Solutions.ArmApiControl",
+									"request": {
+										"method": "GET",
+										"path": "[concat(steps('dedicatedHostInfo').dedicatedHostConfig.vmDedicatedHostGroup, '/hosts?api-version=2023-09-01')]"
+									}
+								},
+								{
+									"name": "dedicatedHost",
+									"type": "Microsoft.Common.DropDown",
+									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
+									"filter": true,
+									"label": "Select the Dedicated Host",
+									"defaultValue": "",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": "[map(steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHostApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+										"required": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]"
+									}
+								},
+								{
+									"name": "dedicatedHostTagName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Tag Name for VM(s)",
+									"defaultValue": "DedicatedHost",
+									"toolTip": "Name for the Tag Key denoting this is VM will be on a dedicated Host. The Value will be the Dedicated Host Name. For NO added tag, remove the value and leave blank.",
+									"placeholder": "",
+									"multiLine": false,
+									"constraints": {
+										"required": false,
+										"validations": [
+											{
+												"regex": "^[a-zA-Z0-9_-]{1,256}$",
+												"message": "Only alphanumeric characters, dashes and hyphens are allowed, and the value must be 1-256 characters long."
+											}
+										]
+									},
+									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]"
+								}
+							]
+						}
+					]
+				},
+				{
 					"name": "networking",
 					"label": "Virtual Networking",
 					"elements": [
@@ -1070,14 +1134,14 @@
 										"label": "Windows 11 22H2 - Office 365 (Gen2)",
 										"value": "win11_22h2_office"
 									},
-                                    {
-                                        "label": "Windows 11 23H2 (Gen2)",
-                                        "value": "win11_23h2"
-                                    },
-                                    {
-                                        "label": "Windows 11 23H2 - Office 365 (Gen2)",
-                                        "value": "win11_23h2_office"
-                                    }
+									{
+										"label": "Windows 11 23H2 (Gen2)",
+										"value": "win11_23h2"
+									},
+									{
+										"label": "Windows 11 23H2 - Office 365 (Gen2)",
+										"value": "win11_23h2_office"
+									}
 								]
 							}
 						}
@@ -1095,7 +1159,8 @@
 				"ComputeGalleryRG": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),4))]",
 				"ComputeGalleryImage": "[steps('imageInfo').imageSelection]",
 				"CustomRdpProperty": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').CustomRdpProperty, steps('hostPool').hostPoolApi.properties.customRdpProperty)]",
-				"dedicatedHostId": "[steps('hostInfo').vmInformation.dedicatedHost]",
+				"dedicatedHostId": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHost]",
+				"dedicatedHostTagName": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHostTagName]",
 				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
 				"DomainName": "[steps('hostInfo').domainInformation.DomainName]",
 				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",

@@ -2,6 +2,7 @@ param AgentPackageLocation string
 param ComputeGalleryImageId string
 param ComputeGalleryProperties object
 param DedicatedHostResId string
+param DedicatedHostTagName string
 @secure()
 param DomainName string
 param DomainUser string
@@ -51,6 +52,10 @@ var securityProfileJson = {
 
 var imageToUse = UseCustomImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
 
+var DedicatedHostName = split(DedicatedHostResId, '/')[10]
+var vmTagDH = !empty(DedicatedHostTagName) ? { DedicatedHostTagName : DedicatedHostName} : {}
+var vmTags = !empty(DedicatedHostTagName) ? union(vmTagDH, Tags) : Tags
+
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
@@ -78,7 +83,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [fo
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
-  tags: contains(Tags, 'Microsoft.Compute/virtualMachines') ? Tags['Microsoft.Compute/virtualMachines'] : {}
+  tags: contains(vmTags, 'Microsoft.Compute/virtualMachines') ? vmTags['Microsoft.Compute/virtualMachines'] : {}
   identity: PostDeployOption ? {
     type: 'SystemAssigned, UserAssigned'
     userAssignedIdentities: {

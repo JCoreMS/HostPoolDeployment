@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "10240410858182104482"
+      "templateHash": "17772801086650448290"
     }
   },
   "parameters": {
@@ -58,6 +58,10 @@
       "defaultValue": ""
     },
     "dedicatedHostId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "dedicatedHostTagName": {
       "type": "string",
       "defaultValue": ""
     },
@@ -1043,6 +1047,7 @@
           "ComputeGalleryImageId": "[if(parameters('UseCustomImage'), createObject('value', format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))), createObject('value', 'none'))]",
           "ComputeGalleryProperties": "[if(parameters('UseCustomImage'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')), createObject('value', createObject()))]",
           "DedicatedHostResId": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', parameters('dedicatedHostId')), createObject('value', ''))]",
+          "DedicatedHostTagName": "[if(not(empty(parameters('dedicatedHostTagName'))), createObject('value', parameters('dedicatedHostTagName')), createObject('value', ''))]",
           "DomainUser": {
             "value": "[parameters('DomainUser')]"
           },
@@ -1121,7 +1126,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "6142664847395576065"
+              "templateHash": "4300344916206238258"
             }
           },
           "parameters": {
@@ -1135,6 +1140,9 @@
               "type": "object"
             },
             "DedicatedHostResId": {
+              "type": "string"
+            },
+            "DedicatedHostTagName": {
               "type": "string"
             },
             "DomainName": {
@@ -1244,7 +1252,10 @@
               },
               "securityType": "[variables('SecurityType')]"
             },
-            "imageToUse": "[if(parameters('UseCustomImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]"
+            "imageToUse": "[if(parameters('UseCustomImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]",
+            "DedicatedHostName": "[split(parameters('DedicatedHostResId'), '/')[10]]",
+            "vmTagDH": "[if(not(empty(parameters('DedicatedHostTagName'))), createObject('DedicatedHostTagName', variables('DedicatedHostName')), createObject())]",
+            "vmTags": "[if(not(empty(parameters('DedicatedHostTagName'))), union(variables('vmTagDH'), parameters('Tags')), parameters('Tags'))]"
           },
           "resources": [
             {
@@ -1284,7 +1295,7 @@
               "apiVersion": "2022-11-01",
               "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
-              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines'), parameters('Tags')['Microsoft.Compute/virtualMachines'], createObject())]",
+              "tags": "[if(contains(variables('vmTags'), 'Microsoft.Compute/virtualMachines'), variables('vmTags')['Microsoft.Compute/virtualMachines'], createObject())]",
               "identity": "[if(parameters('PostDeployOption'), createObject('type', 'SystemAssigned, UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserIdentityResId')), createObject())), createObject('type', 'SystemAssigned'))]",
               "properties": {
                 "hardwareProfile": {
