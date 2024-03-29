@@ -28,6 +28,9 @@ param ComputeGalleryRG string = ''
 param ComputeGalleryImage string = ''
 
 param CustomRdpProperty string = ''
+param DCRStatus string = ''
+param DCRNewName string = ''
+param DCRExisting string = ''
 
 param dedicatedHostId string = ''
 param dedicatedHostTagName string = ''
@@ -47,6 +50,7 @@ param DomainUser string
 param DomainPassword string
 
 param ResourceGroupHP string = ''
+param ResGroupIdMonitor string = ''
 param HostPoolName string = 'none'
 param HostPoolWorkspaceName string = 'none'
 
@@ -162,7 +166,7 @@ var PostDeployEndpoint = PostDeployOption
   : ''
 
 var DedicatedHostRG = !empty(dedicatedHostId) ? split(dedicatedHostId, '/')[4] : ''
-
+var DCRExistingName = !empty(DCRExisting) ? split(DCRExisting, '/')[8] : ''
 var RoleAssignments = {
   BlobDataRead: {
     Name: 'Blob-Data-Reader'
@@ -338,14 +342,20 @@ module hostPool 'modules/hostpool.bicep' =
 
 // Monitoring Resources for AVD Insights
 // This module configures Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
-module monitoring 'modules/monitoring.bicep' =
+module diagnostics 'modules/diagnostics.bicep' =
   if (HostPool != 'AltTenant') {
-    name: 'linked_Monitoring_Setup'
+    name: 'linked_Diagnostics_Setup'
     scope: resourceGroup(DeployHPTo) // Management Resource Group
     params: {
+      DCRStatus: DCRStatus
+      DCRNewName: DCRNewName
+      DCRExisting: DCRExisting
       HostPoolName: HostPoolName
+      Location: Location
       LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
       HostPoolWorkspaceName: HostPoolWorkspaceName
+      ResGroupIdMonitor: ResGroupIdMonitor
+      Tags: Tags
     }
     dependsOn: [
       logAnalyticsWorkspace
@@ -353,8 +363,25 @@ module monitoring 'modules/monitoring.bicep' =
       hostPool
     ]
   }
-module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' =
-  if (!empty(dedicatedHostId)) {
+
+// Get EXISTING DCR
+resource dataCollectionRuleExisting 'Microsoft.Insights/dataCollectionRules@2022-06-01' existing = if (DCRStatus == 'Existing') {
+    name: DCRExistingName
+    scope: resourceGroup(ResGroupIdMonitor)
+  }
+
+module dataCollectionRule 'modules/dataCollectionRule.bicep' = if (DCRStatus == 'New') {
+    name: 'linked_DataCollectionRule'
+    scope: resourceGroup(ResGroupIdMonitor)
+    params: {
+      DCRNewName: DCRNewName
+      Location: Location
+      LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
+      Tags: Tags
+    }
+  }
+
+module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (!empty(dedicatedHostId)) {
     name: 'linked_dedicatedHostInfo'
     scope: resourceGroup(DedicatedHostRG)
     params: {
@@ -363,8 +390,7 @@ module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' =
   }
 
 @batchSize(1)
-module virtualMachines 'modules/virtualmachines.bicep' = [
-  for i in range(1, SessionHostBatchCount): {
+module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
     name: 'linked_VirtualMachines_batch_${i - 1}'
     scope: resourceGroup(DeployVMsTo)
     params: {
@@ -406,11 +432,11 @@ module virtualMachines 'modules/virtualmachines.bicep' = [
     }
     dependsOn: PostDeployOption
       ? [
-          monitoring
+          diagnostics
           userIdentity
         ]
       : [
-          monitoring
+          diagnostics
         ]
   }
 ]

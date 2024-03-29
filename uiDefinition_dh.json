@@ -31,6 +31,17 @@
 							}
 						},
 						{
+							"name": "dcrApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.Insights/dataCollectionRules?api-version=2022-06-01')]",
+								"transforms": {
+									"list": "value|[*].{label:name, value:id, description:properties.destinations.logAnalytics[0].name}"
+								}
+							}
+						},
+						{
 							"name": "optionPostDeploy",
 							"type": "Microsoft.Common.OptionsGroup",
 							"label": "Use Post Deployment Script",
@@ -572,11 +583,90 @@
 						{
 							"name": "alaWorkspaceExistingWorkspacesSelection",
 							"type": "Microsoft.Solutions.ResourceSelector",
-							"visible": true,
+							"visible": "[if(equals(steps('monitoring').lawNewExisting, 'Existing'), true, false)]",
 							"label": "Existing workspace",
 							"resourceType": "Microsoft.OperationalInsights/workspaces",
 							"constraints": {
-								"required": "[if(equals(steps('monitoring').lawNewExisting), 'Existing')]"
+								"required": "[if(equals(steps('monitoring').lawNewExisting, 'Existing'), true, false)]"
+							}
+						},
+						{
+							"name": "lawNewName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "New Log Analytics Name",
+							"defaultValue": "",
+							"toolTip": "Consider your current naming standards when creating a new name.",
+							"constraints": {
+								"required": "[if(equals(steps('monitoring').lawNewExisting, 'New'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('monitoring').lawNewExisting, 'New'), true, false)]"
+						},
+						{
+							"name": "dcrNewExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "New or Existing Data Collection Rule",
+							"defaultValue": "Existing",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "New",
+										"value": "New"
+									},
+									{
+										"label": "Existing",
+										"value": "Existing"
+									}
+								],
+								"required": true
+							},
+							"visible": true
+						},
+						{
+							"name": "dcrExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Existing Data Collection Rule",
+							"placeholder": "",
+							"defaultValue": "",
+							"toolTip": "Select the existing Data Collection Rule that was configured per AVD Insights.",
+							"multiselect": false,
+							"selectAll": false,
+							"filter": true,
+							"filterPlaceholder": "Filter items ...",
+							"multiLine": true,
+							"defaultDescription": "A value for selection",
+							"constraints": {
+								"allowedValues": "[steps('basics').dcrApi.transformed.list]",
+								"required": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), true, false)]"
+							},
+							"visible": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), true, false)]"
+						},
+						{
+							"name": "dcrNewName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "New Data Collection Rule Name",
+							"defaultValue": "",
+							"toolTip": "Consider your current naming standards when creating a new name.",
+							"constraints": {
+								"required": "[if(equals(steps('monitoring').dcrNewExisting, 'New'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('monitoring').dcrNewExisting, 'New'), true, false)]"
+						},
+						{
+							"name": "monitoringRGExisting",
+							"type": "Microsoft.Common.DropDown",
+							"visible": "[if(or(equals(steps('monitoring').lawNewExisting, 'New'), equals(steps('monitoring').dcrNewExisting, 'New')), true, false)]",
+							"filter": true,
+							"label": "Resource Group for Monitoring",
+							"defaultValue": "",
+							"toolTip": "Select the Resource Group where you'd like to create the new Log Analytics Workspace and/or Data Collection Rule for AVD.",
+							"constraints": {
+								"allowedValues": "[map(steps('basics').resourceGroupsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+								"required": "[if(equals(steps('monitoring').lawNewExisting, 'New'), true, false)]"
 							}
 						},
 						{
@@ -1159,6 +1249,9 @@
 				"ComputeGalleryRG": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),4))]",
 				"ComputeGalleryImage": "[steps('imageInfo').imageSelection]",
 				"CustomRdpProperty": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').CustomRdpProperty, steps('hostPool').hostPoolApi.properties.customRdpProperty)]",
+				"DCRStatus": "[steps('monitoring').dcrNewExisting]",
+				"DCRNewName": "[if(equals(steps('monitoring').dcrNewExisting, 'New'), steps('monitoring').dcrNewName, '')]",
+				"DCRExisting": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), steps('monitoring').dcrExisting, '')]",
 				"dedicatedHostId": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHost]",
 				"dedicatedHostTagName": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHostTagName]",
 				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
@@ -1189,6 +1282,7 @@
 				"PostDeployContainerId": "[steps('basics').PostDeploySection.containerResourceId]",
 				"PostDeployScript": "[steps('basics').PostDeploySection.postScriptName]",
 				"PostDeployOptVDOT": "[steps('basics').PostDeploySection.VDOT]",
+				"ResGroupIdMonitor": "[if(or(equals(steps('monitoring').lawNewExisting, 'New'), equals(steps('monitoring').dcrNewExisting, 'New')), steps('monitoring').monitoringRGExisting, '')]",
 				"Restart": "[steps('basics').PostDeploySection.restart]",
 				"Subnet": "[steps('networking').subnet]",
 				"Tags": "[steps('basics').TagsSection.Tags]",

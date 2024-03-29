@@ -145,7 +145,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
   ]
 }]
 
-resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
+/* resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/MicrosoftMonitoringAgent'
   location: Location
   tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
@@ -164,6 +164,18 @@ resource extension_MicrosoftMonitoringAgent 'Microsoft.Compute/virtualMachines/e
   dependsOn: [
     virtualMachine
   ]
+}] */
+resource extension_AzureMonitorWindowsAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
+  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/AzureMonitorWindowsAgent'
+  location: Location
+  tags: Tags
+  properties: {
+    publisher: 'Microsoft.Azure.Monitor'
+    type: 'AzureMonitorWindowsAgent'
+    typeHandlerVersion: '1.0'
+    autoUpgradeMinorVersion: true
+    enableAutomaticUpgrade: true
+  }
 }]
 
 resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
@@ -188,7 +200,7 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
     }
   }
   dependsOn: [
-    extension_MicrosoftMonitoringAgent
+    extension_AzureMonitorWindowsAgent
   ]
 }]
 
