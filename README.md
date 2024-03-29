@@ -65,3 +65,5 @@ Write-Host "Complete URL copied to clipboard!" -ForegroundColor Yellow
 ```PowerShell
 New-AzTemplateSpec -ResourceGroupName 'myRG' -Name 'DeployHostPool-Custom-UI' -Version 'v1.0' -Location 'West US' -TemplateFile 'solution.json' -UIFormDefinitionFile 'uiDefinition.json'
 ```
+
+[![TEST-DedicatedHost](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2Fsolution.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinition_dh.json)
