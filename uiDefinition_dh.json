@@ -1033,7 +1033,7 @@
 							"visible": "[if(equals(steps('imageInfo').ImageSource, 'MSGallery'), true, false)]",
 							"label": "OS version",
 							"filter": true,
-							"defaultValue": "Windows 11 22H2 (Gen2)",
+							"defaultValue": "Windows 11 23H2 - Office 365 (Gen2)",
 							"toolTip": "Select the operating system version of the session hosts.",
 							"constraints": {
 								"required": "[if(equals(steps('imageInfo').ImageSource, 'MSGallery'), true, false)]",
@@ -1069,7 +1069,15 @@
 									{
 										"label": "Windows 11 22H2 - Office 365 (Gen2)",
 										"value": "win11_22h2_office"
-									}
+									},
+                                    {
+                                        "label": "Windows 11 23H2 (Gen2)",
+                                        "value": "win11_23h2"
+                                    },
+                                    {
+                                        "label": "Windows 11 23H2 - Office 365 (Gen2)",
+                                        "value": "win11_23h2_office"
+                                    }
 								]
 							}
 						}
