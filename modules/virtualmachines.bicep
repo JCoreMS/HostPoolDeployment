@@ -176,6 +176,9 @@ resource extension_AzureMonitorWindowsAgent 'Microsoft.Compute/virtualMachines/e
     autoUpgradeMinorVersion: true
     enableAutomaticUpgrade: true
   }
+  dependsOn: [
+    virtualMachine
+  ]
 }]
 
 resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
@@ -204,30 +207,6 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
   ]
 }]
 
-// Add session hosts to Host Pool.
-resource addToHostPool 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
-  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/HostPoolRegistration'
-  location: Location
-  tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
-  properties: {
-    publisher: 'Microsoft.PowerShell'
-    type: 'DSC'
-    typeHandlerVersion: '2.73'
-    autoUpgradeMinorVersion: true
-    settings: {
-      modulesUrl: AgentPackageLocation
-      configurationFunction: 'Configuration.ps1\\AddSessionHost'
-      properties: {
-        hostPoolName: HostPoolName
-        registrationInfoToken: HostPoolRegistrationToken
-        aadJoin: false
-      }
-    }
-  }
-  dependsOn: [
-    extension_JsonADDomainExtension
-  ]
-}]
 
 resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if(PostDeployOption) {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
@@ -250,8 +229,35 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     }
   }
   dependsOn: [
-    addToHostPool
+    extension_JsonADDomainExtension
   ]
 }]
 
+
+// Add session hosts to Host Pool.
+resource addToHostPool 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
+  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/HostPoolRegistration'
+  location: Location
+  tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
+  properties: {
+    publisher: 'Microsoft.PowerShell'
+    type: 'DSC'
+    typeHandlerVersion: '2.73'
+    autoUpgradeMinorVersion: true
+    settings: {
+      modulesUrl: AgentPackageLocation
+      configurationFunction: 'Configuration.ps1\\AddSessionHost'
+      properties: {
+        hostPoolName: HostPoolName
+        registrationInfoToken: HostPoolRegistrationToken
+        aadJoin: false
+      }
+    }
+  }
+  dependsOn: PostDeployOption ? [
+    extension_JsonADDomainExtension
+  ] : [
+    extension_CustomScriptExtension
+  ]
+}]
 

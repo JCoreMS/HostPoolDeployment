@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "5835231956101551021"
+      "templateHash": "5846912617034539845"
     }
   },
   "parameters": {
@@ -1325,7 +1325,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "8075863088993833347"
+              "templateHash": "16171799754993061239"
             }
           },
           "parameters": {
@@ -1562,7 +1562,10 @@
                 "typeHandlerVersion": "1.0",
                 "autoUpgradeMinorVersion": true,
                 "enableAutomaticUpgrade": true
-              }
+              },
+              "dependsOn": [
+                "virtualMachine"
+              ]
             },
             {
               "copy": {
@@ -1597,35 +1600,6 @@
             },
             {
               "copy": {
-                "name": "addToHostPool",
-                "count": "[length(range(0, parameters('NumSessionHosts')))]"
-              },
-              "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2023-03-01",
-              "name": "[format('{0}{1}/HostPoolRegistration', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
-              "location": "[parameters('Location')]",
-              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
-              "properties": {
-                "publisher": "Microsoft.PowerShell",
-                "type": "DSC",
-                "typeHandlerVersion": "2.73",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                  "modulesUrl": "[parameters('AgentPackageLocation')]",
-                  "configurationFunction": "Configuration.ps1\\AddSessionHost",
-                  "properties": {
-                    "hostPoolName": "[parameters('HostPoolName')]",
-                    "registrationInfoToken": "[parameters('HostPoolRegistrationToken')]",
-                    "aadJoin": false
-                  }
-                }
-              },
-              "dependsOn": [
-                "extension_JsonADDomainExtension"
-              ]
-            },
-            {
-              "copy": {
                 "name": "extension_CustomScriptExtension",
                 "count": "[length(range(0, parameters('NumSessionHosts')))]"
               },
@@ -1654,7 +1628,37 @@
                 }
               },
               "dependsOn": [
-                "addToHostPool"
+                "extension_JsonADDomainExtension"
+              ]
+            },
+            {
+              "copy": {
+                "name": "addToHostPool",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}{1}/HostPoolRegistration', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
+              "properties": {
+                "publisher": "Microsoft.PowerShell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.73",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "modulesUrl": "[parameters('AgentPackageLocation')]",
+                  "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                  "properties": {
+                    "hostPoolName": "[parameters('HostPoolName')]",
+                    "registrationInfoToken": "[parameters('HostPoolRegistrationToken')]",
+                    "aadJoin": false
+                  }
+                }
+              },
+              "dependsOn": [
+                "extension_CustomScriptExtension",
+                "extension_JsonADDomainExtension"
               ]
             }
           ]
