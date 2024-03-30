@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.54.24096",
-      "templateHash": "5846912617034539845"
+      "templateHash": "1166603977041978482"
     }
   },
   "parameters": {
@@ -1325,7 +1325,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.54.24096",
-              "templateHash": "16171799754993061239"
+              "templateHash": "14080367536307427378"
             }
           },
           "parameters": {
@@ -1555,7 +1555,7 @@
               "apiVersion": "2023-03-01",
               "name": "[format('{0}{1}/AzureMonitorWindowsAgent', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
-              "tags": "[parameters('Tags')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
                 "publisher": "Microsoft.Azure.Monitor",
                 "type": "AzureMonitorWindowsAgent",

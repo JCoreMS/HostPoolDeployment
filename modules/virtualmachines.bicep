@@ -168,7 +168,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [for i 
 resource extension_AzureMonitorWindowsAgent 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): {
   name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/AzureMonitorWindowsAgent'
   location: Location
-  tags: Tags
+  tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
   properties: {
     publisher: 'Microsoft.Azure.Monitor'
     type: 'AzureMonitorWindowsAgent'
