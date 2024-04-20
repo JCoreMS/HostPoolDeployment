@@ -1175,7 +1175,7 @@
       ]
     },
     {
-      "condition": "[not(empty(parameters('dedicatedHostId')))]",
+      "condition": "[not(equals(parameters('dedicatedHostId'), ''))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_dedicatedHostInfo",
