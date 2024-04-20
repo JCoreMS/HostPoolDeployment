@@ -383,7 +383,7 @@ module dataCollectionRule 'modules/dataCollectionRule.bicep' = if (DCRStatus == 
 
 module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId != '') {
     name: 'linked_dedicatedHostInfo'
-    scope: resourceGroup(DedicatedHostRG)
+    scope: dedicatedHostId != '' ? resourceGroup(DedicatedHostRG): resourceGroup().id
     params: {
       dedicatedHostId: dedicatedHostId
     }
