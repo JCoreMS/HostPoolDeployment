@@ -381,7 +381,7 @@ module dataCollectionRule 'modules/dataCollectionRule.bicep' = if (DCRStatus == 
     }
   }
 
-module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId != '')) {
+module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId != '') {
     name: 'linked_dedicatedHostInfo'
     scope: resourceGroup(DedicatedHostRG)
     params: {
