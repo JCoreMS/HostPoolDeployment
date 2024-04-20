@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.26.54.24096",
-      "templateHash": "12384843272735243393"
+      "version": "0.26.170.59819",
+      "templateHash": "16176452504794842951"
     }
   },
   "parameters": {
@@ -465,8 +465,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "18421582299342790140"
+              "version": "0.26.170.59819",
+              "templateHash": "6677134435063180403"
             }
           },
           "parameters": {
@@ -532,8 +532,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.26.54.24096",
-                      "templateHash": "16306736907877425708"
+                      "version": "0.26.170.59819",
+                      "templateHash": "15416411500556387544"
                     }
                   },
                   "parameters": {
@@ -610,8 +610,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "1050679809658659914"
+              "version": "0.26.170.59819",
+              "templateHash": "2335620364263170867"
             }
           },
           "parameters": {
@@ -702,8 +702,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "9071974478142377712"
+              "version": "0.26.170.59819",
+              "templateHash": "2516333463668587415"
             }
           },
           "parameters": {
@@ -889,8 +889,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "4197880767435524319"
+              "version": "0.26.170.59819",
+              "templateHash": "4421017185604565538"
             }
           },
           "parameters": {
@@ -1051,8 +1051,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "7380285218816632104"
+              "version": "0.26.170.59819",
+              "templateHash": "3584347735454649760"
             }
           },
           "parameters": {
@@ -1179,7 +1179,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_dedicatedHostInfo",
-      "resourceGroup": "[variables('DedicatedHostRG')]",
+      "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1196,8 +1196,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "4910762494437665169"
+              "version": "0.26.170.59819",
+              "templateHash": "5622461019911783703"
             }
           },
           "parameters": {
@@ -1316,7 +1316,7 @@
           "VmPrefix": {
             "value": "[parameters('VmPrefix')]"
           },
-          "Zones": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostRG')), 'Microsoft.Resources/deployments', 'linked_dedicatedHostInfo'), '2022-09-01').outputs.Zones.value), createObject('value', createArray()))]"
+          "Zones": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_dedicatedHostInfo'), '2022-09-01').outputs.Zones.value), createObject('value', createArray()))]"
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -1324,8 +1324,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.26.54.24096",
-              "templateHash": "10199903883576404030"
+              "version": "0.26.170.59819",
+              "templateHash": "14349669352623733361"
             }
           },
           "parameters": {
@@ -1665,7 +1665,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostRG')), 'Microsoft.Resources/deployments', 'linked_dedicatedHostInfo')]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_dedicatedHostInfo')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_Diagnostics_Setup')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
