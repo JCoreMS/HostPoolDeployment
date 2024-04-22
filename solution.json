@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "14925324813879393494"
+      "templateHash": "12009076986100327051"
     }
   },
   "parameters": {
@@ -422,7 +422,7 @@
       "apiVersion": "2021-04-01",
       "name": "[if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP')]",
       "location": "[parameters('Location')]",
-      "managedBy": "[if(not(equals(parameters('managedBy'), '')), parameters('managedBy'), '')]",
+      "managedBy": "[parameters('managedBy')]",
       "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
     {
@@ -431,7 +431,7 @@
       "apiVersion": "2021-04-01",
       "name": "[if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none-rgVMs')]",
       "location": "[if(not(empty(parameters('Location'))), parameters('Location'), 'none')]",
-      "managedBy": "[if(not(equals(parameters('managedBy'), '')), parameters('managedBy'), '')]",
+      "managedBy": "[parameters('managedBy')]",
       "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
     {
