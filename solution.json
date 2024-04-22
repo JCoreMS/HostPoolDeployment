@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "12009076986100327051"
+      "templateHash": "12047811098373581812"
     }
   },
   "parameters": {
@@ -98,6 +98,13 @@
     "DomainPassword": {
       "type": "securestring"
     },
+    "HostPoolRGStatus": {
+      "type": "string",
+      "allowedValues": [
+        "New",
+        "Existing"
+      ]
+    },
     "ResourceGroupHP": {
       "type": "string",
       "defaultValue": ""
@@ -113,6 +120,14 @@
     "HostPoolWorkspaceName": {
       "type": "string",
       "defaultValue": "none"
+    },
+    "RGVMsStatus": {
+      "type": "string",
+      "allowedValues": [
+        "New",
+        "Existing",
+        "Same"
+      ]
     },
     "ResourceGroupVMs": {
       "type": "string",
@@ -194,13 +209,6 @@
     "LogAnalyticsRG": {
       "type": "string",
       "defaultValue": ""
-    },
-    "managedBy": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Optional. The ID of the resource that manages this resource group."
-      }
     },
     "NumSessionHosts": {
       "type": "int"
@@ -417,22 +425,110 @@
   },
   "resources": [
     {
-      "condition": "[not(empty(parameters('ResourceGroupHP')))]",
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2021-04-01",
-      "name": "[if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP')]",
-      "location": "[parameters('Location')]",
-      "managedBy": "[parameters('managedBy')]",
-      "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
+      "condition": "[equals(parameters('HostPoolRGStatus'), 'New')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_ResourceGroupHP",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "RGName": {
+            "value": "[parameters('ResourceGroupHP')]"
+          },
+          "Tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), createObject('value', parameters('Tags')['Microsoft.Resources/resourceGroups']), createObject('value', createObject()))]"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "8174319786470589930"
+            }
+          },
+          "parameters": {
+            "RGName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/resourceGroups",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('RGName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]"
+            }
+          ]
+        }
+      }
     },
     {
-      "condition": "[not(empty(parameters('ResourceGroupVMs')))]",
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2021-04-01",
-      "name": "[if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none-rgVMs')]",
-      "location": "[if(not(empty(parameters('Location'))), parameters('Location'), 'none')]",
-      "managedBy": "[parameters('managedBy')]",
-      "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
+      "condition": "[equals(parameters('RGVMsStatus'), 'New')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_ResourceGroupVMs",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "RGName": {
+            "value": "[parameters('ResourceGroupVMs')]"
+          },
+          "Tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), createObject('value', parameters('Tags')['Microsoft.Resources/resourceGroups']), createObject('value', createObject()))]"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "8174319786470589930"
+            }
+          },
+          "parameters": {
+            "RGName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/resourceGroups",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('RGName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]"
+            }
+          ]
+        }
+      }
     },
     {
       "condition": "[parameters('PostDeployOption')]",

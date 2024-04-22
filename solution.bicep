@@ -49,11 +49,21 @@ param DomainUser string
 @secure()
 param DomainPassword string
 
+@allowed([
+  'New'
+  'Existing'
+])
+param HostPoolRGStatus string
 param ResourceGroupHP string = ''
 param ResGroupIdMonitor string = ''
 param HostPoolName string = 'none'
 param HostPoolWorkspaceName string = 'none'
-
+@allowed([
+  'New'
+  'Existing'
+  'Same'
+])
+param RGVMsStatus string
 param ResourceGroupVMs string = ''
 
 @allowed([
@@ -94,10 +104,6 @@ param Location string = deployment().location
 param LogAnalyticsWorkspaceName string = ''
 param LogAnalyticsSubId string = ''
 param LogAnalyticsRG string = ''
-
-@description('Optional. The ID of the resource that manages this resource group.')
-param managedBy string = ''
-
 param NumSessionHosts int
 param NumUsersPerHost int = 0
 param PostDeployContainerId string = ''
@@ -257,13 +263,14 @@ var varMarketPlaceGalleryWindows = {
   }
 }
 
-resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' =
-  if (!empty(ResourceGroupHP)) {
-    name: !empty(ResourceGroupHP) ? ResourceGroupHP : 'none-rgHP'
-    location: Location
-    managedBy: managedBy
-    tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
+module resourceGroupHP 'modules/resourceGroup.bicep' = if (HostPoolRGStatus == 'New') {
+  name: 'linked_ResourceGroupHP'
+  params: {
+    Location: Location
+    RGName: ResourceGroupHP
+    Tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
   }
+}
 
 resource kvDomain 'Microsoft.KeyVault/vaults@2022-11-01' existing =
   if (KeyVaultDomainOption) {
@@ -277,13 +284,14 @@ resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing =
     scope: resourceGroup(varKvLocSubId, varKvLocRg)
   }
 
-resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' =
-  if (!empty(ResourceGroupVMs)) {
-    name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none-rgVMs'
-    location: !empty(Location) ? Location : 'none'
-    managedBy: managedBy
-    tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
-  }
+module resourceGroupVMs 'modules/resourceGroup.bicep' = if (RGVMsStatus == 'New') {
+    name: 'linked_ResourceGroupVMs'
+    params: {
+        Location: Location
+        RGName: ResourceGroupVMs
+        Tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
+    }
+}
 
 resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' existing =
   if (!empty(ComputeGalleryName)) {
