@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "16176452504794842951"
+      "templateHash": "5386302282146791698"
     }
   },
   "parameters": {
@@ -194,6 +194,13 @@
     "LogAnalyticsRG": {
       "type": "string",
       "defaultValue": ""
+    },
+    "managedBy": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional. The ID of the resource that manages this resource group."
+      }
     },
     "NumSessionHosts": {
       "type": "int"
@@ -415,6 +422,7 @@
       "apiVersion": "2021-04-01",
       "name": "[if(not(empty(parameters('ResourceGroupHP'))), parameters('ResourceGroupHP'), 'none-rgHP')]",
       "location": "[parameters('Location')]",
+      "managedBy": "[if(not(equals(parameters('managedBy'), '')), parameters('managedBy'), null())]",
       "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
     {
@@ -423,6 +431,7 @@
       "apiVersion": "2021-04-01",
       "name": "[if(not(empty(parameters('ResourceGroupVMs'))), parameters('ResourceGroupVMs'), 'none-rgVMs')]",
       "location": "[if(not(empty(parameters('Location'))), parameters('Location'), 'none')]",
+      "managedBy": "[if(not(equals(parameters('managedBy'), '')), parameters('managedBy'), null())]",
       "tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), parameters('Tags')['Microsoft.Resources/resourceGroups'], createObject())]"
     },
     {

@@ -94,6 +94,10 @@ param Location string = deployment().location
 param LogAnalyticsWorkspaceName string = ''
 param LogAnalyticsSubId string = ''
 param LogAnalyticsRG string = ''
+
+@description('Optional. The ID of the resource that manages this resource group.')
+param managedBy string = ''
+
 param NumSessionHosts int
 param NumUsersPerHost int = 0
 param PostDeployContainerId string = ''
@@ -257,6 +261,7 @@ resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' =
   if (!empty(ResourceGroupHP)) {
     name: !empty(ResourceGroupHP) ? ResourceGroupHP : 'none-rgHP'
     location: Location
+    managedBy: managedBy != '' ? managedBy : null
     tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
   }
 
@@ -276,6 +281,7 @@ resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' =
   if (!empty(ResourceGroupVMs)) {
     name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none-rgVMs'
     location: !empty(Location) ? Location : 'none'
+    managedBy: managedBy != '' ? managedBy : null
     tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
   }
 
