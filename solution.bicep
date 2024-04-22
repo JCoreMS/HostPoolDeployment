@@ -49,11 +49,6 @@ param DomainUser string
 @secure()
 param DomainPassword string
 
-@allowed([
-  'New'
-  'Existing'
-])
-param HostPoolRGStatus string
 param ResourceGroupHP string = ''
 param ResGroupIdMonitor string = ''
 param HostPoolName string = 'none'
@@ -263,7 +258,7 @@ var varMarketPlaceGalleryWindows = {
   }
 }
 
-module resourceGroupHP 'modules/resourceGroup.bicep' = if (HostPoolRGStatus == 'New') {
+module resourceGroupHP 'modules/resourceGroup.bicep' = if ((HostPool == 'New') && (ResourceGroupHP != '')) {
   name: 'linked_ResourceGroupHP'
   params: {
     Location: Location

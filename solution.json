@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "12047811098373581812"
+      "templateHash": "7168139054038037532"
     }
   },
   "parameters": {
@@ -97,13 +97,6 @@
     },
     "DomainPassword": {
       "type": "securestring"
-    },
-    "HostPoolRGStatus": {
-      "type": "string",
-      "allowedValues": [
-        "New",
-        "Existing"
-      ]
     },
     "ResourceGroupHP": {
       "type": "string",
@@ -425,7 +418,7 @@
   },
   "resources": [
     {
-      "condition": "[equals(parameters('HostPoolRGStatus'), 'New')]",
+      "condition": "[and(equals(parameters('HostPool'), 'New'), not(equals(parameters('ResourceGroupHP'), '')))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_ResourceGroupHP",

@@ -1234,7 +1234,6 @@
 				"ResourceGroupHP": "[if(equals(steps('hostPool').hostPool, 'Existing'), first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)), if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), steps('hostPool').hpRGExisting, steps('hostPool').hpRGNameNew))]",
 				"HostPool": "[steps('hostPool').hostPool]",
 				"HostPoolName": "[if(equals(steps('hostPool').hostPool, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
-				"HostPoolRGStatus": "[steps('hostPool').rgNewExistingHP]",
 				"HostPoolAltToken": "[steps('hostPool').CrossTenantHPToken]",
 				"HostPoolWorkspaceName": "[steps('hostPool').WorkspaceName]",
 				"ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
