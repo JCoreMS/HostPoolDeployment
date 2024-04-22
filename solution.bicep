@@ -261,7 +261,7 @@ resource resourceGroupHP 'Microsoft.Resources/resourceGroups@2021-04-01' =
   if (!empty(ResourceGroupHP)) {
     name: !empty(ResourceGroupHP) ? ResourceGroupHP : 'none-rgHP'
     location: Location
-    managedBy: managedBy != '' ? managedBy : null
+    managedBy: managedBy != '' ? managedBy : ''
     tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
   }
 
@@ -281,7 +281,7 @@ resource resourceGroupVMs 'Microsoft.Resources/resourceGroups@2021-04-01' =
   if (!empty(ResourceGroupVMs)) {
     name: !empty(ResourceGroupVMs) ? ResourceGroupVMs : 'none-rgVMs'
     location: !empty(Location) ? Location : 'none'
-    managedBy: managedBy != '' ? managedBy : null
+    managedBy: managedBy != '' ? managedBy : ''
     tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
   }
 
