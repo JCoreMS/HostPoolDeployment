@@ -13,10 +13,10 @@ resource HostGroup 'Microsoft.Compute/HostGroups@2020-12-01' existing = {
 }
 
 resource DedicatedHost 'Microsoft.Compute/hostGroups/hosts@2023-09-01' existing = {
-  scope: resourceGroup(DedicatedHostRG)  
+  scope: resourceGroup(DedicatedHostRG)
   name: DedicatedHostName
 }
 
 output Hosts array = HostGroup.properties.hosts
 output Zones array = HostGroup.zones
-output DedicatedHostRG = DedicatedHostRG
+output DedicatedHostRG string = DedicatedHostRG

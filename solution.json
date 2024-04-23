@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "7168139054038037532"
+      "templateHash": "10376663809502988008"
     }
   },
   "parameters": {
@@ -1295,7 +1295,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "5622461019911783703"
+              "templateHash": "14766711526201482909"
             }
           },
           "parameters": {
@@ -1305,17 +1305,22 @@
           },
           "variables": {
             "DedicatedHostGroupName": "[split(parameters('dedicatedHostId'), '/')[8]]",
-            "DedicatedHostName": "[split(parameters('dedicatedHostId'), '/')[10]]"
+            "DedicatedHostName": "[split(parameters('dedicatedHostId'), '/')[10]]",
+            "DedicatedHostRG": "[split(parameters('dedicatedHostId'), '/')[4]]"
           },
           "resources": [],
           "outputs": {
             "Hosts": {
               "type": "array",
-              "value": "[reference(resourceId('Microsoft.Compute/hostGroups', variables('DedicatedHostGroupName')), '2020-12-01').hosts]"
+              "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostRG')), 'Microsoft.Compute/hostGroups', variables('DedicatedHostGroupName')), '2020-12-01').hosts]"
             },
             "Zones": {
               "type": "array",
-              "value": "[reference(resourceId('Microsoft.Compute/hostGroups', variables('DedicatedHostGroupName')), '2020-12-01', 'full').zones]"
+              "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostRG')), 'Microsoft.Compute/hostGroups', variables('DedicatedHostGroupName')), '2020-12-01', 'full').zones]"
+            },
+            "DedicatedHostRG": {
+              "type": "string",
+              "value": "[variables('DedicatedHostRG')]"
             }
           }
         }
