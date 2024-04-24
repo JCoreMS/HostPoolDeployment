@@ -39,9 +39,8 @@ param VmUsername string
 param VmPassword string
 param Zones array
 
-
-var SharedImageSecType = contains(ComputeGalleryProperties, 'features') ? filter(ComputeGalleryProperties.features, feature => feature.name == 'SecurityType').value : 'Standard'
-var SecurityType = contains(SharedImageSecType, 'TrustedLaunch') ? 'TrustedLaunch' : SharedImageSecType
+var ImgDefSecType = ComputeGalleryProperties.features[0]
+var SecurityType = contains(ImgDefSecType.value, 'TrustedLaunch') ? 'TrustedLaunch' : 'Standard'
 var securityProfileJson = {
   uefiSettings: {
     secureBootEnabled: true
