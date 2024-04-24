@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "16806755058323046990"
+      "templateHash": "18187215003368988430"
     }
   },
   "parameters": {
@@ -804,7 +804,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "12768408570135427960"
+              "templateHash": "9750178551591823686"
             }
           },
           "parameters": {
@@ -902,14 +902,6 @@
                 "startVMOnConnect": "[parameters('StartVmOnConnect')]",
                 "vmTemplate": "[variables('vmTemplate')]"
               }
-            },
-            {
-              "condition": "[equals(parameters('HostPoolStatus'), 'Existing')]",
-              "type": "Microsoft.DesktopVirtualization/hostPools",
-              "apiVersion": "2022-10-14-preview",
-              "name": "[parameters('HostPoolName')]",
-              "location": "[parameters('Location')]",
-              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/hostPools'), parameters('Tags')['Microsoft.DesktopVirtualization/hostPools'], createObject())]"
             },
             {
               "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",

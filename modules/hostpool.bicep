@@ -51,10 +51,8 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview'
   }
 }
 
-resource hostPoolExisting 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' = if(HostPoolStatus == 'Existing') {
+resource hostPoolExisting 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = if(HostPoolStatus == 'Existing') {
   name: HostPoolName
-  location: Location
-  tags: contains(Tags, 'Microsoft.DesktopVirtualization/hostPools') ? Tags['Microsoft.DesktopVirtualization/hostPools'] : {}
 }
 
 
