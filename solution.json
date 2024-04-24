@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "9551144537796086150"
+      "templateHash": "16806755058323046990"
     }
   },
   "parameters": {
@@ -804,7 +804,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "14941143255485674201"
+              "templateHash": "12768408570135427960"
             }
           },
           "parameters": {
@@ -881,6 +881,7 @@
           },
           "resources": [
             {
+              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
               "type": "Microsoft.DesktopVirtualization/hostPools",
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('HostPoolName')]",
@@ -901,6 +902,14 @@
                 "startVMOnConnect": "[parameters('StartVmOnConnect')]",
                 "vmTemplate": "[variables('vmTemplate')]"
               }
+            },
+            {
+              "condition": "[equals(parameters('HostPoolStatus'), 'Existing')]",
+              "type": "Microsoft.DesktopVirtualization/hostPools",
+              "apiVersion": "2022-10-14-preview",
+              "name": "[parameters('HostPoolName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/hostPools'), parameters('Tags')['Microsoft.DesktopVirtualization/hostPools'], createObject())]"
             },
             {
               "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
@@ -938,7 +947,7 @@
           "outputs": {
             "HostPoolRegistrationToken": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview').registrationInfo.token]"
+              "value": "[if(not(equals(reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview', 'full'), 'Existing')), reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview').registrationInfo.token, reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview').registrationInfo.token)]"
             },
             "ComputeImageGalleryID": {
               "type": "string",
