@@ -6,6 +6,7 @@ param AppGroupType string
 param CustomRdpProperty string
 param DiskSku string
 param DomainName string
+param HostPoolStatus string
 param HostPoolName string
 param HostPoolType string
 param HostPoolWorkspaceName string
@@ -51,7 +52,7 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview'
 }
 
 
-resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-preview' = {
+resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-preview' = if(HostPoolStatus != 'Existing') {
   name: AppGroupName
   location: Location
   tags: contains(Tags, 'Microsoft.DesktopVirtualization/applicationGroups') ? Tags['Microsoft.DesktopVirtualization/applicationGroups'] : {}

@@ -331,6 +331,7 @@ module hostPool 'modules/hostpool.bicep' =
       CustomRdpProperty: CustomRdpProperty
       DiskSku: DiskSku
       DomainName: DomainName
+      HostPoolStatus: HostPool
       HostPoolName: HostPoolName
       HostPoolType: HostPoolType
       Location: Location

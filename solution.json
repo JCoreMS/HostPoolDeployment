@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "10376663809502988008"
+      "templateHash": "18187008815937278261"
     }
   },
   "parameters": {
@@ -757,6 +757,9 @@
           "DomainName": {
             "value": "[parameters('DomainName')]"
           },
+          "HostPoolStatus": {
+            "value": "[parameters('HostPool')]"
+          },
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
@@ -801,7 +804,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "2516333463668587415"
+              "templateHash": "4725487355362794897"
             }
           },
           "parameters": {
@@ -818,6 +821,9 @@
               "type": "string"
             },
             "DomainName": {
+              "type": "string"
+            },
+            "HostPoolStatus": {
               "type": "string"
             },
             "HostPoolName": {
@@ -897,6 +903,7 @@
               }
             },
             {
+              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
               "type": "Microsoft.DesktopVirtualization/applicationGroups",
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('AppGroupName')]",
