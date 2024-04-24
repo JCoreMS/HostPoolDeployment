@@ -69,6 +69,8 @@ param ResourceGroupVMs string = ''
 @description('Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud.')
 param HostPool string
 
+param HostPoolRGStatus string = 'Existing'
+
 @allowed([
   'Pooled'
   'Personal'
@@ -258,7 +260,7 @@ var varMarketPlaceGalleryWindows = {
   }
 }
 
-module resourceGroupHP 'modules/resourceGroup.bicep' = if ((HostPool == 'New') && (ResourceGroupHP != '')) {
+module resourceGroupHP 'modules/resourceGroup.bicep' = if (HostPoolRGStatus != 'Existing') {
   name: 'linked_ResourceGroupHP'
   params: {
     Location: Location

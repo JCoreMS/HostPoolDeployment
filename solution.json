@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "9680338416477417659"
+      "templateHash": "7061991976423739197"
     }
   },
   "parameters": {
@@ -136,6 +136,10 @@
       "metadata": {
         "description": "Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud."
       }
+    },
+    "HostPoolRGStatus": {
+      "type": "string",
+      "defaultValue": "Existing"
     },
     "HostPoolKind": {
       "type": "string",
@@ -418,7 +422,7 @@
   },
   "resources": [
     {
-      "condition": "[and(equals(parameters('HostPool'), 'New'), not(equals(parameters('ResourceGroupHP'), '')))]",
+      "condition": "[not(equals(parameters('HostPoolRGStatus'), 'Existing'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_ResourceGroupHP",
