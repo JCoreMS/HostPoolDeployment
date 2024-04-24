@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "4934327852978484502"
+      "templateHash": "9680338416477417659"
     }
   },
   "parameters": {
@@ -969,6 +969,9 @@
           "DCRExisting": {
             "value": "[parameters('DCRExisting')]"
           },
+          "HostPoolStatus": {
+            "value": "[parameters('HostPool')]"
+          },
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
@@ -995,7 +998,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "4421017185604565538"
+              "templateHash": "13437866685490930818"
             }
           },
           "parameters": {
@@ -1006,6 +1009,9 @@
               "type": "string"
             },
             "DCRExisting": {
+              "type": "string"
+            },
+            "HostPoolStatus": {
               "type": "string"
             },
             "HostPoolName": {
@@ -1103,6 +1109,7 @@
               }
             },
             {
+              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2021-05-01-preview",
               "scope": "[format('Microsoft.DesktopVirtualization/hostPools/{0}', parameters('HostPoolName'))]",

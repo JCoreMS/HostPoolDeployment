@@ -3,6 +3,7 @@ targetScope = 'resourceGroup'
 param DCRStatus string
 param DCRNewName string
 param DCRExisting string
+param HostPoolStatus string
 param HostPoolName string
 param HostPoolWorkspaceName string
 param LogAnalyticsWorkspaceId string
@@ -88,11 +89,11 @@ resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
   }
 }
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = if(HostPoolStatus != 'Existing') {
   name: HostPoolName
 }
 
-resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if(HostPoolStatus != 'Existing') {
   name: 'WVDInsights'
   scope: hostPool
   properties: {

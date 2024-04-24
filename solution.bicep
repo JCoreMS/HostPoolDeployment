@@ -360,6 +360,7 @@ module diagnostics 'modules/diagnostics.bicep' =
       DCRStatus: DCRStatus
       DCRNewName: DCRNewName
       DCRExisting: DCRExisting
+      HostPoolStatus: HostPool
       HostPoolName: HostPoolName
       Location: Location
       LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
