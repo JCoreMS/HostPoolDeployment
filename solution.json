@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "13445004625633190804"
+      "templateHash": "2860238605797206381"
     }
   },
   "parameters": {
@@ -1782,11 +1782,5 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployIDTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
       ]
     }
-  ],
-  "outputs": {
-    "computeGalleryProperties": {
-      "type": "object",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')]"
-    }
-  }
+  ]
 }

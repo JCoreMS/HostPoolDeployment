@@ -451,4 +451,3 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
   }
 ]
 
-output computeGalleryProperties object = computeGalleryImage.properties
