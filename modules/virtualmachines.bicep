@@ -51,7 +51,7 @@ var securityProfileJson = {
 
 var imageToUse = UseCustomImage ? { id: ComputeGalleryImageId } : MarketPlaceGalleryWindows
 
-var DedicatedHostName = split(DedicatedHostResId, '/')[10]
+var DedicatedHostName = !empty(DedicatedHostResId) ? split(DedicatedHostResId, '/')[10] : ''
 var vmTagDH = !empty(DedicatedHostTagName) ? { DedicatedHostTagName : DedicatedHostName} : {}
 var vmTags = !empty(DedicatedHostTagName) ? union(vmTagDH, Tags) : Tags
 

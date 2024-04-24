@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "2860238605797206381"
+      "templateHash": "17428685684169817173"
     }
   },
   "parameters": {
@@ -1435,7 +1435,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "5986282681426595462"
+              "templateHash": "5073786158734084661"
             }
           },
           "parameters": {
@@ -1562,7 +1562,7 @@
               "securityType": "[variables('SecurityType')]"
             },
             "imageToUse": "[if(parameters('UseCustomImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]",
-            "DedicatedHostName": "[split(parameters('DedicatedHostResId'), '/')[10]]",
+            "DedicatedHostName": "[if(not(empty(parameters('DedicatedHostResId'))), split(parameters('DedicatedHostResId'), '/')[10], '')]",
             "vmTagDH": "[if(not(empty(parameters('DedicatedHostTagName'))), createObject('DedicatedHostTagName', variables('DedicatedHostName')), createObject())]",
             "vmTags": "[if(not(empty(parameters('DedicatedHostTagName'))), union(variables('vmTagDH'), parameters('Tags')), parameters('Tags'))]"
           },
