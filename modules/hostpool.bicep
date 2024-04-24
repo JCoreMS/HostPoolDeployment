@@ -30,7 +30,7 @@ var vmTemplateMS = '{"domain":"${DomainName}","galleryImageOffer":"${vmOffer}","
 var vmTemplateCompGal = '{"domain":"${DomainName}","galleryImageOffer":null,"galleryImagePublisher":null,"galleryImageSKU":null,"imageType":"CustomImage","imageUri":null,"customImageId":"${ComputeGalleryImageId}","namePrefix":"${VmPrefix}","osDiskType":"${DiskSku}","useManagedDisks":true,"vmSize":{"id":"${VmSize}","cores":null,"ram":null},"galleryItemId":null}' 
 var vmTemplate = UseCustomImage ? vmTemplateCompGal : vmTemplateMS
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' = if(HostPoolStatus != 'Existing') {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' = {
   name: HostPoolName
   location: Location
   tags: contains(Tags, 'Microsoft.DesktopVirtualization/hostPools') ? Tags['Microsoft.DesktopVirtualization/hostPools'] : {}
@@ -50,11 +50,6 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview'
     vmTemplate: vmTemplate
   }
 }
-
-resource hostPoolExisting 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = if(HostPoolStatus == 'Existing') {
-  name: HostPoolName
-}
-
 
 resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-preview' = if(HostPoolStatus != 'Existing') {
   name: AppGroupName
@@ -81,5 +76,5 @@ resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-10-14-previe
 }
 
 // output HostPoolRegistrationToken string = hostPool.properties.registrationInfo.token
-output HostPoolRegistrationToken string = hostPoolExisting != 'Existing' ? hostPool.properties.registrationInfo.token : hostPoolExisting.properties.registrationInfo.token
+output HostPoolRegistrationToken string = hostPool.properties.registrationInfo.token
 output ComputeImageGalleryID string = ComputeGalleryImageId

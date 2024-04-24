@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "18187215003368988430"
+      "templateHash": "9551144537796086150"
     }
   },
   "parameters": {
@@ -804,7 +804,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "9750178551591823686"
+              "templateHash": "14941143255485674201"
             }
           },
           "parameters": {
@@ -881,7 +881,6 @@
           },
           "resources": [
             {
-              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
               "type": "Microsoft.DesktopVirtualization/hostPools",
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('HostPoolName')]",
@@ -939,7 +938,7 @@
           "outputs": {
             "HostPoolRegistrationToken": {
               "type": "string",
-              "value": "[if(not(equals(reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview', 'full'), 'Existing')), reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview').registrationInfo.token, reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview').registrationInfo.token)]"
+              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview').registrationInfo.token]"
             },
             "ComputeImageGalleryID": {
               "type": "string",
