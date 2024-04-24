@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "18187008815937278261"
+      "templateHash": "10594125444814848868"
     }
   },
   "parameters": {
@@ -1435,7 +1435,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "14349669352623733361"
+              "templateHash": "9435344852899916852"
             }
           },
           "parameters": {
@@ -1552,8 +1552,8 @@
             }
           },
           "variables": {
-            "SharedImageSecType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features[0], lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType'))).value, 'Standard')]",
-            "SecurityType": "[if(equals(variables('SharedImageSecType'), 'TrustedLaunchSupported'), 'TrustedLaunch', variables('SharedImageSecType'))]",
+            "SharedImageSecType": "[if(contains(parameters('ComputeGalleryProperties'), 'features'), filter(parameters('ComputeGalleryProperties').features, lambda('feature', equals(lambdaVariables('feature').name, 'SecurityType'))).value, 'Standard')]",
+            "SecurityType": "[if(contains(variables('SharedImageSecType'), 'TrustedLaunch'), 'TrustedLaunch', variables('SharedImageSecType'))]",
             "securityProfileJson": {
               "uefiSettings": {
                 "secureBootEnabled": true,
@@ -1782,5 +1782,11 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployIDTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
       ]
     }
-  ]
+  ],
+  "outputs": {
+    "computeGalleryProperties": {
+      "type": "object",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')]"
+    }
+  }
 }
