@@ -70,7 +70,7 @@ var WinEvents = [
   }
 ]
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = if(HostPoolWorkspaceName != 'none') {
   name: HostPoolWorkspaceName
 }
 
