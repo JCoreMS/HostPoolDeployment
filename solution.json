@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "17428685684169817173"
+      "templateHash": "9551144537796086150"
     }
   },
   "parameters": {
@@ -804,7 +804,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "4725487355362794897"
+              "templateHash": "14941143255485674201"
             }
           },
           "parameters": {
@@ -938,7 +938,7 @@
           "outputs": {
             "HostPoolRegistrationToken": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token]"
+              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2022-10-14-preview').registrationInfo.token]"
             },
             "ComputeImageGalleryID": {
               "type": "string",
@@ -1371,9 +1371,6 @@
           "Location": {
             "value": "[parameters('Location')]"
           },
-          "LogAnalyticsWorkspaceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
-          },
           "NumSessionHosts": {
             "value": "[parameters('NumSessionHosts')]"
           },
@@ -1435,7 +1432,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "5073786158734084661"
+              "templateHash": "17780314986710485123"
             }
           },
           "parameters": {
@@ -1470,9 +1467,6 @@
               "type": "string"
             },
             "Location": {
-              "type": "string"
-            },
-            "LogAnalyticsWorkspaceId": {
               "type": "string"
             },
             "NumSessionHosts": {
@@ -1574,7 +1568,7 @@
               },
               "type": "Microsoft.Network/networkInterfaces",
               "apiVersion": "2022-11-01",
-              "name": "[format('{0}{1}-NIC', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "name": "[format('nic-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Network/networkInterfaces'), parameters('Tags')['Microsoft.Network/networkInterfaces'], createObject())]",
               "properties": {
@@ -1778,7 +1772,6 @@
         "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_dedicatedHostInfo')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_Diagnostics_Setup')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployHPTo')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DeployIDTo')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
       ]
     }

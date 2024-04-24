@@ -415,7 +415,6 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
       HostPoolName: HostPoolName
       HostPoolRegistrationToken: HostPool != 'AltTenant' ? hostPool.outputs.HostPoolRegistrationToken : HostPoolAltToken
       Location: Location
-      LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
       NumSessionHosts: NumSessionHosts
       MarketPlaceGalleryWindows: UseCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]
       OUPath: OUPath

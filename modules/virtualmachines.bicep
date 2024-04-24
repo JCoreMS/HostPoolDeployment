@@ -11,7 +11,6 @@ param DomainPassword string
 param HostPoolName string
 param HostPoolRegistrationToken string
 param Location string
-param LogAnalyticsWorkspaceId string
 param NumSessionHosts int
 @description('Market Place OS image.')
 param MarketPlaceGalleryWindows object
@@ -56,7 +55,7 @@ var vmTagDH = !empty(DedicatedHostTagName) ? { DedicatedHostTagName : DedicatedH
 var vmTags = !empty(DedicatedHostTagName) ? union(vmTagDH, Tags) : Tags
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
-  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}-NIC'
+  name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
   location: Location
   tags: contains(Tags, 'Microsoft.Network/networkInterfaces') ? Tags['Microsoft.Network/networkInterfaces'] : {}
   properties: {
