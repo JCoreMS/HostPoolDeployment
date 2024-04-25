@@ -154,9 +154,6 @@ var SessionHostBatchCount = DivisionRemainderValue > 0 ? DivisionValue + 1 : Div
 
 var varAvdAgentPackageLocation = 'https://wvdportalstorageblob.blob.${environment().suffixes.storage}/galleryartifacts/Configuration_1.0.02454.213.zip'
 var HostPoolType = '${HostPoolKind} ${HostPoolLBType}'
-var DeployVMsTo = empty(ResourceGroupVMs) ? ResourceGroupHP : ResourceGroupVMs
-var DeployIDTo = empty(ResourceGroupHP) ? ResourceGroupVMs : ResourceGroupHP
-var DeployHPTo = !empty(ResourceGroupHP) ? ResourceGroupHP : ResourceGroupVMs
 
 var varKvDomSubId = KeyVaultDomainOption ? split(KeyVaultDomResId, '/')[2] : 'none'
 var varKvLocSubId = KeyVaultLocalOption ? split(KeyVaultLocResId, '/')[2] : 'none'
@@ -300,7 +297,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 
 module userIdentity 'modules/userIdentity.bicep' =
   if (PostDeployOption) {
-    scope: resourceGroup(DeployIDTo)
+    scope: resourceGroup(ResourceGroupHP)
     name: 'linked_UserIdentityCreateAssign'
     params: {
       Location: Location
@@ -312,7 +309,7 @@ module userIdentity 'modules/userIdentity.bicep' =
       UserIdentityName: UserIdentityName
     }
     dependsOn: [
-      resourceGroup(DeployIDTo)
+      resourceGroupHP
     ]
   }
 
@@ -327,7 +324,7 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
 module hostPool 'modules/hostpool.bicep' =
   if (HostPool != 'AltTenant') {
     name: 'linked_HostPoolDeployment'
-    scope: resourceGroup(DeployHPTo)
+    scope: resourceGroup(ResourceGroupHP)
     params: {
       AppGroupName: AppGroupName
       AppGroupType: AppGroupType
@@ -350,7 +347,7 @@ module hostPool 'modules/hostpool.bicep' =
       HostPoolWorkspaceName: HostPoolWorkspaceName
     }
     dependsOn: [
-      resourceGroup(DeployHPTo)
+      resourceGroupHP
     ]
   }
 
@@ -359,7 +356,7 @@ module hostPool 'modules/hostpool.bicep' =
 module diagnostics 'modules/diagnostics.bicep' =
   if (HostPool != 'AltTenant') {
     name: 'linked_Diagnostics_Setup'
-    scope: resourceGroup(DeployHPTo) // Management Resource Group
+    scope: resourceGroup(ResourceGroupHP) // Management Resource Group
     params: {
       DCRStatus: DCRStatus
       DCRNewName: DCRNewName
@@ -374,7 +371,7 @@ module diagnostics 'modules/diagnostics.bicep' =
     }
     dependsOn: [
       logAnalyticsWorkspace
-      resourceGroup(DeployHPTo)
+      resourceGroupHP
       hostPool
     ]
   }
@@ -398,7 +395,7 @@ module dataCollectionRule 'modules/dataCollectionRule.bicep' = if (DCRStatus == 
 
 module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId != '') {
     name: 'linked_dedicatedHostInfo'
-    scope: DedicatedHostRG != '' ? resourceGroup(DedicatedHostRG) : resourceGroup(DeployHPTo)
+    scope: DedicatedHostRG != '' ? resourceGroup(DedicatedHostRG) : resourceGroup(ResourceGroupHP)
     params: {
       dedicatedHostId: dedicatedHostId
     }
@@ -407,7 +404,7 @@ module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId
 @batchSize(1)
 module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
     name: 'linked_VirtualMachines_batch_${i - 1}'
-    scope: resourceGroup(DeployVMsTo)
+    scope: resourceGroup(ResourceGroupVMs)
     params: {
       AgentPackageLocation: varAvdAgentPackageLocation
       ComputeGalleryImageId: UseCustomImage ? '${computeGalleryImage.id}/versions/latest' : 'none'

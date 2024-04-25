@@ -108,3 +108,4 @@ resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
 }
 
 
+output WorkspaceInfo object = workspace
