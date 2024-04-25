@@ -655,7 +655,7 @@
 									"name": "DiskSku",
 									"type": "Microsoft.Common.DropDown",
 									"label": "OS Disk Sku",
-									"defaultValue": "Standard",
+									"defaultValue": "Standard SSD",
 									"toolTip": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS.",
 									"constraints": {
 										"required": true,
@@ -752,7 +752,7 @@
 								{
 									"name": "kvDomainSecretName",
 									"type": "Microsoft.Common.TextBox",
-									"defaultValue": "DomainAdminPassword",
+									"defaultValue": "domainJoinUserPassword",
 									"label": "KeyVault Secret Name (Domain Credential)",
 									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
 									"visible": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
@@ -819,7 +819,7 @@
 								{
 									"name": "kvLocalSecretName",
 									"type": "Microsoft.Common.TextBox",
-									"defaultValue": "AdminPassword",
+									"defaultValue": "vmLocalUserPassword",
 									"label": "KeyVault Secret Name (Local Admin Credential)",
 									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
 									"visible": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
@@ -875,7 +875,7 @@
 						{
 							"name": "dedicatedHostConfig",
 							"type": "Microsoft.Common.Section",
-							"visible": true,
+							"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
 							"label": "Dedicated Host Configuration",
 							"elements": [
 								{
@@ -928,8 +928,7 @@
 												"message": "Only alphanumeric characters, dashes and hyphens are allowed, and the value must be 1-256 characters long."
 											}
 										]
-									},
-									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]"
+									}
 								}
 							]
 						}
