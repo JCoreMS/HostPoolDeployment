@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "7061991976423739197"
+      "templateHash": "13252794499551339283"
     }
   },
   "parameters": {
@@ -422,7 +422,6 @@
   },
   "resources": [
     {
-      "condition": "[not(equals(parameters('HostPoolRGStatus'), 'Existing'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_ResourceGroupHP",
@@ -439,6 +438,9 @@
           "RGName": {
             "value": "[parameters('ResourceGroupHP')]"
           },
+          "RGStatus": {
+            "value": "[parameters('HostPoolRGStatus')]"
+          },
           "Tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), createObject('value', parameters('Tags')['Microsoft.Resources/resourceGroups']), createObject('value', createObject()))]"
         },
         "template": {
@@ -448,11 +450,14 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "8174319786470589930"
+              "templateHash": "6286527708151898998"
             }
           },
           "parameters": {
             "RGName": {
+              "type": "string"
+            },
+            "RGStatus": {
               "type": "string"
             },
             "Location": {
@@ -464,18 +469,24 @@
           },
           "resources": [
             {
+              "condition": "[equals(parameters('RGStatus'), 'New')]",
               "type": "Microsoft.Resources/resourceGroups",
               "apiVersion": "2022-09-01",
               "name": "[parameters('RGName')]",
               "location": "[parameters('Location')]",
               "tags": "[parameters('Tags')]"
             }
-          ]
+          ],
+          "outputs": {
+            "resourceGroupId": {
+              "type": "string",
+              "value": "[if(equals(parameters('RGStatus'), 'Existing'), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')))]"
+            }
+          }
         }
       }
     },
     {
-      "condition": "[equals(parameters('RGVMsStatus'), 'New')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_ResourceGroupVMs",
@@ -492,6 +503,9 @@
           "RGName": {
             "value": "[parameters('ResourceGroupVMs')]"
           },
+          "RGStatus": {
+            "value": "[parameters('RGVMsStatus')]"
+          },
           "Tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), createObject('value', parameters('Tags')['Microsoft.Resources/resourceGroups']), createObject('value', createObject()))]"
         },
         "template": {
@@ -501,11 +515,14 @@
             "_generator": {
               "name": "bicep",
               "version": "0.26.170.59819",
-              "templateHash": "8174319786470589930"
+              "templateHash": "6286527708151898998"
             }
           },
           "parameters": {
             "RGName": {
+              "type": "string"
+            },
+            "RGStatus": {
               "type": "string"
             },
             "Location": {
@@ -517,13 +534,20 @@
           },
           "resources": [
             {
+              "condition": "[equals(parameters('RGStatus'), 'New')]",
               "type": "Microsoft.Resources/resourceGroups",
               "apiVersion": "2022-09-01",
               "name": "[parameters('RGName')]",
               "location": "[parameters('Location')]",
               "tags": "[parameters('Tags')]"
             }
-          ]
+          ],
+          "outputs": {
+            "resourceGroupId": {
+              "type": "string",
+              "value": "[if(equals(parameters('RGStatus'), 'Existing'), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')))]"
+            }
+          }
         }
       }
     },

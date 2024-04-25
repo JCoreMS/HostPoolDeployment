@@ -260,11 +260,12 @@ var varMarketPlaceGalleryWindows = {
   }
 }
 
-module resourceGroupHP 'modules/resourceGroup.bicep' = if (HostPoolRGStatus != 'Existing') {
+module resourceGroupHP 'modules/resourceGroup.bicep' = {
   name: 'linked_ResourceGroupHP'
   params: {
     Location: Location
     RGName: ResourceGroupHP
+    RGStatus: HostPoolRGStatus
     Tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
   }
 }
@@ -281,11 +282,12 @@ resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing =
     scope: resourceGroup(varKvLocSubId, varKvLocRg)
   }
 
-module resourceGroupVMs 'modules/resourceGroup.bicep' = if (RGVMsStatus == 'New') {
+module resourceGroupVMs 'modules/resourceGroup.bicep' = {
     name: 'linked_ResourceGroupVMs'
     params: {
         Location: Location
         RGName: ResourceGroupVMs
+        RGStatus: RGVMsStatus
         Tags: contains(Tags, 'Microsoft.Resources/resourceGroups') ? Tags['Microsoft.Resources/resourceGroups'] : {}
     }
 }
