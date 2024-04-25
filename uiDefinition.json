@@ -655,7 +655,7 @@
 									"name": "DiskSku",
 									"type": "Microsoft.Common.DropDown",
 									"label": "OS Disk Sku",
-									"defaultValue": "StandardSSD_LRS",
+									"defaultValue": "Standard SSD",
 									"toolTip": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS.",
 									"constraints": {
 										"required": true,
