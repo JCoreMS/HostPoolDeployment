@@ -58,7 +58,7 @@ param vmAdminUsername string
 param vmAdminPassword string
 
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
-var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts/'
+var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 
 // Create User Assigned Managed Identity

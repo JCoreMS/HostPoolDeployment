@@ -7,7 +7,7 @@ param groupUsers = 'azWVDUsers'
 param keyVaultName = 'kv-corefamily01b'
 param location = 'eastus2'
 param managedIdentityName = 'id-stgcorefamily01'
-param ouPath = 'OU=VDI,OU=Workstations,OU=CoreFamily,DC=corefamily,DC=net'
+param ouPath = 'OU=Servers,DC=corefamily,DC=net'
 param privateDNSZoneId = '/subscriptions/8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9/resourceGroups/rg-eastus2-LandingZone/providers/Microsoft.Network/privateDnsZones/privatelink.file.core.windows.net'
 param smbSettings = {
         versions: 'SMB3.1.1'

@@ -30,9 +30,9 @@ var securityProfileJson = {
 }
 
 var imageToUse = {
-  publisher: 'MicrosoftWindowsServer'
-  offer: 'WindowsServer'
-  sku: '2022-datacenter-azure-edition'
+  publisher: 'MicrosoftWindowsDesktop'
+  offer: 'Windows-11'
+  sku: 'win11-23h2-ent'
   version: 'latest'
 }
 
@@ -44,7 +44,7 @@ var cloudEnvironment = environment().name
 
 var VmSize = 'Standard_D2s_v4'
 
-var storageSetupScriptUri = '${scriptLocation}${storageSetupScript}'
+var storageSetupScriptUri = '${scriptLocation}/${storageSetupScript}'
 
 resource networkInterfaceMgmtVM 'Microsoft.Network/networkInterfaces@2022-11-01' = {
   name: 'nic-${vmName}'
@@ -74,6 +74,9 @@ resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2022-11-01' =
   name: vmName
   location: location
   tags: tags
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     hardwareProfile: {
       vmSize: VmSize
@@ -169,3 +172,5 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     extension_JsonADDomainExtension
   ]
 }
+
+output scriptUri string = storageSetupScriptUri

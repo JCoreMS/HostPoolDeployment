@@ -150,7 +150,7 @@ $FilesSuffix = '.file.' + $StorageSuffix
 Connect-AzAccount `
     -Environment $Environment `
     -Tenant $TenantId `
-    -Subscription $SubscriptionId | Out-Null
+    -Subscription $SubscriptionId -Identity | Out-Null
 
 Write-Host "Connected to the target Azure Subscription" | Write-Log
 
