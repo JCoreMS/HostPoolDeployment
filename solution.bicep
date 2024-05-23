@@ -1,6 +1,7 @@
 targetScope = 'subscription'
 
 param AppGroupName string = 'none'
+param AppGroupExisting string = 'none'
 
 @allowed([
   'Desktop'
@@ -67,7 +68,7 @@ param ResourceGroupVMs string = ''
   'AltTenant'
 ])
 @description('Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud.')
-param HostPool string
+param HostPoolOption string
 
 param HostPoolRGStatus string = 'Existing'
 
@@ -322,7 +323,7 @@ module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
 }
 
 module hostPool 'modules/hostpool.bicep' =
-  if (HostPool != 'AltTenant') {
+  if (HostPoolOption != 'AltTenant') {
     name: 'linked_HostPoolDeployment'
     scope: resourceGroup(ResourceGroupHP)
     params: {
@@ -332,7 +333,7 @@ module hostPool 'modules/hostpool.bicep' =
       CustomRdpProperty: CustomRdpProperty
       DiskSku: DiskSku
       DomainName: DomainName
-      HostPoolStatus: HostPool
+      HostPoolStatus: HostPoolOption
       HostPoolName: HostPoolName
       HostPoolType: HostPoolType
       Location: Location
@@ -354,14 +355,14 @@ module hostPool 'modules/hostpool.bicep' =
 // Monitoring Resources for AVD Insights
 // This module configures Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
 module diagnostics 'modules/diagnostics.bicep' =
-  if (HostPool != 'AltTenant') {
+  if (HostPoolOption != 'AltTenant') {
     name: 'linked_Diagnostics_Setup'
     scope: resourceGroup(ResourceGroupHP) // Management Resource Group
     params: {
       DCRStatus: DCRStatus
       DCRNewName: DCRNewName
       DCRExisting: DCRExisting
-      HostPoolStatus: HostPool
+      HostPoolStatus: HostPoolOption
       HostPoolName: HostPoolName
       Location: Location
       LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
@@ -415,7 +416,7 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
       DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
       DomainName: DomainName
       HostPoolName: HostPoolName
-      HostPoolRegistrationToken: HostPool != 'AltTenant' ? hostPool.outputs.HostPoolRegistrationToken : HostPoolAltToken
+      HostPoolRegistrationToken: HostPoolOption != 'AltTenant' ? hostPool.outputs.HostPoolRegistrationToken : HostPoolAltToken
       Location: Location
       NumSessionHosts: NumSessionHosts
       MarketPlaceGalleryWindows: UseCustomImage ? {} : varMarketPlaceGalleryWindows[avdOsImage]

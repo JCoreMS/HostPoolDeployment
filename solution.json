@@ -5,11 +5,15 @@
     "_generator": {
       "name": "bicep",
       "version": "0.26.170.59819",
-      "templateHash": "8202748606923266927"
+      "templateHash": "16986197156490271534"
     }
   },
   "parameters": {
     "AppGroupName": {
+      "type": "string",
+      "defaultValue": "none"
+    },
+    "AppGroupExisting": {
       "type": "string",
       "defaultValue": "none"
     },
@@ -126,7 +130,7 @@
       "type": "string",
       "defaultValue": ""
     },
-    "HostPool": {
+    "HostPoolOption": {
       "type": "string",
       "allowedValues": [
         "New",
@@ -756,7 +760,7 @@
       }
     },
     {
-      "condition": "[not(equals(parameters('HostPool'), 'AltTenant'))]",
+      "condition": "[not(equals(parameters('HostPoolOption'), 'AltTenant'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_HostPoolDeployment",
@@ -786,7 +790,7 @@
             "value": "[parameters('DomainName')]"
           },
           "HostPoolStatus": {
-            "value": "[parameters('HostPool')]"
+            "value": "[parameters('HostPoolOption')]"
           },
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
@@ -980,7 +984,7 @@
       ]
     },
     {
-      "condition": "[not(equals(parameters('HostPool'), 'AltTenant'))]",
+      "condition": "[not(equals(parameters('HostPoolOption'), 'AltTenant'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_Diagnostics_Setup",
@@ -1001,7 +1005,7 @@
             "value": "[parameters('DCRExisting')]"
           },
           "HostPoolStatus": {
-            "value": "[parameters('HostPool')]"
+            "value": "[parameters('HostPoolOption')]"
           },
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
@@ -1412,7 +1416,7 @@
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
-          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPool'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
+          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPoolOption'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
           "Location": {
             "value": "[parameters('Location')]"
           },

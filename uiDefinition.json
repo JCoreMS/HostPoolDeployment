@@ -31,6 +31,28 @@
 							}
 						},
 						{
+							"name": "appGroupApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.DesktopVirtualization/applicationGroups?api-version=2022-02-10-preview')]",
+								"transforms": {
+									"list": "value|[*].{label:name, value:{name:name, id:id, kind:kind, properties:properties}, description:kind}"
+								}
+							}
+						},
+						{
+							"name": "workSpaceApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.DesktopVirtualization/workspaces?api-version=2022-02-10-preview')]",
+								"transforms": {
+									"list": "value|[*].{label:name, value:{name:name, id:id, properties:properties}, description:properties.friendlyName}"
+								}
+							}
+						},
+						{
 							"name": "dcrApi",
 							"type": "Microsoft.Solutions.ArmApiControl",
 							"request": {
@@ -251,7 +273,7 @@
 											},
 											{
 												"label": "Remote Apps",
-												"value": "RailApplications"
+												"value": "RemoteApp"
 											}
 										]
 									},
@@ -317,6 +339,17 @@
 							"visible": true
 						},
 						{
+							"name": "StartVmOnConnect",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Start Vm On Connect",
+							"toolTip": "Enables ability for VM to start if VMs are turned off but deployed to the host pool.",
+							"constraints": {
+								"required": false,
+								"validationMessage": "Ideally you'd enable this for multisession when you have Scaling Plans or Personal Desktops in which VMs may be powered down."
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
 							"name": "ValidationEnvironment",
 							"type": "Microsoft.Common.CheckBox",
 							"label": "Validation Environment",
@@ -324,6 +357,28 @@
 							"constraints": {
 								"required": false,
 								"validationMessage": "This should be set for test and development environments."
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
+							"name": "WorkSpaceNew",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Create New Workspace",
+							"toolTip": "Select this option to then create a new AVD Workspace that the Application Group will be associated with.",
+							"constraints": {
+								"required": false,
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), false, true)]"
+						},
+						{
+							"name": "AppGroupNew",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Create New Application Group",
+							"toolTip": "Select this option to then create a new AVD Application Group. Consider including DAG for Desktop and RAIL for Remote Apps in the name.",
+							"constraints": {
+								"required": false,
+								"validationMessage": ""
 							},
 							"visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), false, true)]"
 						},
@@ -335,11 +390,30 @@
 							"toolTip": "",
 							"placeholder": "ws-",
 							"constraints": {
-								"required": true,
+								"required": "[steps('hostPool').WorkSpaceNew]",
 								"regex": "",
 								"validationMessage": ""
 							},
-							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+							"visible": "[steps('hostPool').WorkSpaceNew]"
+						},
+						{
+							"name": "workSpaceExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Existing Workspace",
+							"placeholder": "",
+							"defaultValue": "",
+							"toolTip": "Select the existing Workspace to associate the Application Group to.",
+							"multiselect": false,
+							"selectAll": false,
+							"filter": true,
+							"filterPlaceholder": "Filter items ...",
+							"multiLine": true,
+							"defaultDescription": "No Friendly Name",
+							"constraints": {
+								"allowedValues": "[steps('basics').workSpaceApi.transformed.list]",
+								"required": "[not(steps('hostPool').WorkSpaceNew)]"
+							},
+							"visible": "[not(steps('hostPool').WorkSpaceNew)]"
 						},
 						{
 							"name": "AppGroupName",
@@ -349,11 +423,30 @@
 							"toolTip": "",
 							"placeholder": "appgrp-",
 							"constraints": {
-								"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
+								"required": "[steps('hostPool').AppGroupNew]",
 								"regex": "",
 								"validationMessage": ""
 							},
-							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+							"visible": "[steps('hostPool').AppGroupNew]"
+						},
+						{
+							"name": "appGroupExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Existing Application Group",
+							"placeholder": "",
+							"defaultValue": "",
+							"toolTip": "Select the existing Application Group to associate to the Host Pool.",
+							"multiselect": false,
+							"selectAll": false,
+							"filter": true,
+							"filterPlaceholder": "Filter items ...",
+							"multiLine": true,
+							"defaultDescription": "No Friendly Name",
+							"constraints": {
+								"allowedValues": "[steps('basics').appGroupApi.transformed.list]",
+								"required": "[not(steps('hostPool').AppGroupNew)]"
+							},
+							"visible": "[not(steps('hostPool').AppGroupNew)]"
 						},
 						{
 							"name": "CustomRdpProperty",
@@ -366,17 +459,6 @@
 								"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
 								"regex": "",
 								"validationMessage": ""
-							},
-							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
-						},
-						{
-							"name": "StartVmOnConnect",
-							"type": "Microsoft.Common.CheckBox",
-							"label": "Start Vm On Connect",
-							"toolTip": "Enables ability for VM to start if VMs are turned off but deployed to the host pool.",
-							"constraints": {
-								"required": false,
-								"validationMessage": "Ideally you'd enable this for multisession when you have Scaling Plans or Personal Desktops in which VMs may be powered down."
 							},
 							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
 						},
@@ -1213,7 +1295,8 @@
 		},
 		"outputs": {
 			"parameters": {
-				"AppGroupName": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').AppGroupName, steps('hostPool').hostPoolSelection.name)]",
+				"AppGroupNameNew": "[if(steps('hostPool').AppGroupNew, steps('hostPool').AppGroupName, 'none')]",
+				"AppGroupExisting": "[if(equals(steps('hostPool').AppGroupNew, false), steps('hostPool').appGroupExisting, 'none')]",
 				"AppGroupType": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
 				"avdOsImage": "[steps('imageInfo').sessionHostsOsImage]",
 				"ComputeGalleryName": "[steps('imageInfo').computeGallerySelection.name]",
@@ -1274,7 +1357,7 @@
 				"VmPassword": "[if(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityLocalCredentials.VmPassword.password)]",
 				"VmSize": "[steps('hostInfo').vmInformation.VmSize]",
 				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]",
-				"WorkspaceName": "[steps('hostPool').WorkspaceName]"
+				"WorkspaceName": "[if(steps('hostPool').WorkSpaceNew, steps('hostPool').WorkspaceName, steps('hostPool').workSpaceExisting)]"
 			},
 			"kind": "Subscription",
 			"location": "[steps('basics').resourceScope.location.name]",
