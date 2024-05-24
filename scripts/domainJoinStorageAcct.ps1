@@ -108,12 +108,14 @@ $providers = get-packageprovider -ListAvailable
 If($providers.Name -notcontains "NuGet"){
     Install-packageprovider -Name "NuGet" -Force | Out-Null
     }
+else { Write-Log "---NuGet provider already installed" }
 
 Write-Log "...Checking and installing RSAT for Active Directory"
 $RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State | Out-Null
 If($RSATAD.State -eq "NotPresent"){
     Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online | Out-Null
     }
+else { Write-Log "---RSAT for Active Directory already installed" }
 
 $modules = get-module -ListAvailable
 
@@ -121,12 +123,13 @@ Write-Log "...Checking and loading ActiveDirectory Module"
 If($modules.name -notcontains "ActiveDirectory"){
     Install-Module -Name "ActiveDirectory" -Force | Out-Null
     }
+else { Write-Log "---ActiveDirectory Module already installed" }
 
 Write-Log "...Checking and loading Az.Storage Module"
 If($modules.name -notcontains "Az.Storage"){
     Install-Module -Name "Az.Storage" -Force | Out-Null
     }
-
+else { Write-Log "---Az.Storage Module already installed" }
 
 
 
