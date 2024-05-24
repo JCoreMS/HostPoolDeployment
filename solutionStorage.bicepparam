@@ -2,8 +2,8 @@ using './solutionStorage.bicep'
 
 param domainJoinUserName = 'jcore@corefamily.net'
 param domainJoinUserPassword = 'P@lmtree5P1per28r$'
-param groupAdmins = 'azWVDAdmins'
-param groupUsers = 'azWVDUsers'
+param groupAdmins = 'azAVDAdmins_MAC'
+param groupUsers = 'azAVDUsers_MAC'
 param keyVaultName = 'kv-corefamily01b'
 param location = 'eastus2'
 param managedIdentityName = 'id-stgcorefamily01'
@@ -25,4 +25,4 @@ param tags = {}
 param tenantId = 'e5df932b-82ca-4872-a0bb-f880a766a051'
 param vmName = 'vme2stmgmt01'  // 15 characters or less
 param vmAdminPassword =  'P@lmtree5lab'
-param vmAdminUsername =  'jcore'
+param vmAdminUsername =  'vmadmin'

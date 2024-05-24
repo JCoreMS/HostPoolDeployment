@@ -3,16 +3,8 @@ param domainJoinOUPath string
 param domainJoinUserName string
 @secure()
 param domainJoinUserPassword string
-param groupAdmins string
-param groupUsers string
-param identityStorageSetup string
-param kerberosEncryptionType string
 param location string = resourceGroup().location
-param storageAccountName string
-param storageFileShareName string
-param storageResourceGroup string
-param scriptLocation string
-param storageSetupScript string
+
 param subnetId string
 param tags object
 param timestamp string = utcNow('u')
@@ -36,15 +28,7 @@ var imageToUse = {
   version: 'latest'
 }
 
-var subscriptionId = subscription().subscriptionId
-
-var tenantId = subscription().tenantId
-
-var cloudEnvironment = environment().name
-
 var VmSize = 'Standard_D2s_v4'
-
-var storageSetupScriptUri = '${scriptLocation}/${storageSetupScript}'
 
 resource networkInterfaceMgmtVM 'Microsoft.Network/networkInterfaces@2022-11-01' = {
   name: 'nic-${vmName}'
@@ -122,6 +106,8 @@ resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2022-11-01' =
   }
 }
 
+
+
 resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = {
   name: 'JsonADDomainExtension'
   parent: virtualMachineStorMgmt
@@ -146,69 +132,7 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
   }
 }
 
-resource vm_RunScriptDomJoinStorage 'Microsoft.Compute/virtualMachines/runCommands@2023-03-01' = {
-  name: 'vm_RunScriptDomJoinStorage'
-  parent: virtualMachineStorMgmt
-  location: location
-  tags: tags
-  properties: {
-    treatFailureAsDeploymentFailure: true
-    asyncExecution: false
-    runAsUser: domainJoinUserName
-    runAsPassword: domainJoinUserPassword
-    parameters: [
-      {
-        name: 'File'
-        value: storageSetupScript
-      }
-      {
-        name: 'Environment'
-        value: cloudEnvironment
-      }
-      {
-        name: 'KerberosEncryptionType'
-        value: kerberosEncryptionType
-      }
-      {
-        name: 'OuPath'
-        value: domainJoinOUPath
-      }
-      {
-        name: 'StorageAccountName'
-        value: storageAccountName
-      }
-      {
-        name: 'StorageAccountResourceGroupName'
-        value: storageResourceGroup
-      }
-      {
-        name: 'SubscriptionId'
-        value: subscriptionId
-      }
-      {
-        name: 'TenantId'
-        value: tenantId
-      }
-      {
-        name: 'AclUsers'
-        value: groupUsers
-      }
-      {
-        name: 'AclAdmins'
-        value: groupAdmins
-      }
-      {
-        name: 'StorageFileShareName'
-        value: storageFileShareName
-      }
-    ]
-    source: {
-      scriptUri: storageSetupScriptUri
-    }
-  }
-  dependsOn: [
-    extension_JsonADDomainExtension
-  ]
-}
 
-output scriptUri string = storageSetupScriptUri
+
+
+output vmPrincipalId string = virtualMachineStorMgmt.identity.principalId

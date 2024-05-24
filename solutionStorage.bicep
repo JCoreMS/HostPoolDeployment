@@ -248,7 +248,6 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
   }
 }
 
-
 // Create Management Virtual Machine and domain join storage
 //     System Managed Identity to access storage
 
@@ -259,16 +258,7 @@ module managementVm './modules/managementVm.bicep' = {
     domainJoinOUPath: ouPath
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
-    groupAdmins: groupAdmins
-    groupUsers: groupUsers
-    identityStorageSetup: identityStorageSetup.properties.principalId
-    kerberosEncryptionType: kerberosEncryptionType
     location: location
-    storageAccountName: storageAcctName
-    storageFileShareName: storageFileShareName
-    storageResourceGroup: storageResourceGroup
-    scriptLocation: scriptLocation
-    storageSetupScript: storageSetupScript
     subnetId: subnetId
     vmName: vmName
     tags: tags
@@ -277,5 +267,59 @@ module managementVm './modules/managementVm.bicep' = {
   }
   dependsOn: [
     storagePvtEndpoint
+  ]
+}
+
+resource roleAssignVMtoStorageKeyOp 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(storageAccount.id, vmName, 'Storage Account Key Operator Service Role')
+  scope: storageAccount
+  properties: {
+    delegatedManagedIdentityResourceId: 'string'
+    description: 'Storage Account Key Operators are allowed to list and regenerate keys on Storage Accounts (VM: ${vmName})'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '81a9662b-bebf-436f-a333-f67b29880f12')
+    principalId: managementVm.outputs.vmPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+  dependsOn: [
+    managementVm
+  ]
+}
+
+resource roleAssignVMtoStorageSMBElev 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(storageAccount.id, vmName, 'Storage File Data SMB Share Elevated Contributor')
+  scope: storageAccount
+  properties: {
+    delegatedManagedIdentityResourceId: 'string'
+    description: 'Allows for read, write, delete and modify NTFS permission access in Azure Storage file shares over SMB (VM: ${vmName})'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a7264617-510b-434b-a828-9731dc254ea7')
+    principalId: managementVm.outputs.vmPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+  dependsOn: [
+    managementVm
+  ]
+}
+
+module managementVmScript './modules/managementVmScript.bicep' = {
+  name: 'managementVMscript'
+  params: {
+    domainJoinOUPath: ouPath
+    domainJoinUserName: domainJoinUserName
+    domainJoinUserPassword: domainJoinUserPassword
+    location: location
+    scriptLocation: scriptLocation
+    storageSetupScript: storageSetupScript
+    storageAccountName: storageAcctName
+    storageFileShareName: storageFileShareName
+    storageResourceGroup: storageResourceGroup
+    tags: tags
+    vmName: vmName
+    groupAdmins: groupAdmins
+    groupUsers: groupUsers
+    kerberosEncryptionType: kerberosEncryptionType
+  }
+  dependsOn: [
+    roleAssignVMtoStorageKeyOp
+    roleAssignVMtoStorageSMBElev
   ]
 }

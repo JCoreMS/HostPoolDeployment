@@ -1,0 +1,674 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.27.1.19265",
+      "templateHash": "10671190283345703996"
+    }
+  },
+  "parameters": {
+    "domainJoinUserName": {
+      "type": "string"
+    },
+    "domainJoinUserPassword": {
+      "type": "securestring"
+    },
+    "groupAdmins": {
+      "type": "string"
+    },
+    "groupUsers": {
+      "type": "string"
+    },
+    "kerberosEncryptionType": {
+      "type": "string",
+      "defaultValue": "AES256"
+    },
+    "keyExpiration": {
+      "type": "int",
+      "defaultValue": "[dateTimeToEpoch(dateTimeAdd(utcNow(), 'P1Y'))]",
+      "metadata": {
+        "description": "Expiration time of the key"
+      }
+    },
+    "keyVaultName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "managedIdentityName": {
+      "type": "string"
+    },
+    "ouPath": {
+      "type": "string"
+    },
+    "privateDNSZoneId": {
+      "type": "string"
+    },
+    "smbSettings": {
+      "type": "object"
+    },
+    "storageAcctName": {
+      "type": "string"
+    },
+    "storageFileShareName": {
+      "type": "string"
+    },
+    "storageResourceGroup": {
+      "type": "string"
+    },
+    "storageShareSize": {
+      "type": "int"
+    },
+    "storageSKU": {
+      "type": "string",
+      "allowedValues": [
+        "Premium_LRS",
+        "Premium_ZRS",
+        "Standard_GRS",
+        "Standard_GZRS",
+        "Standard_LRS",
+        "Standard_RAGRS",
+        "Standard_RAGZRS",
+        "Standard_ZRS"
+      ]
+    },
+    "subnetId": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object"
+    },
+    "tenantId": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "defaultValue": "[utcNow()]"
+    },
+    "vmName": {
+      "type": "string"
+    },
+    "vmAdminUsername": {
+      "type": "string"
+    },
+    "vmAdminPassword": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
+    "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
+    "storageSetupScript": "domainJoinStorageAcct.ps1"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2023-01-31",
+      "name": "[parameters('managedIdentityName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2023-07-01",
+      "name": "[parameters('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "enablePurgeProtection": true,
+        "enableSoftDelete": true,
+        "enabledForDiskEncryption": true,
+        "enableRbacAuthorization": true,
+        "networkAcls": {
+          "defaultAction": "Deny",
+          "bypass": "AzureServices"
+        },
+        "publicNetworkAccess": "Disabled",
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "softDeleteRetentionInDays": 7,
+        "tenantId": "[parameters('tenantId')]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/keys",
+      "apiVersion": "2023-07-01",
+      "name": "[format('{0}/{1}', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "attributes": {
+          "enabled": true,
+          "exp": "[parameters('keyExpiration')]"
+        },
+        "kty": "RSA",
+        "keySize": 2048,
+        "curveName": "P-256",
+        "keyOps": [
+          "encrypt",
+          "decrypt",
+          "sign",
+          "verify",
+          "wrapKey",
+          "unwrapKey"
+        ],
+        "rotationPolicy": {
+          "attributes": {
+            "expiryTime": "P1Y"
+          },
+          "lifetimeActions": [
+            {
+              "action": {
+                "type": "rotate"
+              },
+              "trigger": {
+                "timeBeforeExpiry": "P90D"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
+      "name": "[guid(subscription().subscriptionId, 'assignIdentity2Vault')]",
+      "properties": {
+        "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
+        "principalType": "ServicePrincipal",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2022-09-01",
+      "name": "[parameters('storageAcctName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "[parameters('storageSKU')]"
+      },
+      "kind": "StorageV2",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')))]": {}
+        }
+      },
+      "properties": {
+        "minimumTlsVersion": "TLS1_2",
+        "supportsHttpsTrafficOnly": true,
+        "allowBlobPublicAccess": false,
+        "allowSharedKeyAccess": false,
+        "defaultToOAuthAuthentication": false,
+        "accessTier": "Hot",
+        "publicNetworkAccess": "Disabled",
+        "allowCrossTenantReplication": false,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "defaultAction": "Deny"
+        },
+        "dnsEndpointType": "Standard",
+        "largeFileSharesState": "Enabled",
+        "encryption": {
+          "identity": {
+            "userAssignedIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
+          },
+          "keySource": "Microsoft.Keyvault",
+          "keyvaultproperties": {
+            "keyname": "[format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp'))]",
+            "keyvaulturi": "[if(endsWith(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, '/'), substring(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, 0, sub(length(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri), 1)), reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri)]"
+          },
+          "services": {
+            "file": {
+              "enabled": true
+            }
+          },
+          "requireInfrastructureEncryption": false
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}/{1}', parameters('storageAcctName'), 'default')]",
+      "properties": {
+        "protocolSettings": {
+          "smb": "[parameters('smbSettings')]"
+        },
+        "shareDeleteRetentionPolicy": {
+          "enabled": true,
+          "days": 7
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName'))]",
+      "properties": {
+        "shareQuota": "[parameters('storageShareSize')]",
+        "enabledProtocols": "SMB"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2020-07-01",
+      "name": "[format('pep-{0}', parameters('storageAcctName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "privateLinkServiceConnections": [
+          {
+            "name": "[format('pep-{0}', parameters('storageAcctName'))]",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
+              "groupIds": [
+                "file"
+              ]
+            }
+          }
+        ],
+        "subnet": {
+          "id": "[parameters('subnetId')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2020-06-01",
+      "name": "[format('{0}/{1}', format('pep-{0}', parameters('storageAcctName')), 'filePrivateDnsZoneGroup')]",
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "dnsConfig",
+            "properties": {
+              "privateDnsZoneId": "[parameters('privateDNSZoneId')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('storageAcctName')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "managementVm",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "domainJoinFQDN": {
+            "value": "[variables('domainJoinFQDN')]"
+          },
+          "domainJoinOUPath": {
+            "value": "[parameters('ouPath')]"
+          },
+          "domainJoinUserName": {
+            "value": "[parameters('domainJoinUserName')]"
+          },
+          "domainJoinUserPassword": {
+            "value": "[parameters('domainJoinUserPassword')]"
+          },
+          "groupAdmins": {
+            "value": "[parameters('groupAdmins')]"
+          },
+          "groupUsers": {
+            "value": "[parameters('groupUsers')]"
+          },
+          "identityStorageSetup": {
+            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]"
+          },
+          "kerberosEncryptionType": {
+            "value": "[parameters('kerberosEncryptionType')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('storageAcctName')]"
+          },
+          "storageFileShareName": {
+            "value": "[parameters('storageFileShareName')]"
+          },
+          "storageResourceGroup": {
+            "value": "[parameters('storageResourceGroup')]"
+          },
+          "scriptLocation": {
+            "value": "[variables('scriptLocation')]"
+          },
+          "storageSetupScript": {
+            "value": "[variables('storageSetupScript')]"
+          },
+          "subnetId": {
+            "value": "[parameters('subnetId')]"
+          },
+          "vmName": {
+            "value": "[parameters('vmName')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "vmAdminPassword": {
+            "value": "[parameters('vmAdminPassword')]"
+          },
+          "vmAdminUsername": {
+            "value": "[parameters('vmAdminUsername')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.27.1.19265",
+              "templateHash": "3795657323320983026"
+            }
+          },
+          "parameters": {
+            "domainJoinFQDN": {
+              "type": "string"
+            },
+            "domainJoinOUPath": {
+              "type": "string"
+            },
+            "domainJoinUserName": {
+              "type": "string"
+            },
+            "domainJoinUserPassword": {
+              "type": "securestring"
+            },
+            "groupAdmins": {
+              "type": "string"
+            },
+            "groupUsers": {
+              "type": "string"
+            },
+            "identityStorageSetup": {
+              "type": "string"
+            },
+            "kerberosEncryptionType": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageFileShareName": {
+              "type": "string"
+            },
+            "storageResourceGroup": {
+              "type": "string"
+            },
+            "scriptLocation": {
+              "type": "string"
+            },
+            "storageSetupScript": {
+              "type": "string"
+            },
+            "subnetId": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object"
+            },
+            "timestamp": {
+              "type": "string",
+              "defaultValue": "[utcNow('u')]"
+            },
+            "vmName": {
+              "type": "string"
+            },
+            "vmAdminUsername": {
+              "type": "string"
+            },
+            "vmAdminPassword": {
+              "type": "securestring"
+            }
+          },
+          "variables": {
+            "securityProfileJson": {
+              "uefiSettings": {
+                "secureBootEnabled": true,
+                "vTpmEnabled": true
+              },
+              "securityType": "TrustedLaunch"
+            },
+            "imageToUse": {
+              "publisher": "MicrosoftWindowsDesktop",
+              "offer": "Windows-11",
+              "sku": "win11-23h2-ent",
+              "version": "latest"
+            },
+            "subscriptionId": "[subscription().subscriptionId]",
+            "tenantId": "[subscription().tenantId]",
+            "cloudEnvironment": "[environment().name]",
+            "VmSize": "Standard_D2s_v4",
+            "storageSetupScriptUri": "[format('{0}/{1}', parameters('scriptLocation'), parameters('storageSetupScript'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-11-01",
+              "name": "[format('nic-{0}', parameters('vmName'))]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "primary": true,
+                      "privateIPAddressVersion": "IPv4"
+                    }
+                  }
+                ],
+                "enableAcceleratedNetworking": true,
+                "enableIPForwarding": false
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2022-11-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[variables('VmSize')]"
+                },
+                "storageProfile": {
+                  "imageReference": "[variables('imageToUse')]",
+                  "osDisk": {
+                    "name": "[format('{0}_osdisk', parameters('vmName'))]",
+                    "osType": "Windows",
+                    "createOption": "FromImage",
+                    "caching": "ReadWrite",
+                    "deleteOption": "Delete"
+                  },
+                  "dataDisks": []
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('vmAdminUsername')]",
+                  "adminPassword": "[parameters('vmAdminPassword')]",
+                  "windowsConfiguration": {
+                    "provisionVMAgent": true,
+                    "enableAutomaticUpdates": false
+                  },
+                  "secrets": [],
+                  "allowExtensionOperations": true
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}', parameters('vmName')))]",
+                      "properties": {
+                        "deleteOption": "Delete"
+                      }
+                    }
+                  ]
+                },
+                "securityProfile": "[variables('securityProfileJson')]",
+                "diagnosticsProfile": {
+                  "bootDiagnostics": {
+                    "enabled": false
+                  }
+                },
+                "licenseType": "Windows_Client"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}', parameters('vmName')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'JsonADDomainExtension')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "forceUpdateTag": "[parameters('timestamp')]",
+                "publisher": "Microsoft.Compute",
+                "type": "JsonADDomainExtension",
+                "typeHandlerVersion": "1.3",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "Name": "[parameters('domainJoinFQDN')]",
+                  "User": "[parameters('domainJoinUserName')]",
+                  "Restart": "true",
+                  "Options": "3",
+                  "OUPath": "[parameters('domainJoinOUPath')]"
+                },
+                "protectedSettings": {
+                  "Password": "[parameters('domainJoinUserPassword')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines/runCommands",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}/{1}', parameters('vmName'), 'vm_RunScriptDomJoinStorage')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "properties": {
+                "treatFailureAsDeploymentFailure": true,
+                "asyncExecution": false,
+                "runAsUser": "[split(parameters('domainJoinUserName'), '@')[0]]",
+                "runAsPassword": "[parameters('domainJoinUserPassword')]",
+                "parameters": [
+                  {
+                    "name": "File",
+                    "value": "[parameters('storageSetupScript')]"
+                  },
+                  {
+                    "name": "Environment",
+                    "value": "[variables('cloudEnvironment')]"
+                  },
+                  {
+                    "name": "KerberosEncryptionType",
+                    "value": "[parameters('kerberosEncryptionType')]"
+                  },
+                  {
+                    "name": "OuPath",
+                    "value": "[parameters('domainJoinOUPath')]"
+                  },
+                  {
+                    "name": "StorageAccountName",
+                    "value": "[parameters('storageAccountName')]"
+                  },
+                  {
+                    "name": "StorageAccountResourceGroupName",
+                    "value": "[parameters('storageResourceGroup')]"
+                  },
+                  {
+                    "name": "SubscriptionId",
+                    "value": "[variables('subscriptionId')]"
+                  },
+                  {
+                    "name": "TenantId",
+                    "value": "[variables('tenantId')]"
+                  },
+                  {
+                    "name": "AclUsers",
+                    "value": "[parameters('groupUsers')]"
+                  },
+                  {
+                    "name": "AclAdmins",
+                    "value": "[parameters('groupAdmins')]"
+                  },
+                  {
+                    "name": "StorageFileShareName",
+                    "value": "[parameters('storageFileShareName')]"
+                  }
+                ],
+                "source": {
+                  "scriptUri": "[variables('storageSetupScriptUri')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('vmName'), 'JsonADDomainExtension')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "scriptUri": {
+              "type": "string",
+              "value": "[variables('storageSetupScriptUri')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+        "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('storageAcctName')))]"
+      ]
+    }
+  ]
+}
