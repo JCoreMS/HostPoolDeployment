@@ -34,8 +34,8 @@ resource vm_RunScriptDomJoinStorage 'Microsoft.Compute/virtualMachines/runComman
   properties: {
     treatFailureAsDeploymentFailure: true
     asyncExecution: false
-    runAsUser: split(domainJoinUserName, '@')[0]
-    runAsPassword: domainJoinUserPassword
+   // runAsUser: split(domainJoinUserName, '@')[0]
+    //runAsPassword: domainJoinUserPassword
     parameters: [
       {
         name: 'File'

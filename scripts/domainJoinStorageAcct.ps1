@@ -106,25 +106,25 @@ Write-Log "Verifying PowerShell Modules Needed"
 Write-Log "...Checking and loading NuGet provider"
 $providers = get-packageprovider -ListAvailable
 If($providers.Name -notcontains "NuGet"){
-    Install-packageprovider -Name "NuGet" -Force -Verbose
+    Install-packageprovider -Name "NuGet" -Force | Out-Null
     }
 
 Write-Log "...Checking and installing RSAT for Active Directory"
-$RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State
+$RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State | Out-Null
 If($RSATAD.State -eq "NotPresent"){
-    Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online
+    Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online | Out-Null
     }
 
 $modules = get-module -ListAvailable
 
 Write-Log "...Checking and loading ActiveDirectory Module"
 If($modules.name -notcontains "ActiveDirectory"){
-    Install-Module -Name "ActiveDirectory" -Force -Verbose
+    Install-Module -Name "ActiveDirectory" -Force | Out-Null
     }
 
 Write-Log "...Checking and loading Az.Storage Module"
 If($modules.name -notcontains "Az.Storage"){
-    Install-Module -Name "Az.Storage" -Force -Verbose
+    Install-Module -Name "Az.Storage" -Force | Out-Null
     }
 
 
