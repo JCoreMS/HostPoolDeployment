@@ -275,25 +275,41 @@ if($KerberosEncryptionType -eq 'AES256')
 
     Write-Host "Updated the password on the computer object for the Azure Storage Account in AD DS" | Write-Log
 }
+##############################################################
+#  Map Azure Files Share to Drive letter
+##############################################################
+$storageKey = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName).Value[0]
+
+Write-Host "Mapping Azure Files Share to Drive Letter" | Write-Log
+
+$connectTestResult = Test-NetConnection -ComputerName stfslcfpet5.file.core.windows.net -Port 445 | Write-Log
+if ($connectTestResult.TcpTestSucceeded) {
+    # Save the password so the drive will persist on reboot
+    cmd.exe /C "cmdkey /add:`"$StorageAccountName.file.$StorageSuffix`" /user:`"localhost\$StorageAccountName`" /pass:`"$storageKey`""
+    # Mount the drive
+    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\$StorageAccountName.file.$StorageSuffix\$StorageFileShareName" -Persist
+} else {
+    Write-Error -Message "Unable to reach the Azure storage account via port 445. Check to make sure your organization or ISP is not blocking port 445, or use Azure P2S VPN, Azure S2S VPN, or Express Route to tunnel SMB traffic over a different port." | write-log
+}
+
 
 ##############################################################
 #  Set NTFS Permissions on File Share
 ##############################################################
 
 Write-Host "Setting NTFS Permissions on File Share" | Write-Log
-$UNCPath = "\\" + $StorageAccountName + $FilesSuffix + "\" + $StorageFileShareName
 $DomainName = $Domain.DNSRoot
 # Remove Inheritance
 Write-Host "...Removing Inheritance" | Write-Log
-$NewAcl = Get-Acl -Path $UNCPath
+$NewAcl = Get-Acl -Path 'Z:\'
 $isProtected = $true
 $preserveInheritance = $true
 $NewAcl.SetAccessRuleProtection($isProtected, $preserveInheritance)
-Set-Acl -Path $UNCPath -AclObject $NewAcl
+Set-Acl -Path 'Z:\' -AclObject $NewAcl
 
 # Modify Creator Owner permissions
 Write-Host "...Modifying Creator Owner permissions" | Write-Log
-$NewAcl = Get-Acl -Path $UNCPath
+$NewAcl = Get-Acl -Path 'Z:\'
 $identity = New-Object System.Security.Principal.NTAccount("Creator Owner")
 $fileSystemRights = "Modify, Synchronize"
 $inheritanceFlags = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
@@ -304,11 +320,11 @@ $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $inheritanceFl
 $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
 
 $NewAcl.SetAccessRule($fileSystemAccessRule)
-Set-Acl -Path $UNCPath -AclObject $NewAcl
+Set-Acl -Path 'Z:\' -AclObject $NewAcl
 
 # Configure AVD USers Group with Modify permissions
 Write-Host "...Configuring AVD Users Group with Modify permissions" | Write-Log
-$NewAcl = Get-Acl -Path $UNCPath
+$NewAcl = Get-Acl -Path 'Z:\'
 $identity = "$DomainName\$AclUsers"
 $fileSystemRights = "Modify, Synchronize"
 $type = "Allow"
@@ -317,11 +333,11 @@ $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
 $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
 
 $NewAcl.SetAccessRule($fileSystemAccessRule)
-Set-Acl -Path $UNCPath -AclObject $NewAcl
+Set-Acl -Path 'Z:\' -AclObject $NewAcl
 
 # Configure AVD Admins Group with Full Control permissions
 Write-Host "...Configuring AVD Admins Group with Full Control permissions" | Write-Log
-$NewAcl = Get-Acl -Path $UNCPath
+$NewAcl = Get-Acl -Path 'Z:\'
 $identity = "$DomainName\$AclUsers"
 $fileSystemRights = "FullControl"
 $type = "Allow"
@@ -330,6 +346,13 @@ $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
 $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
 
 $NewAcl.SetAccessRule($fileSystemAccessRule)
-Set-Acl -Path $UNCPath -AclObject $NewAcl
+Set-Acl -Path 'Z:\' -AclObject $NewAcl
+
+##############################################################
+#  Remove Mapped Azure Files Share to Drive letter
+##############################################################
+
+Write-Host "REMOVING Mapped Drive to Azure Files Share" | Write-Log
+Remove-PSDrive -Name "Z" -Force
 
 Write-Host "DONE!" | Write-Log

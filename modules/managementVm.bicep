@@ -69,7 +69,6 @@ resource networkInterfaceMgmtVM 'Microsoft.Network/networkInterfaces@2022-11-01'
   }
 }
 
-
 resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2022-11-01' = {
   name: vmName
   location: location
@@ -147,25 +146,64 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
   }
 }
 
-resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = {
-  name: 'CustomScriptExtension'
+resource vm_RunScriptDomJoinStorage 'Microsoft.Compute/virtualMachines/runCommands@2023-03-01' = {
+  name: 'vm_RunScriptDomJoinStorage'
   parent: virtualMachineStorMgmt
   location: location
   tags: tags
   properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'CustomScriptExtension'
-    typeHandlerVersion: '1.10'
-    autoUpgradeMinorVersion: true
-    settings: {
-      fileUris: [
-        storageSetupScriptUri
-      ]
-      timestamp: timestamp
-    }
-    protectedSettings: {
-      managedIdentity: { objectId: identityStorageSetup }
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -Environment ${cloudEnvironment} -KerberosEncryptionType ${kerberosEncryptionType} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName}'
+    treatFailureAsDeploymentFailure: true
+    asyncExecution: false
+    runAsUser: domainJoinUserName
+    runAsPassword: domainJoinUserPassword
+    parameters: [
+      {
+        name: 'File'
+        value: storageSetupScript
+      }
+      {
+        name: 'Environment'
+        value: cloudEnvironment
+      }
+      {
+        name: 'KerberosEncryptionType'
+        value: kerberosEncryptionType
+      }
+      {
+        name: 'OuPath'
+        value: domainJoinOUPath
+      }
+      {
+        name: 'StorageAccountName'
+        value: storageAccountName
+      }
+      {
+        name: 'StorageAccountResourceGroupName'
+        value: storageResourceGroup
+      }
+      {
+        name: 'SubscriptionId'
+        value: subscriptionId
+      }
+      {
+        name: 'TenantId'
+        value: tenantId
+      }
+      {
+        name: 'AclUsers'
+        value: groupUsers
+      }
+      {
+        name: 'AclAdmins'
+        value: groupAdmins
+      }
+      {
+        name: 'StorageFileShareName'
+        value: storageFileShareName
+      }
+    ]
+    source: {
+      scriptUri: storageSetupScriptUri
     }
   }
   dependsOn: [
