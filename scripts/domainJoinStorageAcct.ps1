@@ -90,7 +90,7 @@ param (
     [Parameter(Mandatory = $true)]
     [string]$DomainPassword  # passed via protected section of BICEP so encrypted
 )
-$DEBUG = $true
+$TESTING = $true
 $ErrorActionPreference = 'Stop'
 
 try {
@@ -218,7 +218,7 @@ try {
 
     Write-Log "Checked for an existing computer object for the Azure Storage Account in AD DS"
 
-    if($DEBUG) {
+    if($TESTING) {
         Write-Log "DEBUG: StorageAccountName: $StorageAccountName"
         Write-Log "DEBUG: OuPath: $OuPath"
         Write-Log "DEBUG: SPN: $SPN"
