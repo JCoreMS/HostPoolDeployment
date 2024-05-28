@@ -88,11 +88,9 @@ param (
     [Parameter(Mandatory = $true)]
     [string]$DomainUser,
     [Parameter(Mandatory = $true)]
-    [string]$DomainPassword,  # passed via protected section of BICEP so encrypted
-    [Parameter(Mandatory = $false)]
-    [bool]$DEBUG
+    [string]$DomainPassword  # passed via protected section of BICEP so encrypted
 )
-
+$DEBUG = $true
 $ErrorActionPreference = 'Stop'
 
 try {
