@@ -149,7 +149,9 @@ try {
     }
     else { Write-Log "---Az.Storage Module already installed" }
 
-
+    Write-Log "...Disabling Windows Defender Real-time Protection and Anti-Spyware temporarily"
+    Set-MpPreference -DisableRealtimeMonitoring $true
+    New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Name DisableAntiSpyware -Value 1 -PropertyType DWORD -Force
 
     ##############################################################
     #  Variables
@@ -388,6 +390,10 @@ try {
 
     Write-Log "REMOVING Mapped Drive to Azure Files Share"
     Remove-PSDrive -Name "Z" -Force
+
+    Write-Log "Enabling Windows Defender Real-time Protection and Anti-Spyware"
+    Set-MpPreference -DisableRealtimeMonitoring $false
+    New-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Name DisableAntiSpyware -Value 0 -PropertyType DWORD -Force
 
     Write-Log "DONE!"
 }
