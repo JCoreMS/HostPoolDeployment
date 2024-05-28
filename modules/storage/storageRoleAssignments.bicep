@@ -5,6 +5,8 @@ param storageAccountId string
 param vmName string
 param managementVmPrincipalId string
 
+var storageAcctName = split(storageAccountId, '/')[8]
+
 resource roleAssignVMtoStorageKeyOp 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(storageAccountId, vmName, 'Storage Account Key Operator Service Role')
   properties: {
@@ -15,11 +17,11 @@ resource roleAssignVMtoStorageKeyOp 'Microsoft.Authorization/roleAssignments@202
   }
 }
 
-resource roleAssignVMtoStorageSMBElev 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccountId, vmName, 'Storage File Data SMB Share Elevated Contributor')
+resource roleAssignVMtoStorageContrib 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(storageAccountId, vmName, 'Contributor')
   properties: {
-    description: 'Allows for read, write, delete and modify NTFS permission access in Azure Storage file shares over SMB (VM: ${vmName})'
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a7264617-510b-434b-a828-9731dc254ea7')
+    description: 'Allows the management VM (${vmName}) to domian join the storage account (${storageAcctName})'
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
     principalId: managementVmPrincipalId
     principalType: 'ServicePrincipal'
   }

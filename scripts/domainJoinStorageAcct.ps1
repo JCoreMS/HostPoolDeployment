@@ -281,7 +281,8 @@ try {
         # Set the Kerberos encryption on the computer object
         Set-ADComputer `
             -Identity $ComputerObject.DistinguishedName `
-            -KerberosEncryptionType 'AES256' | Out-Null
+            -KerberosEncryptionType 'AES256' `
+            -Credential $DomainJoineCredObj
 
         Write-Log "Set AES256 Kerberos encryption on the computer object for the Azure Storage Account in AD DS"
 
