@@ -88,7 +88,9 @@ param (
     [Parameter(Mandatory = $true)]
     [string]$DomainUser,
     [Parameter(Mandatory = $true)]
-    [string]$DomainPassword  # passed via protected section of BICEP so encrypted
+    [string]$DomainPassword,  # passed via protected section of BICEP so encrypted
+    [Parameter(Mandatory = $false)]
+    [bool]$DEBUG
 )
 
 $ErrorActionPreference = 'Stop'
@@ -216,6 +218,13 @@ try {
 
     Write-Log "Checked for an existing computer object for the Azure Storage Account in AD DS"
 
+    if($DEBUG) {
+        Write-Log "DEBUG: StorageAccountName: $StorageAccountName"
+        Write-Log "DEBUG: OuPath: $OuPath"
+        Write-Log "DEBUG: SPN: $SPN"
+        Write-Log "DEBUG: ComputerPassword: $ComputerPassword"
+        Write-Log "DEBUG: Description: $Description"
+    }
 
     # Remove existing AD computer object for the Azure Storage Account
     if ($Computer) {
