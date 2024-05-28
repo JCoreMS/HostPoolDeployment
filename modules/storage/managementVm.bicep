@@ -108,7 +108,7 @@ resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2022-11-01' =
 
 
 
-/* resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = {
+resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = {
   name: 'JsonADDomainExtension'
   parent: virtualMachineStorMgmt
   location: location
@@ -130,7 +130,7 @@ resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2022-11-01' =
       Password: domainJoinUserPassword
     }
   }
-} */
+}
 
 
 

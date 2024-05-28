@@ -265,9 +265,6 @@ module managementVm './modules/storage/managementVm.bicep' = {
     vmAdminPassword: vmAdminPassword
     vmAdminUsername: vmAdminUsername
   }
-  dependsOn: [
-    storagePvtEndpoint
-  ]
 }
 
 module roleAssignments './modules/storage/storageRoleAssignments.bicep' = {
@@ -279,9 +276,6 @@ module roleAssignments './modules/storage/storageRoleAssignments.bicep' = {
     storageAccountId: storageAccount.id
     vmName: vmName
   }
-  dependsOn: [
-    managementVm
-  ]
 }
 
 
@@ -304,4 +298,8 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     groupUsers: groupUsers
     kerberosEncryptionType: kerberosEncryptionType
   }
+  dependsOn: [
+    managementVm
+    roleAssignments
+  ]
 }
