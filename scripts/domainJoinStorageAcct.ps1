@@ -63,18 +63,29 @@ The ID of the Azure Active Directory tenant.
 
 This example domain joins an Azure Storage Account to the AVD organizational unit in the Fabrikam.com domain.
 #>
-
-$Environment = "AzureCloud"
-$KerberosEncryptionType = "AES256"
-$OuPath = "OU=Servers,DC=corefamily,DC=net"
-$StorageAccountName = "stgcorefamily01"
-$StorageAccountResourceGroupName = "rg-eus2-corefamily01"
-$SubscriptionId = "8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9"
-$TenantId = "e5df932b-82ca-4872-a0bb-f880a766a051"
-$AclUsers = "azAVDUsers_MAC"
-$AclAdmins = "azAVDAdmins_MAC"
-$StorageFileShareName = "fslogix1"
-
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory=$true)]
+    [string]$Environment,
+    [Parameter(Mandatory=$true)]
+    [string]$KerberosEncryptionType,
+    [Parameter(Mandatory=$true)]
+    [string]$OuPath,
+    [Parameter(Mandatory=$true)]
+    [string]$StorageAccountName,
+    [Parameter(Mandatory=$true)]
+    [string]$StorageAccountResourceGroupName,
+    [Parameter(Mandatory=$true)]
+    [string]$SubscriptionId,
+    [Parameter(Mandatory=$true)]
+    [string]$TenantId,
+    [Parameter(Mandatory=$true)]
+    [string]$AclUsers,
+    [Parameter(Mandatory=$true)]
+    [string]$AclAdmins,
+    [Parameter(Mandatory=$true)]
+    [string]$StorageFileShareName
+)
 
 $ErrorActionPreference = 'Stop'
 
