@@ -168,6 +168,13 @@ try {
     # Create suffix for storage account FQDN
     $FilesSuffix = '.file.' + $StorageSuffix
 
+    #Domain Creds
+    # Convert to SecureString
+    [securestring]$secStringPassword = ConvertTo-SecureString $DomainPassword -AsPlainText -Force
+
+    # Create PSCredential object
+    [pscredential]$DomainJoineCredObj = New-Object System.Management.Automation.PSCredential($DomainUser, $secStringPassword)
+
 
     ##############################################################
     #  Process Storage Resources
@@ -211,7 +218,7 @@ try {
 
     # Check for existing AD computer object for the Azure Storage Account
     $Computer = Get-ADComputer `
-        -Filter { Name -eq $StorageAccountName }
+        -Filter { Name -eq $StorageAccountName } `
 
     Write-Log "Checked for an existing computer object for the Azure Storage Account in AD DS"
 
@@ -227,7 +234,8 @@ try {
     if ($Computer) {
         Remove-ADComputer `
             -Identity $StorageAccountName `
-            -Confirm:$false | Out-Null
+            -Confirm:$false `
+            -Credential $DomainJoineCredObj
 
         Write-Log "Removed an existing computer object for the Azure Storage Account in AD DS"
     }
@@ -242,7 +250,8 @@ try {
         -Description $Description `
         -AllowReversiblePasswordEncryption $false `
         -Enabled $true `
-        -PassThru
+        -PassThru `
+        -Credential $DomainJoineCredObj
 
     Write-Log "Created a new computer object for the Azure Storage Account in AD DS"
 
@@ -301,7 +310,8 @@ try {
         Set-ADAccountPassword `
             -Identity $ComputerObject.DistinguishedName `
             -Reset `
-            -NewPassword $NewPassword | Out-Null
+            -NewPassword $NewPassword `
+            -Credential $DomainJoineCredObj
 
         Write-Log "Updated the password on the computer object for the Azure Storage Account in AD DS"
     }
