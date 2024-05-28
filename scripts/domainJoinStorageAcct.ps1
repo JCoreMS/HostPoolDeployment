@@ -65,317 +65,324 @@ This example domain joins an Azure Storage Account to the AVD organizational uni
 #>
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$Environment,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$KerberosEncryptionType,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$OuPath,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$StorageAccountName,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$StorageAccountResourceGroupName,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$SubscriptionId,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$TenantId,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$AclUsers,
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string]$AclAdmins,
-    [Parameter(Mandatory=$true)]
-    [string]$StorageFileShareName
+    [Parameter(Mandatory = $true)]
+    [string]$StorageFileShareName,
+    [Parameter(Mandatory = $true)]
+    [string]$DomainUser,
+    [Parameter(Mandatory = $true)]
+    [string]$DomainPassword  # passed via protected section of BICEP so encrypted
 )
 
 $ErrorActionPreference = 'Stop'
 
-##############################################################
-#  Logging Function
-##############################################################
-function Write-Log
-{
-    param
-    (
-        [Parameter(Mandatory=$true)]
-        [String]$Message
-    )
+try {
 
-    $LogPath = 'C:\domainJoinStorageAcct.log'
-    $Date = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
-    $LogMessage = "$Date - $Message"
+    ##############################################################
+    #  Logging Function
+    ##############################################################
+    function Write-Log {
+        param
+        (
+            [Parameter(Mandatory = $true)]
+            [String]$Message
+        )
 
-    Add-Content -Path $LogPath -Value $LogMessage
-}
+        $LogPath = 'C:\domainJoinStorageAcct.log'
+        $Date = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+        $LogMessage = "$Date - $Message"
 
-##############################################################
-#  Pre-requisites
-##############################################################
-Write-Log "Verifying PowerShell Modules Needed"
-
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-Write-Log "...Checking and loading NuGet provider"
-$providers = get-packageprovider -ListAvailable
-If($providers.Name -notcontains "NuGet"){
-    Install-packageprovider -Name "NuGet" -Force | Out-Null
+        Add-Content -Path $LogPath -Value $LogMessage
     }
-else { Write-Log "---NuGet provider already installed" }
 
-Write-Log "...Checking and installing RSAT for Active Directory"
-$RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State | Out-Null
-If($RSATAD.State -eq "NotPresent"){
-    Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online | Out-Null
+    ##############################################################
+    #  Pre-requisites
+    ##############################################################
+    Write-Log "Verifying PowerShell Modules Needed"
+
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+    Write-Log "...Checking and loading NuGet provider"
+    $providers = get-packageprovider -ListAvailable
+    If ($providers.Name -notcontains "NuGet") {
+        Install-packageprovider -Name "NuGet" -Force | Out-Null
     }
-else { Write-Log "---RSAT for Active Directory already installed" }
+    else { Write-Log "---NuGet provider already installed" }
 
-$modules = get-module -ListAvailable
-
-Write-Log "...Checking and loading ActiveDirectory Module"
-If($modules.name -notcontains "ActiveDirectory"){
-    Install-Module -Name "ActiveDirectory" -Force | Out-Null
+    Write-Log "...Checking and installing RSAT for Active Directory"
+    $RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State | Out-Null
+    If ($RSATAD.State -eq "NotPresent") {
+        Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online | Out-Null
     }
-else { Write-Log "---ActiveDirectory Module already installed" }
+    else { Write-Log "---RSAT for Active Directory already installed" }
 
-Write-Log "...Checking and loading Az.Storage Module"
-If($modules.name -notcontains "Az.Storage"){
-    Install-Module -Name "Az.Storage" -Force | Out-Null
+    $modules = get-module -ListAvailable
+
+    Write-Log "...Checking and loading ActiveDirectory Module"
+    If ($modules.name -notcontains "ActiveDirectory") {
+        Install-Module -Name "ActiveDirectory" -Force | Out-Null
     }
-else { Write-Log "---Az.Storage Module already installed" }
+    else { Write-Log "---ActiveDirectory Module already installed" }
+
+    Write-Log "...Checking and loading Az.Storage Module"
+    If ($modules.name -notcontains "Az.Storage") {
+        Install-Module -Name "Az.Storage" -Force | Out-Null
+    }
+    else { Write-Log "---Az.Storage Module already installed" }
 
 
 
-##############################################################
-#  Variables
-##############################################################
-# Set Azure storage suffix
-$StorageSuffix = switch($Environment)
-{
-    "AzureCloud"        {"core.windows.net"}
-    "AzureUSGovernment" {"core.usgovcloudapi.net"}
-}
+    ##############################################################
+    #  Variables
+    ##############################################################
+    # Set Azure storage suffix
+    $StorageSuffix = switch ($Environment) {
+        "AzureCloud" { "core.windows.net" }
+        "AzureUSGovernment" { "core.usgovcloudapi.net" }
+    }
 
 
-# Get Domain information
-$Domain = Get-ADDomain `
-    -Current 'LocalComputer'
+    # Get Domain information
+    $Domain = Get-ADDomain `
+        -Current 'LocalComputer'
 
-Write-Log "Collected domain information"
-
-
-# Create suffix for storage account FQDN
-$FilesSuffix = '.file.' + $StorageSuffix
+    Write-Log "Collected domain information"
 
 
-##############################################################
-#  Process Storage Resources
-##############################################################
-# Connect to Azure
-Connect-AzAccount `
-    -Environment $Environment `
-    -Tenant $TenantId `
-    -Subscription $SubscriptionId -Identity | Out-Null
-
-Write-Log "Connected to the target Azure Subscription"
+    # Create suffix for storage account FQDN
+    $FilesSuffix = '.file.' + $StorageSuffix
 
 
-# Create the Kerberos key for the Azure Storage Account
-$Key = (New-AzStorageAccountKey `
-    -ResourceGroupName $StorageAccountResourceGroupName `
-    -Name $StorageAccountName `
-    -KeyName 'kerb1' `
-    | Select-Object -ExpandProperty 'Keys' `
-    | Where-Object {$_.Keyname -eq 'kerb1'}).Value
+    ##############################################################
+    #  Process Storage Resources
+    ##############################################################
+    # Connect to Azure
+    Connect-AzAccount `
+        -Environment $Environment `
+        -Tenant $TenantId `
+        -Subscription $SubscriptionId -Identity | Out-Null
 
-Write-Log "Captured the Kerberos key for the Storage Account"
-
-
-# Creates a password for the Azure Storage Account in AD using the Kerberos key
-$ComputerPassword = ConvertTo-SecureString `
-    -String $Key `
-    -AsPlainText `
-    -Force
-
-Write-Log "Created the computer object password for the Azure Storage Account in AD DS"
+    Write-Log "Connected to the target Azure Subscription"
 
 
-# Create the SPN value for the Azure Storage Account; attribute for computer object in AD
-$SPN = 'cifs/' + $StorageAccountName + $FilesSuffix
-
-
-# Create the Description value for the Azure Storage Account; attribute for computer object in AD
-$Description = "Computer account object for Azure storage account $($StorageAccountName)."
-
-
-# Check for existing AD computer object for the Azure Storage Account
-$Computer = Get-ADComputer `
-    -Filter {Name -eq $StorageAccountName}
-
-Write-Log "Checked for an existing computer object for the Azure Storage Account in AD DS"
-
-
-# Remove existing AD computer object for the Azure Storage Account
-if($Computer)
-{
-    Remove-ADComputer `
-        -Identity $StorageAccountName `
-        -Confirm:$false | Out-Null
-
-    Write-Log "Removed an existing computer object for the Azure Storage Account in AD DS"
-}
-
-
-# Create AD computer object for the Azure Storage Account
-$ComputerObject = New-ADComputer `
-    -Name $StorageAccountName `
-    -Path $OuPath `
-    -ServicePrincipalNames $SPN `
-    -AccountPassword $ComputerPassword `
-    -Description $Description `
-    -AllowReversiblePasswordEncryption $false `
-    -Enabled $true `
-    -PassThru
-
-Write-Log "Created a new computer object for the Azure Storage Account in AD DS"
-
-# Update the Azure Storage Account with the domain join 'INFO'
-$SamAccountName = switch($KerberosEncryptionType)
-{
-    'AES256' {$StorageAccountName}
-    'RC4' {$ComputerObject.SamAccountName}
-}
-
-Set-AzStorageAccount `
-    -ResourceGroupName $StorageAccountResourceGroupName `
-    -Name $StorageAccountName `
-    -EnableActiveDirectoryDomainServicesForFile $true `
-    -ActiveDirectoryDomainName $Domain.DNSRoot `
-    -ActiveDirectoryNetBiosDomainName $Domain.NetBIOSName `
-    -ActiveDirectoryForestName $Domain.Forest `
-    -ActiveDirectoryDomainGuid $Domain.ObjectGUID `
-    -ActiveDirectoryDomainSid $Domain.DomainSID `
-    -ActiveDirectoryAzureStorageSid $ComputerObject.SID.Value `
-    -ActiveDirectorySamAccountName $SamAccountName `
-    -ActiveDirectoryAccountType 'Computer' | Out-Null
-
-Write-Log "Updated the Azure Storage Account with the domain and computer object properties"
-
-# Enable AES256 encryption if selected
-if($KerberosEncryptionType -eq 'AES256')
-{
-    # Set the Kerberos encryption on the computer object
-    Set-ADComputer `
-        -Identity $ComputerObject.DistinguishedName `
-        -KerberosEncryptionType 'AES256' | Out-Null
-
-    Write-Log "Set AES256 Kerberos encryption on the computer object for the Azure Storage Account in AD DS"
-
-
-    # Reset the Kerberos key on the Storage Account
+    # Create the Kerberos key for the Azure Storage Account
     $Key = (New-AzStorageAccountKey `
-        -ResourceGroupName $StorageAccountResourceGroupName `
-        -Name $StorageAccountName `
-        -KeyName 'kerb1' `
+            -ResourceGroupName $StorageAccountResourceGroupName `
+            -Name $StorageAccountName `
+            -KeyName 'kerb1' `
         | Select-Object -ExpandProperty 'Keys' `
-        | Where-Object {$_.Keyname -eq 'kerb1'}).Value
+        | Where-Object { $_.Keyname -eq 'kerb1' }).Value
 
-    Write-Log "Created a new Kerberos key on the Azure Storage Account to support AES256 Kerberos encryption"
+    Write-Log "Captured the Kerberos key for the Storage Account"
 
 
-    # Capture the Kerberos key as a secure string
-    $NewPassword = ConvertTo-SecureString `
+    # Creates a password for the Azure Storage Account in AD using the Kerberos key
+    $ComputerPassword = ConvertTo-SecureString `
         -String $Key `
         -AsPlainText `
         -Force
 
-    Write-Log "Created the computer object password for the Azure Storage Account in AD DS to support AES256 Kerberos encryption"
+    Write-Log "Created the computer object password for the Azure Storage Account in AD DS"
 
 
-    # Update the password on the computer object with the new Kerberos key from the Storage Account
-    Set-ADAccountPassword `
-        -Identity $ComputerObject.DistinguishedName `
-        -Reset `
-        -NewPassword $NewPassword | Out-Null
+    # Create the SPN value for the Azure Storage Account; attribute for computer object in AD
+    $SPN = 'cifs/' + $StorageAccountName + $FilesSuffix
 
-    Write-Log "Updated the password on the computer object for the Azure Storage Account in AD DS"
+
+    # Create the Description value for the Azure Storage Account; attribute for computer object in AD
+    $Description = "Computer account object for Azure storage account $($StorageAccountName)."
+
+
+    # Check for existing AD computer object for the Azure Storage Account
+    $Computer = Get-ADComputer `
+        -Filter { Name -eq $StorageAccountName }
+
+    Write-Log "Checked for an existing computer object for the Azure Storage Account in AD DS"
+
+
+    # Remove existing AD computer object for the Azure Storage Account
+    if ($Computer) {
+        Remove-ADComputer `
+            -Identity $StorageAccountName `
+            -Confirm:$false | Out-Null
+
+        Write-Log "Removed an existing computer object for the Azure Storage Account in AD DS"
+    }
+
+
+    # Create AD computer object for the Azure Storage Account
+    $ComputerObject = New-ADComputer `
+        -Name $StorageAccountName `
+        -Path $OuPath `
+        -ServicePrincipalNames $SPN `
+        -AccountPassword $ComputerPassword `
+        -Description $Description `
+        -AllowReversiblePasswordEncryption $false `
+        -Enabled $true `
+        -PassThru
+
+    Write-Log "Created a new computer object for the Azure Storage Account in AD DS"
+
+    # Update the Azure Storage Account with the domain join 'INFO'
+    $SamAccountName = switch ($KerberosEncryptionType) {
+        'AES256' { $StorageAccountName }
+        'RC4' { $ComputerObject.SamAccountName }
+    }
+
+    Set-AzStorageAccount `
+        -ResourceGroupName $StorageAccountResourceGroupName `
+        -Name $StorageAccountName `
+        -EnableActiveDirectoryDomainServicesForFile $true `
+        -ActiveDirectoryDomainName $Domain.DNSRoot `
+        -ActiveDirectoryNetBiosDomainName $Domain.NetBIOSName `
+        -ActiveDirectoryForestName $Domain.Forest `
+        -ActiveDirectoryDomainGuid $Domain.ObjectGUID `
+        -ActiveDirectoryDomainSid $Domain.DomainSID `
+        -ActiveDirectoryAzureStorageSid $ComputerObject.SID.Value `
+        -ActiveDirectorySamAccountName $SamAccountName `
+        -ActiveDirectoryAccountType 'Computer' | Out-Null
+
+    Write-Log "Updated the Azure Storage Account with the domain and computer object properties"
+
+    # Enable AES256 encryption if selected
+    if ($KerberosEncryptionType -eq 'AES256') {
+        # Set the Kerberos encryption on the computer object
+        Set-ADComputer `
+            -Identity $ComputerObject.DistinguishedName `
+            -KerberosEncryptionType 'AES256' | Out-Null
+
+        Write-Log "Set AES256 Kerberos encryption on the computer object for the Azure Storage Account in AD DS"
+
+
+        # Reset the Kerberos key on the Storage Account
+        $Key = (New-AzStorageAccountKey `
+                -ResourceGroupName $StorageAccountResourceGroupName `
+                -Name $StorageAccountName `
+                -KeyName 'kerb1' `
+            | Select-Object -ExpandProperty 'Keys' `
+            | Where-Object { $_.Keyname -eq 'kerb1' }).Value
+
+        Write-Log "Created a new Kerberos key on the Azure Storage Account to support AES256 Kerberos encryption"
+
+
+        # Capture the Kerberos key as a secure string
+        $NewPassword = ConvertTo-SecureString `
+            -String $Key `
+            -AsPlainText `
+            -Force
+
+        Write-Log "Created the computer object password for the Azure Storage Account in AD DS to support AES256 Kerberos encryption"
+
+
+        # Update the password on the computer object with the new Kerberos key from the Storage Account
+        Set-ADAccountPassword `
+            -Identity $ComputerObject.DistinguishedName `
+            -Reset `
+            -NewPassword $NewPassword | Out-Null
+
+        Write-Log "Updated the password on the computer object for the Azure Storage Account in AD DS"
+    }
+    ##############################################################
+    #  Map Azure Files Share to Drive letter
+    ##############################################################
+    $storageKey = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName).Value[0]
+
+    Write-Log "Mapping Azure Files Share to Drive Letter"
+
+    $connectTestResult = Test-NetConnection -ComputerName stfslcfpet5.file.core.windows.net -Port 445
+    if ($connectTestResult.TcpTestSucceeded) {
+        # Save the password so the drive will persist on reboot
+        cmd.exe /C "cmdkey /add:`"$StorageAccountName.file.$StorageSuffix`" /user:`"localhost\$StorageAccountName`" /pass:`"$storageKey`""
+        # Mount the drive
+        New-PSDrive -Name Z -PSProvider FileSystem -Root "\\$StorageAccountName.file.$StorageSuffix\$StorageFileShareName" -Persist
+    }
+    else {
+        Write-Error -Message "Unable to reach the Azure storage account via port 445. Check to make sure your organization or ISP is not blocking port 445, or use Azure P2S VPN, Azure S2S VPN, or Express Route to tunnel SMB traffic over a different port."
+    }
+
+
+    ##############################################################
+    #  Set NTFS Permissions on File Share
+    ##############################################################
+
+    Write-Log "Setting NTFS Permissions on File Share"
+    $DomainName = $Domain.DNSRoot
+    # Remove Inheritance
+    Write-Log "...Removing Inheritance"
+    $NewAcl = Get-Acl -Path 'Z:\'
+    $isProtected = $true
+    $preserveInheritance = $true
+    $NewAcl.SetAccessRuleProtection($isProtected, $preserveInheritance)
+    Set-Acl -Path 'Z:\' -AclObject $NewAcl
+
+    # Modify Creator Owner permissions
+    Write-Log "...Modifying Creator Owner permissions"
+    $NewAcl = Get-Acl -Path 'Z:\'
+    $identity = New-Object System.Security.Principal.NTAccount("Creator Owner")
+    $fileSystemRights = "Modify, Synchronize"
+    $inheritanceFlags = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
+    $propagationFlags = [System.Security.AccessControl.PropagationFlags]::InheritOnly -bor [System.Security.AccessControl.PropagationFlags]::NoPropagateInherit
+    $type = "Allow"
+
+    $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $inheritanceFlags, $propagationFlags, $type
+    $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
+
+    $NewAcl.SetAccessRule($fileSystemAccessRule)
+    Set-Acl -Path 'Z:\' -AclObject $NewAcl
+
+    # Configure AVD USers Group with Modify permissions
+    Write-Log "...Configuring AVD Users Group with Modify permissions"
+    $NewAcl = Get-Acl -Path 'Z:\'
+    $identity = "$DomainName\$AclUsers"
+    $fileSystemRights = "Modify, Synchronize"
+    $type = "Allow"
+
+    $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
+    $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
+
+    $NewAcl.SetAccessRule($fileSystemAccessRule)
+    Set-Acl -Path 'Z:\' -AclObject $NewAcl
+
+    # Configure AVD Admins Group with Full Control permissions
+    Write-Log "...Configuring AVD Admins Group with Full Control permissions"
+    $NewAcl = Get-Acl -Path 'Z:\'
+    $identity = "$DomainName\$AclUsers"
+    $fileSystemRights = "FullControl"
+    $type = "Allow"
+
+    $fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
+    $fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
+
+    $NewAcl.SetAccessRule($fileSystemAccessRule)
+    Set-Acl -Path 'Z:\' -AclObject $NewAcl
+
+    ##############################################################
+    #  Remove Mapped Azure Files Share to Drive letter
+    ##############################################################
+
+    Write-Log "REMOVING Mapped Drive to Azure Files Share"
+    Remove-PSDrive -Name "Z" -Force
+
+    Write-Log "DONE!"
 }
-##############################################################
-#  Map Azure Files Share to Drive letter
-##############################################################
-$storageKey = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName).Value[0]
-
-Write-Log "Mapping Azure Files Share to Drive Letter"
-
-$connectTestResult = Test-NetConnection -ComputerName stfslcfpet5.file.core.windows.net -Port 445
-if ($connectTestResult.TcpTestSucceeded) {
-    # Save the password so the drive will persist on reboot
-    cmd.exe /C "cmdkey /add:`"$StorageAccountName.file.$StorageSuffix`" /user:`"localhost\$StorageAccountName`" /pass:`"$storageKey`""
-    # Mount the drive
-    New-PSDrive -Name Z -PSProvider FileSystem -Root "\\$StorageAccountName.file.$StorageSuffix\$StorageFileShareName" -Persist
-} else {
-    Write-Error -Message "Unable to reach the Azure storage account via port 445. Check to make sure your organization or ISP is not blocking port 445, or use Azure P2S VPN, Azure S2S VPN, or Express Route to tunnel SMB traffic over a different port."
+catch {
+    Write-Log "ERROR: $_"
+    throw
 }
-
-
-##############################################################
-#  Set NTFS Permissions on File Share
-##############################################################
-
-Write-Log "Setting NTFS Permissions on File Share"
-$DomainName = $Domain.DNSRoot
-# Remove Inheritance
-Write-Log "...Removing Inheritance"
-$NewAcl = Get-Acl -Path 'Z:\'
-$isProtected = $true
-$preserveInheritance = $true
-$NewAcl.SetAccessRuleProtection($isProtected, $preserveInheritance)
-Set-Acl -Path 'Z:\' -AclObject $NewAcl
-
-# Modify Creator Owner permissions
-Write-Log "...Modifying Creator Owner permissions"
-$NewAcl = Get-Acl -Path 'Z:\'
-$identity = New-Object System.Security.Principal.NTAccount("Creator Owner")
-$fileSystemRights = "Modify, Synchronize"
-$inheritanceFlags = [System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [System.Security.AccessControl.InheritanceFlags]::ObjectInherit
-$propagationFlags = [System.Security.AccessControl.PropagationFlags]::InheritOnly -bor [System.Security.AccessControl.PropagationFlags]::NoPropagateInherit
-$type = "Allow"
-
-$fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $inheritanceFlags, $propagationFlags, $type
-$fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
-
-$NewAcl.SetAccessRule($fileSystemAccessRule)
-Set-Acl -Path 'Z:\' -AclObject $NewAcl
-
-# Configure AVD USers Group with Modify permissions
-Write-Log "...Configuring AVD Users Group with Modify permissions"
-$NewAcl = Get-Acl -Path 'Z:\'
-$identity = "$DomainName\$AclUsers"
-$fileSystemRights = "Modify, Synchronize"
-$type = "Allow"
-
-$fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
-$fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
-
-$NewAcl.SetAccessRule($fileSystemAccessRule)
-Set-Acl -Path 'Z:\' -AclObject $NewAcl
-
-# Configure AVD Admins Group with Full Control permissions
-Write-Log "...Configuring AVD Admins Group with Full Control permissions"
-$NewAcl = Get-Acl -Path 'Z:\'
-$identity = "$DomainName\$AclUsers"
-$fileSystemRights = "FullControl"
-$type = "Allow"
-
-$fileSystemAccessRuleArgumentList = $identity, $fileSystemRights, $type
-$fileSystemAccessRule = New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList $fileSystemAccessRuleArgumentList
-
-$NewAcl.SetAccessRule($fileSystemAccessRule)
-Set-Acl -Path 'Z:\' -AclObject $NewAcl
-
-##############################################################
-#  Remove Mapped Azure Files Share to Drive letter
-##############################################################
-
-Write-Log "REMOVING Mapped Drive to Azure Files Share"
-Remove-PSDrive -Name "Z" -Force
-
-Write-Log "DONE!"
