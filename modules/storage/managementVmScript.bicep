@@ -13,6 +13,7 @@ param storageResourceGroup string
 param scriptLocation string
 param storageSetupScript string
 param tags object
+param timestamp string
 param vmName string
 
 
@@ -26,7 +27,28 @@ resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2023-03-01' e
   name: vmName
 }
 
-resource vm_RunScriptDomJoinStorage 'Microsoft.Compute/virtualMachines/runCommands@2023-03-01' = {
+resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = {
+  name: 'CustomScriptExtension'
+  parent: virtualMachineStorMgmt
+  location: location
+  tags: tags
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [ storageSetupScriptUri ]
+      timestamp: timestamp
+    }
+    protectedSettings: {
+     // managedIdentity: { objectId: UserIdentityObjId }
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -Environment ${cloudEnvironment} -KerberosEncryptionType ${kerberosEncryptionType} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -RunAsUser ${domainJoinUserName} -RunAsPassword ${domainJoinUserPassword}'
+    }
+  }
+}
+
+/* resource vm_RunScriptDomJoinStorage 'Microsoft.Compute/virtualMachines/runCommands@2023-03-01' = {
   name: 'vm_RunScriptDomJoinStorage'
   parent: virtualMachineStorMgmt
   location: location
@@ -87,3 +109,4 @@ resource vm_RunScriptDomJoinStorage 'Microsoft.Compute/virtualMachines/runComman
     }
   }
 }
+ */

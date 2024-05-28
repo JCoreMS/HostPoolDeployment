@@ -251,7 +251,7 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
 // Create Management Virtual Machine and domain join storage
 //     System Managed Identity to access storage
 
-module managementVm './modules/managementVm.bicep' = {
+module managementVm './modules/storage/managementVm.bicep' = {
   name: 'managementVm'
   params: {
     domainJoinFQDN: domainJoinFQDN
@@ -270,35 +270,22 @@ module managementVm './modules/managementVm.bicep' = {
   ]
 }
 
-resource roleAssignVMtoStorageKeyOp 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, vmName, 'Storage Account Key Operator Service Role')
-  scope: storageAccount
-  properties: {
-    description: 'Storage Account Key Operators are allowed to list and regenerate keys on Storage Accounts (VM: ${vmName})'
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '81a9662b-bebf-436f-a333-f67b29880f12')
-    principalId: managementVm.outputs.vmPrincipalId
-    principalType: 'ServicePrincipal'
+module roleAssignments './modules/storage/storageRoleAssignments.bicep' = {
+  name: 'roleAssignments'
+  scope: resourceGroup(storageResourceGroup)
+  params: {
+    keyVaultName: keyVaultName
+    managementVmPrincipalId: managementVm.outputs.vmPrincipalId
+    storageAccountId: storageAccount.id
+    vmName: vmName
   }
   dependsOn: [
     managementVm
   ]
 }
 
-resource roleAssignVMtoStorageSMBElev 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, vmName, 'Storage File Data SMB Share Elevated Contributor')
-  scope: storageAccount
-  properties: {
-    description: 'Allows for read, write, delete and modify NTFS permission access in Azure Storage file shares over SMB (VM: ${vmName})'
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a7264617-510b-434b-a828-9731dc254ea7')
-    principalId: managementVm.outputs.vmPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-  dependsOn: [
-    managementVm
-  ]
-}
 
-module managementVmScript './modules/managementVmScript.bicep' = {
+module managementVmScript './modules/storage/managementVmScript.bicep' = {
   name: 'managementVMscript'
   params: {
     domainJoinOUPath: ouPath
@@ -311,13 +298,10 @@ module managementVmScript './modules/managementVmScript.bicep' = {
     storageFileShareName: storageFileShareName
     storageResourceGroup: storageResourceGroup
     tags: tags
+    timestamp: timestamp
     vmName: vmName
     groupAdmins: groupAdmins
     groupUsers: groupUsers
     kerberosEncryptionType: kerberosEncryptionType
   }
-  dependsOn: [
-    roleAssignVMtoStorageKeyOp
-    roleAssignVMtoStorageSMBElev
-  ]
 }
