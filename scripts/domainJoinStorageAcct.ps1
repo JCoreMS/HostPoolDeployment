@@ -127,9 +127,9 @@ try {
     else { Write-Log "---NuGet provider already installed" }
 
     Write-Log "...Checking and installing RSAT for Active Directory"
-    $RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State | Out-Null
+    $RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State
     If ($RSATAD.State -eq "NotPresent") {
-        Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online | Out-Null
+        Get-WindowsCapability -Name RSAT* -Online | Where DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online
     }
     else { Write-Log "---RSAT for Active Directory already installed" }
 
