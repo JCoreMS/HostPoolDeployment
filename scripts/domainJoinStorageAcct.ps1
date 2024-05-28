@@ -115,6 +115,11 @@ try {
     ##############################################################
     #  Pre-requisites
     ##############################################################
+    Write-Log ""
+    Write-Log " =================================================================="
+    Write-Log "|         NEW EXECUTION OF DOMAIN JOIN STORAGE ACCOUNT             |"
+    Write-Log " =================================================================="
+    Write-Log ""
     Write-Log "Verifying PowerShell Modules Needed"
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -222,14 +227,6 @@ try {
 
     Write-Log "Checked for an existing computer object for the Azure Storage Account in AD DS"
 
-    if($TESTING) {
-        Write-Log "DEBUG: StorageAccountName: $StorageAccountName"
-        Write-Log "DEBUG: OuPath: $OuPath"
-        Write-Log "DEBUG: SPN: $SPN"
-        Write-Log "DEBUG: ComputerPassword: $ComputerPassword"
-        Write-Log "DEBUG: Description: $Description"
-    }
-
     # Remove existing AD computer object for the Azure Storage Account
     if ($Computer) {
         Remove-ADComputer `
@@ -323,7 +320,14 @@ try {
 
     Write-Log "Mapping Azure Files Share to Drive Letter"
 
-    $connectTestResult = Test-NetConnection -ComputerName stfslcfpet5.file.core.windows.net -Port 445
+    if($TESTING) {
+        Write-Log "DEBUG: StorageKey: $storageKey"
+        Write-Log "DEBUG: StoraageAccount RG: $StorageAccountResourceGroupName"
+        Write-Log "DEBUG: StorageAccountName: $StorageAccountName"
+        Write-Log "DEBUG: Storage Endpoint: $StorageAccountName.file.$StorageSuffix"
+    }
+
+    $connectTestResult = Test-NetConnection -ComputerName "$StorageAccountName.file.$StorageSuffix" -Port 445
     if ($connectTestResult.TcpTestSucceeded) {
         # Save the password so the drive will persist on reboot
         cmd.exe /C "cmdkey /add:`"$StorageAccountName.file.$StorageSuffix`" /user:`"localhost\$StorageAccountName`" /pass:`"$storageKey`""
