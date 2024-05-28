@@ -116,9 +116,9 @@ try {
     #  Pre-requisites
     ##############################################################
 
-    Write-Log "`n =================================================================="
+    Write-Log " =================================================================="
     Write-Log "|         NEW EXECUTION OF DOMAIN JOIN STORAGE ACCOUNT             |"
-    Write-Log " ==================================================================`n"
+    Write-Log " =================================================================="
     Write-Log "Verifying PowerShell Modules Needed"
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
