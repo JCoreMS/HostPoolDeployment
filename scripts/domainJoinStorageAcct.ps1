@@ -66,8 +66,6 @@ This example domain joins an Azure Storage Account to the AVD organizational uni
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)]
-    [string]$Environment,
-    [Parameter(Mandatory = $true)]
     [string]$KerberosEncryptionType,
     [Parameter(Mandatory = $true)]
     [string]$OuPath,
@@ -92,6 +90,8 @@ param (
 )
 $TESTING = $true
 $ErrorActionPreference = 'Stop'
+$Environment = (Get-AzContext).Environment.Name
+
 
 try {
 
@@ -326,7 +326,9 @@ try {
         Write-Log "DEBUG: Storage Endpoint: $StorageAccountName.file.$StorageSuffix"
     }
 
-    $connectTestResult = Test-NetConnection -ComputerName "$StorageAccountName.file.$StorageSuffix" -Port 445
+    $storageFQDN = "$StorageAccountName.file.$StorageSuffix"
+
+    $connectTestResult = Test-NetConnection -ComputerName $StorageAccountName.file.$StorageSuffix -Port 445
     if ($connectTestResult.TcpTestSucceeded) {
         # Save the password so the drive will persist on reboot
         cmd.exe /C "cmdkey /add:`"$StorageAccountName.file.$StorageSuffix`" /user:`"localhost\$StorageAccountName`" /pass:`"$storageKey`""
