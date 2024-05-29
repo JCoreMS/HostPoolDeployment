@@ -10,6 +10,7 @@ param location string
 param storageAccountName string
 param storageFileShareName string
 param storageResourceGroup string
+param storageSetupId string
 param scriptLocation string
 param storageSetupScript string
 param tags object
@@ -42,7 +43,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
       timestamp: timestamp
     }
     protectedSettings: {
-     // managedIdentity: { objectId: UserIdentityObjId }
+      managedIdentity: { objectId: storageSetupId }
       commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -KerberosEncryptionType ${kerberosEncryptionType} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainUser ${domainJoinUserName} -DomainPassword ${domainJoinUserPassword}'
     }
   }

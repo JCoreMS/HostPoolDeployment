@@ -60,6 +60,12 @@ param vmAdminPassword string
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'  // URL with NO trailing slash
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
+var smbSettingsInitial = {
+  versions: 'SMB2.1;SMB3.0;SMB3.1.1'
+  authenticationMethods: 'Kerberos;NTLMv2'
+  kerberosTicketEncryption: 'RC4-HMAC;AES-256'
+  channelEncryption: 'AES-128-CCM;AES-128-GCM;AES-256-GCM'
+}
 
 // Create User Assigned Managed Identity
 resource identityStorageSetup 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -189,28 +195,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
 }
 
-resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
-  parent: storageAccount
-  name: 'default'
-  properties: {
-    protocolSettings: {
-      smb: smbSettings
-    }
-    shareDeleteRetentionPolicy: {
-      enabled: true
-      days: 7
-    }
-  }
-}
-
-resource storageFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
-  name: '${storageAccount.name}/default/${storageFileShareName}'
-  properties: {
-    shareQuota: storageShareSize
-    enabledProtocols: 'SMB'
-  }
-}
-
 // Private Endpoint for Storage Account
 resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
   name: 'pep-${storageAcctName}'
@@ -232,6 +216,36 @@ resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
     }
   }
 }
+
+resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
+  parent: storageAccount
+  name: 'default'
+  properties: {
+    protocolSettings: {
+      smb: smbSettingsInitial
+    }
+    shareDeleteRetentionPolicy: {
+      enabled: true
+      days: 7
+    }
+  }
+  dependsOn: [
+    storagePvtEndpoint
+  ]
+}
+
+resource storageFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
+  name: '${storageAccount.name}/default/${storageFileShareName}'
+  properties: {
+    shareQuota: storageShareSize
+    enabledProtocols: 'SMB'
+  }
+  dependsOn: [
+    storageFileService
+  ]
+}
+
+
 
 resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
   name: 'filePrivateDnsZoneGroup'
@@ -288,6 +302,7 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     location: location
     scriptLocation: scriptLocation
     storageSetupScript: storageSetupScript
+    storageSetupId: identityStorageSetup.id
     storageAccountName: storageAcctName
     storageFileShareName: storageFileShareName
     storageResourceGroup: storageResourceGroup
@@ -303,3 +318,5 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     roleAssignments
   ]
 }
+
+
