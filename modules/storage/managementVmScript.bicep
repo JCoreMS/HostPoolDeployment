@@ -44,7 +44,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     }
     protectedSettings: {
       managedIdentity: { objectId: storageSetupId }
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -KerberosEncryptionType ${kerberosEncryptionType} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainUser ${domainJoinUserName} -DomainPassword ${domainJoinUserPassword}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -KerberosEncryptionType ${kerberosEncryptionType} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainUser ${domainJoinUserName} -DomainPassword ${domainJoinUserPassword} -UserAssignedIdentityClientId ${storageSetupId}'
     }
   }
 }

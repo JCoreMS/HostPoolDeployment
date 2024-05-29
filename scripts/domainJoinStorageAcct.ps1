@@ -86,7 +86,9 @@ param (
     [Parameter(Mandatory = $true)]
     [string]$DomainUser,
     [Parameter(Mandatory = $true)]
-    [string]$DomainPassword  # passed via protected section of BICEP so encrypted
+    [string]$DomainPassword,  # passed via protected section of BICEP so encrypted
+    [Parameter(Mandatory = $true)]
+    [string]$UserAssignedIdentityClientId
 )
 $TESTING = $true
 $ErrorActionPreference = 'Stop'
