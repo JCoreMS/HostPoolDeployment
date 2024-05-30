@@ -40,7 +40,6 @@ param
 )
 
 $ErrorActionPreference = 'Stop'
-$Environment = (Get-AzContext).Environment.Name
 
 
 try {
