@@ -20,7 +20,6 @@ param vmName string
 
 var subscriptionId = subscription().subscriptionId
 var tenantId = subscription().tenantId
-var cloudEnvironment = environment().name
 var storageSetupScriptUri = '${scriptLocation}/${storageSetupScript}'
 
 
@@ -43,71 +42,8 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
       timestamp: timestamp
     }
     protectedSettings: {
-      managedIdentity: { objectId: storageSetupId }
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -KerberosEncryptionType ${kerberosEncryptionType} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainUser ${domainJoinUserName} -DomainPassword ${domainJoinUserPassword} -UserAssignedIdentityClientId ${storageSetupId}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -KerberosEncryptionType ${kerberosEncryptionType} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainJoinUserPrincipalName ${domainJoinUserName} -DomainJoinPassword ${domainJoinUserPassword} -UserAssignedIdentityClientId ${storageSetupId}'
     }
   }
 }
 
-/* resource vm_RunScriptDomJoinStorage 'Microsoft.Compute/virtualMachines/runCommands@2023-03-01' = {
-  name: 'vm_RunScriptDomJoinStorage'
-  parent: virtualMachineStorMgmt
-  location: location
-  tags: tags
-  properties: {
-    treatFailureAsDeploymentFailure: true
-    asyncExecution: false
-    runAsUser: domainJoinUserName      //split(domainJoinUserName, '@')[0]
-    runAsPassword: domainJoinUserPassword
-    parameters: [
-      {
-        name: 'File'
-        value: storageSetupScript
-      }
-      {
-        name: 'Environment'
-        value: cloudEnvironment
-      }
-      {
-        name: 'KerberosEncryptionType'
-        value: kerberosEncryptionType
-      }
-      {
-        name: 'OuPath'
-        value: domainJoinOUPath
-      }
-      {
-        name: 'StorageAccountName'
-        value: storageAccountName
-      }
-      {
-        name: 'StorageAccountResourceGroupName'
-        value: storageResourceGroup
-      }
-      {
-        name: 'SubscriptionId'
-        value: subscriptionId
-      }
-      {
-        name: 'TenantId'
-        value: tenantId
-      }
-      {
-        name: 'AclUsers'
-        value: groupUsers
-      }
-      {
-        name: 'AclAdmins'
-        value: groupAdmins
-      }
-      {
-        name: 'StorageFileShareName'
-        value: storageFileShareName
-      }
-    ]
-    source: {
-      scriptUri: storageSetupScriptUri
-    }
-  }
-}
- */

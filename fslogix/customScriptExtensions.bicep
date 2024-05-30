@@ -5,7 +5,6 @@ param parameters string
 param scriptFileName string
 param tags object
 param timestamp string = utcNow('yyyyMMddhhmmss')
-param userAssignedIdentityClientId string
 param virtualMachineName string
 
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-03-01' existing = {
@@ -28,9 +27,6 @@ resource customScriptExtension 'Microsoft.Compute/virtualMachines/extensions@202
     protectedSettings: {
       commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${scriptFileName} ${parameters}'
       fileUris: fileUris
-      managedIdentity: {
-        clientId: userAssignedIdentityClientId
-      }
     }
   }
 }

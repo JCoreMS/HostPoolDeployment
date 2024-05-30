@@ -84,6 +84,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
     enableSoftDelete: true
     enabledForDiskEncryption: true
     enableRbacAuthorization: true
+    enabledForDeployment: true
     networkAcls: {
       defaultAction: 'Deny'
       bypass: 'AzureServices'
@@ -141,7 +142,7 @@ resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-0
     description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
     principalId: identityStorageSetup.properties.principalId
     principalType: 'ServicePrincipal'
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6') // Key Vault Crypto Service Encryption User Role
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '14b46e9e-c2b7-41b4-b07b-48a6ebf60603') // Key Vault Crypto Officer Role
   }
 }
 
@@ -193,6 +194,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       requireInfrastructureEncryption: false
     }
   }
+  dependsOn: [
+    assignIdentity2Vault
+  ]
 }
 
 // Private Endpoint for Storage Account

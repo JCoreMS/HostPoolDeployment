@@ -1,16 +1,43 @@
-$DomainJoinUserPrincipalName = "jcore@corefamily.net"
-$DomainJoinPassword = "P@lmtree5P1per28r$"
-$Environment = "AzureCloud"
-$SubscriptionId = "8a0ecebc-0e1d-4e8f-8cb8-8a92f49455b9"
-$StorageAccountResourceGroupName = "rg-eus2-corefamily-01"
-$StorageAccountName = "stgcorefamily01"
-$StorageFileShareName = "fslogix1"
-$OUPath = "OU=Servers,DC=corefamily,DC=net"
-$AclUsers = "azAVDUsers_MAC"
-$AclAdmins = "azAVDAdmins_MAC"
-$TenantId = "e5df932b-82ca-4872-a0bb-f880a766a051"
-$KerberosEncryptionType = "RC4"
-$UserAssignedIdentityClientId = "f09862b9-93a2-4bf4-8762-9c41906d91c8"
+
+
+param
+(
+    [Parameter(Mandatory)]
+    [String]$AclAdmins,
+
+    [Parameter(Mandatory)]
+    [String]$AclUsers,
+
+    [Parameter(Mandatory)]
+    [String]$DomainJoinPassword,
+
+    [Parameter(Mandatory)]
+    [String]$DomainJoinUserPrincipalName,
+
+    [Parameter(Mandatory=$false)]
+    [String]$Environment,
+
+    [Parameter(Mandatory=$false)]
+    [String]$OUPath,
+
+    [Parameter(Mandatory)]
+    [String]$SecurityPrincipalNames,
+
+    [Parameter(Mandatory=$false)]
+    [String]$StorageAccountPrefix,
+
+    [Parameter(Mandatory=$false)]
+    [String]$StorageAccountResourceGroupName,
+
+    [Parameter(Mandatory=$false)]
+    [String]$SubscriptionId,
+
+    [Parameter(Mandatory=$false)]
+    [String]$TenantId,
+
+    [Parameter(Mandatory=$false)]
+    [String]$UserAssignedIdentityClientId
+)
 
 $ErrorActionPreference = 'Stop'
 $Environment = (Get-AzContext).Environment.Name
