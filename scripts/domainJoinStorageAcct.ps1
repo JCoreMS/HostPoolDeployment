@@ -24,10 +24,13 @@ param
     [String]$SecurityPrincipalNames,
 
     [Parameter(Mandatory=$false)]
-    [String]$StorageAccountPrefix,
+    [String]$StorageAccountResourceGroupName,
 
     [Parameter(Mandatory=$false)]
-    [String]$StorageAccountResourceGroupName,
+    [String]$StorageAccountName,
+
+    [Parameter(Mandatory=$false)]
+    [String]$StorageFileShareName,
 
     [Parameter(Mandatory=$false)]
     [String]$SubscriptionId,
@@ -38,6 +41,7 @@ param
     [Parameter(Mandatory=$false)]
     [String]$UserAssignedIdentityClientId
 )
+-KerberosEncryptionType ${kerberosEncryptionType}
 
 $ErrorActionPreference = 'Stop'
 
