@@ -75,7 +75,12 @@ try {
     Write-Log -Message " ==================================================================" -Type 'INFO'
 
     # Check if Domain Joined VM
-    $DomainJoined = if($ENV:COMPUTERNAME -eq $ENV:USERDNSDOMAIN) { $false } else { $true }
+    $DomainJoined = if($ENV:COMPUTERNAME -eq $ENV:USERDNSDOMAIN) { 
+        $false
+        Write-Log -Message "Not Domain Joined" -Type 'ERROR'
+        throw "Error: VM is not Domain Joined."
+        }
+        else { $true }
     Write-Log -Message "Domain Joined: $DomainJoined" -Type 'INFO'
 
     Write-Log -Message "Verifying PowerShell Modules Needed" -Type 'INFO'
