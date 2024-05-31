@@ -58,6 +58,7 @@ param vmAdminUsername string
 param vmAdminPassword string
 
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
+var Environment = environment().name
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'  // URL with NO trailing slash
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 
@@ -285,7 +286,6 @@ module roleAssignments './modules/storage/storageRoleAssignments.bicep' = {
   name: 'roleAssignments'
   scope: resourceGroup(storageResourceGroup)
   params: {
-    keyVaultName: keyVaultName
     managementVmPrincipalId: managementVm.outputs.vmPrincipalId
     storageAccountId: storageAccount.id
     vmName: vmName
@@ -299,6 +299,7 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     domainJoinOUPath: ouPath
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
+    environment: Environment
     location: location
     scriptLocation: scriptLocation
     storageSetupScript: storageSetupScript

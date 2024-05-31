@@ -1,6 +1,5 @@
 targetScope = 'resourceGroup'
 
-param keyVaultName string
 param storageAccountId string
 param vmName string
 param managementVmPrincipalId string
