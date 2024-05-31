@@ -60,12 +60,7 @@ param vmAdminPassword string
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'  // URL with NO trailing slash
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
-var smbSettingsInitial = {
-  versions: 'SMB2.1;SMB3.0;SMB3.1.1'
-  authenticationMethods: 'Kerberos;NTLMv2'
-  kerberosTicketEncryption: 'RC4-HMAC;AES-256'
-  channelEncryption: 'AES-128-CCM;AES-128-GCM;AES-256-GCM'
-}
+
 
 // Create User Assigned Managed Identity
 resource identityStorageSetup 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -196,6 +191,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   dependsOn: [
     assignIdentity2Vault
+    identityStorageSetup
   ]
 }
 
@@ -226,7 +222,7 @@ resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022
   name: 'default'
   properties: {
     protocolSettings: {
-      smb: smbSettingsInitial
+      smb: smbSettings
     }
     shareDeleteRetentionPolicy: {
       enabled: true
@@ -320,6 +316,7 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
   dependsOn: [
     managementVm
     roleAssignments
+    storageFileShare
   ]
 }
 

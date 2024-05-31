@@ -73,6 +73,11 @@ try {
     Write-Log -Message " ==================================================================" -Type 'INFO'
     Write-Log -Message "|         NEW EXECUTION OF DOMAIN JOIN STORAGE ACCOUNT             |" -Type 'INFO'
     Write-Log -Message " ==================================================================" -Type 'INFO'
+
+    # Check if Domain Joined VM
+    $DomainJoined = if($ENV:COMPUTERNAME -eq $ENV:USERDNSDOMAIN) { $false } else { $true }
+    Write-Log -Message "Domain Joined: $DomainJoined" -Type 'INFO'
+
     Write-Log -Message "Verifying PowerShell Modules Needed" -Type 'INFO'
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
