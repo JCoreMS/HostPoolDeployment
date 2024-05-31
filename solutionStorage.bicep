@@ -56,14 +56,17 @@ param vmAdminPassword string
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var Environment = environment().name
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'  // URL with NO trailing slash
-var smbSettings = {
+var smbSettings =   storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? {
   versions: 'SMB3.1.1'
   authenticationMethods: 'NTLMv2;Kerberos'
   kerberosTicketEncryption: 'AES-256'
   channelEncryption: 'AES-256-GCM'
-  multiChannel: {
-    enabled: storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? true : false
-  }
+  mulitchannel: {enabled: true}
+} :{
+  versions: 'SMB3.1.1'
+  authenticationMethods: 'NTLMv2;Kerberos'
+  kerberosTicketEncryption: 'AES-256'
+  channelEncryption: 'AES-256-GCM'
 }
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 var tenantId = subscription().tenantId
