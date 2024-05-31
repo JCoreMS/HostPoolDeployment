@@ -59,11 +59,11 @@ try {
         $Path = 'C:\cse_FileShareSetup.txt'
         if(!(Test-Path -Path $Path))
         {
-            New-Item -Path C:\ -Name cse_FileShareSetup.txt | Out-Null
+            New-Item -Path C:\ -Name cse_FileShareSetup.txt| Out-Null
         }
         $Timestamp = Get-Date -Format 'MM/dd/yyyy HH:mm:ss.ff'
         $Entry = '[' + $Timestamp + '] [' + $Type + '] ' + $Message
-        $Entry | Out-File -FilePath $Path -Append -Encoding ascii
+        $Entry | Out-File -FilePath $Path -Append -Encoding 'UTF8'
     }
 
     ##############################################################
@@ -263,6 +263,6 @@ try {
 catch {
     Write-Log -Message $_ -Type 'ERROR'
     $ErrorData = $_ | Select-Object *
-    $ErrorData | Out-File -FilePath 'C:\cse_FileShareSetup.txt' -Append
+    $ErrorData | Out-File -FilePath 'C:\cse_FileShareSetup.txt' -Append -Encoding 'UTF8'
     throw
 }
