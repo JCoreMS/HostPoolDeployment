@@ -22,8 +22,6 @@ param ouPath string
 
 param privateDNSZoneId string
 
-param smbSettings object
-
 param storageAcctName string
 
 param storageFileShareName string
@@ -48,8 +46,6 @@ param subnetId string
 
 param tags object
 
-param tenantId string
-
 param timestamp string = utcNow()
 
 param vmName string
@@ -60,8 +56,17 @@ param vmAdminPassword string
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var Environment = environment().name
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'  // URL with NO trailing slash
+var smbSettings = {
+  versions: 'SMB3.1.1'
+  authenticationMethods: 'NTLMv2;Kerberos'
+  kerberosTicketEncryption: 'AES-256'
+  channelEncryption: 'AES-256-GCM'
+  multiChannel: {
+    enabled: storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? true : false
+  }
+}
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
-
+var tenantId = subscription().tenantId
 
 // Create User Assigned Managed Identity
 resource identityStorageSetup 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
