@@ -20,9 +20,6 @@ param
     [Parameter(Mandatory=$false)]
     [String]$OUPath,
 
-    [Parameter(Mandatory)]
-    [String]$SecurityPrincipalNames,
-
     [Parameter(Mandatory=$false)]
     [String]$StorageAccountResourceGroupName,
 
@@ -41,7 +38,6 @@ param
     [Parameter(Mandatory=$false)]
     [String]$UserAssignedIdentityClientId
 )
--KerberosEncryptionType ${kerberosEncryptionType}
 
 $ErrorActionPreference = 'Stop'
 
