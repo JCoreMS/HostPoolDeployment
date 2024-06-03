@@ -144,6 +144,7 @@ try {
     $AdminGroup = $Netbios + '\' + $AclAdmins
 
     # Connects to Azure using a User Assigned Managed Identity
+    Write-Log -Message "Authenticating to Azure: AccountID: $UserAsignedIdentityClientId | Environment: $Environmnet | Tenant: $TenantId | Subscription: $SubscriptionId" -Type 'DEBUG'
     Connect-AzAccount -Identity -AccountId $UserAssignedIdentityClientId -Environment $Environment -Tenant $TenantId -Subscription $SubscriptionId | Out-Null
     Write-Log -Message "Authenticated to Azure" -Type 'INFO'
 

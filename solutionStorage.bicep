@@ -57,16 +57,16 @@ var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var Environment = environment().name
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'  // URL with NO trailing slash
 var smbSettings =   storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? {
-  versions: 'SMB3.1.1'
   authenticationMethods: 'NTLMv2;Kerberos'
-  kerberosTicketEncryption: 'AES-256'
   channelEncryption: 'AES-256-GCM'
+  kerberosTicketEncryption: 'AES-256'
   mulitchannel: {enabled: true}
-} :{
   versions: 'SMB3.1.1'
+} :{
   authenticationMethods: 'NTLMv2;Kerberos'
-  kerberosTicketEncryption: 'AES-256'
   channelEncryption: 'AES-256-GCM'
+  kerberosTicketEncryption: 'AES-256'
+  versions: 'SMB3.1.1'
 }
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 var tenantId = subscription().tenantId
@@ -77,7 +77,7 @@ resource identityStorageSetup 'Microsoft.ManagedIdentity/userAssignedIdentities@
   location: location
   tags: tags
 }
-/*
+
 // Create Key Vault for CMK for Storage Account (For Scale only single Key Vault per Storage Account recommended)
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
@@ -150,7 +150,7 @@ resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-0
   }
 }
 
-
+/* 
 // Create Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   name: storageAcctName
@@ -298,8 +298,8 @@ module roleAssignments './modules/storage/storageRoleAssignments.bicep' = {
     storageAccountId: storageAccount.id
     vmName: vmName
   }
-} */
-
+}
+ */
 
 module managementVmScript './modules/storage/managementVmScript.bicep' = {
   name: 'managementVMscript'
@@ -323,9 +323,9 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     groupUsers: groupUsers
   }
   dependsOn: [
-    // managementVm
-    // roleAssignments
-    // storageFileShare
+/*     managementVm
+    roleAssignments
+    storageFileShare */
   ]
 }
 
