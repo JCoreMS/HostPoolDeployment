@@ -45,6 +45,14 @@
 							}
 						},
 						{
+							"name": "callGraphTenant",
+							"type": "Microsoft.Solutions.GraphApiControl",
+							"request": {
+								"method": "GET",
+								"path": "/v1.0/organization"
+							}
+						},
+						{
 							"name": "storageAccountSelector",
 							"type": "Microsoft.Storage.StorageAccountSelector",
 							"label": "Storage account",

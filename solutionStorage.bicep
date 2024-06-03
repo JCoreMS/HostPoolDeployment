@@ -77,7 +77,7 @@ resource identityStorageSetup 'Microsoft.ManagedIdentity/userAssignedIdentities@
   location: location
   tags: tags
 }
-
+/*
 // Create Key Vault for CMK for Storage Account (For Scale only single Key Vault per Storage Account recommended)
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: keyVaultName
@@ -298,7 +298,7 @@ module roleAssignments './modules/storage/storageRoleAssignments.bicep' = {
     storageAccountId: storageAccount.id
     vmName: vmName
   }
-}
+} */
 
 
 module managementVmScript './modules/storage/managementVmScript.bicep' = {
@@ -311,21 +311,21 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     location: location
     scriptLocation: scriptLocation
     storageSetupScript: storageSetupScript
-    storageSetupId: identityStorageSetup.id
+    storageSetupId: identityStorageSetup.properties.principalId
     storageAccountName: storageAcctName
     storageFileShareName: storageFileShareName
     storageResourceGroup: storageResourceGroup
     tags: tags
+    tenantId: tenantId
     timestamp: timestamp
     vmName: vmName
     groupAdmins: groupAdmins
     groupUsers: groupUsers
-    kerberosEncryptionType: kerberosEncryptionType
   }
   dependsOn: [
-    managementVm
-    roleAssignments
-    storageFileShare
+    // managementVm
+    // roleAssignments
+    // storageFileShare
   ]
 }
 

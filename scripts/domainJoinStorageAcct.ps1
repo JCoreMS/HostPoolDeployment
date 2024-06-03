@@ -78,10 +78,11 @@ try {
     $DomainJoined = if($ENV:COMPUTERNAME -eq $ENV:USERDNSDOMAIN) {
         $false
         Write-Log -Message "Not Domain Joined" -Type 'ERROR'
-        throw "Error: VM is not Domain Joined."
+        throw "VM is not Domain Joined! Unable to proceed with domain join storage account."
         }
         else { $true }
-    Write-Log -Message "Domain Joined: $DomainJoined" -Type 'INFO'
+
+    Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'INFO'
 
     Write-Log -Message "Verifying PowerShell Modules Needed" -Type 'INFO'
 
@@ -146,7 +147,7 @@ try {
     Connect-AzAccount -Identity -AccountId $UserAssignedIdentityClientId -Environment $Environment -Tenant $TenantId -Subscription $SubscriptionId | Out-Null
     Write-Log -Message "Authenticated to Azure" -Type 'INFO'
 
-# Set Azure storage suffix
+    # Set Azure storage suffix
     $FileServer = ((Get-AzStorageAccount -StorageAccountName $StorageAccountName -ResourceGroupName $StorageAccountResourceGroupName).PrimaryEndpoints.file -split '/')[2]
 
     # Get the storage account key

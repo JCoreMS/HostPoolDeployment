@@ -6,7 +6,6 @@ param domainJoinUserPassword string
 param environment string
 param groupAdmins string
 param groupUsers string
-param kerberosEncryptionType string
 param location string
 param storageAccountName string
 param storageFileShareName string
@@ -15,12 +14,12 @@ param storageSetupId string
 param scriptLocation string
 param storageSetupScript string
 param tags object
+param tenantId string
 param timestamp string
 param vmName string
 
 
 var subscriptionId = subscription().subscriptionId
-var tenantId = subscription().tenantId
 var storageSetupScriptUri = '${scriptLocation}/${storageSetupScript}'
 
 
@@ -43,7 +42,7 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
       timestamp: timestamp
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainJoinUserPrincipalName ${domainJoinUserName} -DomainJoinPassword ${domainJoinUserPassword} -UserAssignedIdentityClientId ${storageSetupId} -Environment ${environment} -Location ${location} -VmName ${vmName}'
+      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} -OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainJoinUserPrincipalName ${domainJoinUserName} -DomainJoinPassword ${domainJoinUserPassword} -UserAssignedIdentityClientId ${storageSetupId} -Environment ${environment}'
     }
   }
 }
