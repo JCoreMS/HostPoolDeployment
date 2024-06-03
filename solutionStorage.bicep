@@ -311,7 +311,7 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     location: location
     scriptLocation: scriptLocation
     storageSetupScript: storageSetupScript
-    storageSetupId: identityStorageSetup.properties.principalId
+    storageSetupId: identityStorageSetup.properties.clientId
     storageAccountName: storageAcctName
     storageFileShareName: storageFileShareName
     storageResourceGroup: storageResourceGroup
@@ -330,3 +330,5 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
 }
 
 
+output Environment string = Environment
+output AccountId string = identityStorageSetup.properties.clientId

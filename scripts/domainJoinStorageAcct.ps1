@@ -14,28 +14,28 @@ param
     [Parameter(Mandatory)]
     [String]$DomainJoinUserPrincipalName,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$Environment,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$OUPath,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$StorageAccountResourceGroupName,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$StorageAccountName,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$StorageFileShareName,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$SubscriptionId,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$TenantId,
 
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory)]
     [String]$UserAssignedIdentityClientId
 )
 
