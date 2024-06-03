@@ -36,7 +36,7 @@ param
     [String]$TenantId,
 
     [Parameter(Mandatory)]
-    [String]$UserAssignedIdentityClientId
+    [String]$StorageSetupId
 )
 
 $ErrorActionPreference = 'Stop'
@@ -144,8 +144,8 @@ try {
     $AdminGroup = $Netbios + '\' + $AclAdmins
 
     # Connects to Azure using a User Assigned Managed Identity
-    Write-Log -Message "Authenticating to Azure: AccountID: $UserAsignedIdentityClientId | Environment: $Cloud | Tenant: $TenantId | Subscription: $SubscriptionId" -Type 'DEBUG'
-    Connect-AzAccount -Identity -AccountId $UserAssignedIdentityClientId -Environment $Cloud -Tenant $TenantId -Subscription $SubscriptionId | Out-Null
+    Write-Log -Message "Authenticating to Azure: AccountID: $StorageSetupId | Environment: $Cloud | Tenant: $TenantId | Subscription: $SubscriptionId" -Type 'DEBUG'
+    Connect-AzAccount -Identity -AccountId $StorageSetupId -Environment $Cloud -Tenant $TenantId -Subscription $SubscriptionId | Out-Null
     Write-Log -Message "Authenticated to Azure" -Type 'INFO'
 
     # Set Azure storage suffix

@@ -54,7 +54,7 @@ param vmAdminUsername string
 param vmAdminPassword string
 
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
-var Environment = environment().name
+
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts'  // URL with NO trailing slash
 var smbSettings =   storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? {
   authenticationMethods: 'NTLMv2;Kerberos'
@@ -307,7 +307,6 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     domainJoinOUPath: ouPath
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
-    environment: Environment
     location: location
     scriptLocation: scriptLocation
     storageSetupScript: storageSetupScript
@@ -330,5 +329,5 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
 }
 
 
-output Environment string = Environment
+
 output AccountId string = identityStorageSetup.properties.clientId
