@@ -308,8 +308,8 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
     location: location
-    scriptLocation: scriptLocation
-    storageSetupScript: storageSetupScript
+    storageSetupScriptUri: ['${scriptLocation}/${storageSetupScript}']
+    storageSetupScriptName: storageSetupScript
     storageSetupId: identityStorageSetup.properties.clientId
     storageAccountName: storageAcctName
     storageFileShareName: storageFileShareName

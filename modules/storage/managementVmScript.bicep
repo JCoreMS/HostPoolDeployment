@@ -10,8 +10,8 @@ param storageAccountName string
 param storageFileShareName string
 param storageResourceGroup string
 param storageSetupId string
-param scriptLocation string
-param storageSetupScript string
+param storageSetupScriptUri array
+param storageSetupScriptName string
 param tags object
 param tenantId string
 param timestamp string
@@ -19,7 +19,6 @@ param vmName string
 
 var cloud = environment().name
 var subscriptionId = subscription().subscriptionId
-var storageSetupScriptUri = ['${scriptLocation}/${storageSetupScript}']
 var scriptParams = '-OuPath ${domainJoinOUPath} -StorageAccountName ${storageAccountName} -StorageAccountResourceGroupName ${storageResourceGroup} -SubscriptionId ${subscriptionId} -TenantId ${tenantId} -AclUsers ${groupUsers} -AclAdmins ${groupAdmins} -StorageFileShareName ${storageFileShareName} -DomainJoinUserPrincipalName ${domainJoinUserName} -DomainJoinPassword ${domainJoinUserPassword} -StorageSetupId ${storageSetupId} -Cloud ${cloud}'
 
 resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2023-03-01' existing = {
@@ -38,14 +37,10 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     autoUpgradeMinorVersion: true
     settings: {
       timestamp: timestamp
+      fileUris: storageSetupScriptUri
     }
     protectedSettings: {
-      commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScript} ${scriptParams}'
-      fileUris: storageSetupScriptUri
-      managedIdentity: {
-        clientId: storageSetupId
-      }
+        commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScriptName} ${scriptParams}'
     }
   }
 }
-
