@@ -41,6 +41,9 @@ resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/exte
     }
     protectedSettings: {
         commandToExecute: 'powershell -ExecutionPolicy Unrestricted -File ${storageSetupScriptName} ${scriptParams}'
+        managedIdentity: {
+        clientId: storageSetupId
+      }
     }
   }
 }

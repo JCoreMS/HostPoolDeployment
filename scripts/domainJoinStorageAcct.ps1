@@ -147,8 +147,8 @@ try {
     $Cloud = $Cloud.ToString()
     $StorageSetupId = $StorageSetupId.ToString()
     # Connects to Azure using a User Assigned Managed Identity
-    Write-Log -Message "Authenticating to Azure ----> Environment: $Cloud | Tenant: $TenantId | Subscription: $SubscriptionId" -Type 'DEBUG'
-    Connect-AzAccount -Identity -Environment $Cloud -Tenant $TenantId -Subscription $SubscriptionId
+    Write-Log -Message "Authenticating to Azure ---> AccountID: $StorageSetupId | Environment: $Cloud | Tenant: $TenantId | Subscription: $SubscriptionId" -Type 'DEBUG'
+    Connect-AzAccount -Identity -AccountId $StorageSetupId -Environment $Cloud -Tenant $TenantId -Subscription $SubscriptionId
     Write-Log -Message "Authenticated to Azure" -Type 'INFO'
 
     # Set Azure storage suffix

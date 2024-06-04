@@ -319,7 +319,7 @@ module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
       RoleDescription: role.RoleDescription
       RoleName: role.RoleName
       PrincipalId: identityStorageSetup.properties.principalId
-      PrincipalType: 'UserPrincipal'
+      PrincipalType: 'ServicePrincipal'
     }
   }
 ]
