@@ -59,7 +59,7 @@ resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2022-11-01' =
   location: location
   tags: tags
   identity: {
-    type: 'SystemAssigned, UserAssigned'
+    type: 'UserAssigned'
     userAssignedIdentities: {
       '${assignedIdentityId}': {}
     }
@@ -135,8 +135,3 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
     }
   }
 }
-
-
-
-
-output vmPrincipalId string = virtualMachineStorMgmt.identity.principalId

@@ -136,9 +136,7 @@ try {
     $Netbios = $Domain.NetBIOSName
 
     Write-Log -Message "Created domain join credential object" -Type 'INFO'
-    
-    $FilesSuffix = '.file.' + $StorageSuffix
-    Write-Log -Message "Azure Files Suffix = $FilesSuffix" -Type 'INFO'
+
     ##############################################################
     #  Process Storage Resources
     ##############################################################
@@ -239,7 +237,7 @@ try {
 
     # Mount file share
     $FileShare = "\\" + $FileServer + "\" + $StorageFileShareName
-    Write-Log -Message "FileShare: $FileShare  |   FileServer:  $FileServer   |   Share:  $StorageFileShareName   |  FilesSuffix:  $FilesSuffix" -Type 'DEBUG'
+    Write-Log -Message "FileShare: $FileShare  | StorageKey: $Key" -Type 'DEBUG'
     New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $StorageKeyCredential | Out-Null
     Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
 
