@@ -1,3 +1,4 @@
+param assignedIdentityId string
 param domainJoinFQDN string
 param domainJoinOUPath string
 param domainJoinUserName string
@@ -58,7 +59,10 @@ resource virtualMachineStorMgmt 'Microsoft.Compute/virtualMachines@2022-11-01' =
   location: location
   tags: tags
   identity: {
-    type: 'SystemAssigned'
+    type: 'SystemAssigned, UserAssigned'
+    userAssignedIdentities: {
+      '${assignedIdentityId}': {}
+    }
   }
   properties: {
     hardwareProfile: {
