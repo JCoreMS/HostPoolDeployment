@@ -1,3 +1,5 @@
+targetScope = 'resourceGroup'
+
 param domainJoinUserName string
 
 @secure()
@@ -56,16 +58,25 @@ param vmAdminPassword string
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var roleAssignmentsList = [
   {
+    Scope: 'KeyVault'
     RoleDefinitionId: '81a9662b-bebf-436f-a333-f67b29880f12'
     RoleName: 'Storage Account Key Operator Service Role'
     RoleShortName: 'StorageAcctKeyOp'
     RoleDescription: 'Storage Account Key Operators are allowed to list and regenerate keys on Storage Accounts (VM: ${vmName})'
   }
   {
+    Scope: 'ResourceGroup'
     RoleDefinitionId: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
     RoleName: 'Contributor'
     RoleShortName: 'Contributor'
     RoleDescription: 'Allows the management VM (${vmName}) to domian join the storage account (${storageAcctName})'
+  }
+  {
+    Scope: 'StorageAccount'
+    RoleDefinitionId: 'a7264617-510b-434b-a828-9731dc254ea7'
+    RoleName: 'Storage File Data SMB Share Elevated Contributor'
+    RoleShortName: 'SMBElevatedContrib'
+    RoleDescription: 'Allows for read, write, delete and modify NTFS permission access in Azure Storage file shares over SMB'
   }
 ]
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts' // URL with NO trailing slash
@@ -85,6 +96,14 @@ var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'
     }
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 var tenantId = subscription().tenantId
+
+
+// Get existing Resource Group
+resource storageRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: storageResourceGroup
+  scope: subscription(storageAcctName)
+}
+
 
 // Create User Assigned Managed Identity
 resource identityStorageSetup 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -311,9 +330,9 @@ module managementVm './modules/storage/managementVm.bicep' = {
 module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
   for role in roleAssignmentsList: {
     name: 'linked_roleAssignmentVM-Storage-${role.RoleShortName}'
-    scope: resourceGroup(storageResourceGroup)
+    scope: role.Scope == 'StorageAccount' ? storageAccount : role.Scope == 'KeyVault' ? keyVault : storageRG
     params: {
-      ResourceName: vmName
+      ApplyToResourceName: vmName
       AccountId: storageAccount.id
       RoleDefinitionId: role.RoleDefinitionId
       RoleDescription: role.RoleDescription

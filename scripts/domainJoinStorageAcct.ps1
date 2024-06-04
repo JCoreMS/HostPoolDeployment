@@ -136,7 +136,9 @@ try {
     $Netbios = $Domain.NetBIOSName
 
     Write-Log -Message "Created domain join credential object" -Type 'INFO'
-
+    
+    $FilesSuffix = '.file.' + $StorageSuffix
+    Write-Log -Message "Azure Files Suffix = $FilesSuffix" -Type 'INFO'
     ##############################################################
     #  Process Storage Resources
     ##############################################################
