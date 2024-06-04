@@ -142,7 +142,7 @@ try {
     ##############################################################
     $UsersGroup = $Netbios + '\' + $AclUsers
     $AdminGroup = $Netbios + '\' + $AclAdmins
-    $SubscriptionId = tostring($SubscriptionId)
+    $SubscriptionId = $SubscriptionId.ToString()
     # Connects to Azure using a User Assigned Managed Identity
     Write-Log -Message "Authenticating to Azure: AccountID: $StorageSetupId | Environment: $Cloud | Tenant: $TenantId | Subscription: $SubscriptionId" -Type 'DEBUG'
     Connect-AzAccount -Identity -AccountId $StorageSetupId -Environment $Cloud -Tenant $TenantId -Subscription $SubscriptionId
