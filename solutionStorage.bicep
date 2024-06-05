@@ -86,13 +86,13 @@ var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'
       channelEncryption: 'AES-256-GCM'
       kerberosTicketEncryption: 'AES-256'
       mulitchannel: { enabled: true }
-      versions: 'SMB3.1.1'
+      versions: 'SMB3.0;SMB3.1.1'
     }
   : {
       authenticationMethods: 'NTLMv2;Kerberos'
       channelEncryption: 'AES-256-GCM'
       kerberosTicketEncryption: 'AES-256'
-      versions: 'SMB3.1.1'
+      versions: 'SMB3.0;SMB3.1.1'
     }
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 var tenantId = subscription().tenantId
