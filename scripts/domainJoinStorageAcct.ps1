@@ -176,22 +176,6 @@ try {
         $Key = $KerberosKey
         Write-Log -Message "Acquired Kerberos Key from Storage Account, $StorageAccountName." -Type 'INFO'
     }
-    
-    # Check File Share Security for NTLMv2 or mapping will fail
-    $FileShareSec = Get-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -StorageAccountName $StorageAccountName
-    If($FileShareSec.ProtocolSettings.Smb.AuthenticationMethods -notcontains 'NTLMv2'){
-        Write-Log -Message "Missing NTLMv2 property to allow mapping, setting temporarily..." -Type 'WARN'
-        Update-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -AccountName $StorageAccountName `
-            -SMBAuthenticationMethod Kerberos,NTLMv2 | Out-Null
-        $RemoveNTLMv2 = $true
-        }
-
-    # Mount file share
-    $FileShare = "\\" + $FileServer + "\" + $StorageFileShareName
-    Write-Log -Message "FileShare: $FileShare  | StorageKey: $Key" -Type 'DEBUG'
-    New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $StorageKeyCredential | Out-Null
-    Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
-
 
     # Creates a password for the Azure Storage Account in AD using the Kerberos key
     $ComputerPassword = ConvertTo-SecureString -String $Key.Replace("'","") -AsPlainText -Force
@@ -240,6 +224,22 @@ try {
     $NewPassword = ConvertTo-SecureString -String $Key -AsPlainText -Force
     Set-ADAccountPassword -Credential $DomainCredential -Identity $DistinguishedName -Reset -NewPassword $NewPassword | Out-Null
     Write-Log -Message "Setting the new Kerberos key on the Computer Object succeeded" -Type 'INFO'
+
+
+    # Check File Share Security for NTLMv2 or mapping will fail
+    $FileShareSec = Get-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -StorageAccountName $StorageAccountName
+    If($FileShareSec.ProtocolSettings.Smb.AuthenticationMethods -notcontains 'NTLMv2'){
+        Write-Log -Message "Missing NTLMv2 property to allow mapping, setting temporarily..." -Type 'WARN'
+        Update-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -AccountName $StorageAccountName `
+            -SMBAuthenticationMethod Kerberos,NTLMv2 | Out-Null
+        $RemoveNTLMv2 = $true
+        }
+
+    # Mount file share
+    $FileShare = "\\" + $FileServer + "\" + $StorageFileShareName
+    Write-Log -Message "FileShare: $FileShare  | StorageKey: $Key" -Type 'DEBUG'
+    New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $StorageKeyCredential | Out-Null
+    Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
 
 
     # Set recommended NTFS permissions on the file share
