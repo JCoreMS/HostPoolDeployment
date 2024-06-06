@@ -83,15 +83,15 @@ var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployme
 var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'
   ? {
       authenticationMethods: 'NTLMv2;Kerberos'
-      channelEncryption: 'AES-256-GCM'
-      kerberosTicketEncryption: 'AES-256'
+      channelEncryption: 'AES-256-GCM;AES-128-GCM;AES-128-CCM'
+      kerberosTicketEncryption: 'AES-256;RC4-HMAC'
       mulitchannel: { enabled: true }
       versions: 'SMB3.0;SMB3.1.1'
     }
   : {
       authenticationMethods: 'NTLMv2;Kerberos'
-      channelEncryption: 'AES-256-GCM'
-      kerberosTicketEncryption: 'AES-256'
+      channelEncryption: 'AES-256-GCM;AES-128-GCM;AES-128-CCM'
+      kerberosTicketEncryption: 'AES-256;RC4-HMAC'
       versions: 'SMB3.0;SMB3.1.1'
     }
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
@@ -206,7 +206,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: false
-    allowSharedKeyAccess: false
+    allowSharedKeyAccess: true
     defaultToOAuthAuthentication: false
     accessTier: 'Hot'
     publicNetworkAccess: 'Disabled'
