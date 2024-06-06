@@ -1,3 +1,4 @@
+targetScope = 'resourceGroup'
 
 param domainJoinOUPath string
 param domainJoinUserName string

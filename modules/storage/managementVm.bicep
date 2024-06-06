@@ -1,3 +1,5 @@
+targetScope = 'resourceGroup'
+
 param assignedIdentityId string
 param domainJoinFQDN string
 param domainJoinOUPath string
