@@ -1,0 +1,1828 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.26.170.59819",
+      "templateHash": "16986197156490271534"
+    }
+  },
+  "parameters": {
+    "AppGroupName": {
+      "type": "string",
+      "defaultValue": "none"
+    },
+    "AppGroupExisting": {
+      "type": "string",
+      "defaultValue": "none"
+    },
+    "AppGroupType": {
+      "type": "string",
+      "defaultValue": "Desktop",
+      "allowedValues": [
+        "Desktop",
+        "RailApplications"
+      ]
+    },
+    "avdOsImage": {
+      "type": "string",
+      "defaultValue": "win11_23h2_office",
+      "allowedValues": [
+        "win10_21h2",
+        "win10_21h2_office",
+        "win10_22h2_g2",
+        "win10_22h2_office_g2",
+        "win11_21h2",
+        "win11_21h2_office",
+        "win11_22h2",
+        "win11_22h2_office",
+        "win11_23h2",
+        "win11_23h2_office"
+      ]
+    },
+    "ComputeGalleryName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "ComputeGallerySubId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "ComputeGalleryRG": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "ComputeGalleryImage": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "CustomRdpProperty": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "DCRStatus": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "DCRNewName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "DCRExisting": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "dedicatedHostId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "dedicatedHostTagName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "DiskSku": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "StandardSSD_LRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS."
+      }
+    },
+    "DomainName": {
+      "type": "string"
+    },
+    "DomainUser": {
+      "type": "string"
+    },
+    "DomainPassword": {
+      "type": "securestring"
+    },
+    "ResourceGroupHP": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "ResGroupIdMonitor": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "HostPoolName": {
+      "type": "string",
+      "defaultValue": "none"
+    },
+    "HostPoolWorkspaceName": {
+      "type": "string",
+      "defaultValue": "none"
+    },
+    "RGVMsStatus": {
+      "type": "string",
+      "allowedValues": [
+        "New",
+        "Existing",
+        "Same"
+      ]
+    },
+    "ResourceGroupVMs": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "HostPoolOption": {
+      "type": "string",
+      "allowedValues": [
+        "New",
+        "Existing",
+        "AltTenant"
+      ],
+      "metadata": {
+        "description": "Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud."
+      }
+    },
+    "HostPoolRGStatus": {
+      "type": "string",
+      "defaultValue": "Existing"
+    },
+    "HostPoolKind": {
+      "type": "string",
+      "defaultValue": "Pooled",
+      "allowedValues": [
+        "Pooled",
+        "Personal"
+      ],
+      "metadata": {
+        "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
+      }
+    },
+    "HostPoolLBType": {
+      "type": "string",
+      "defaultValue": "DepthFirst",
+      "allowedValues": [
+        "DepthFirst",
+        "BreadthFirst",
+        "Automatic",
+        "Direct"
+      ],
+      "metadata": {
+        "description": "These options specify the host pool type and depending on the type provides the load balancing options and assignment types."
+      }
+    },
+    "HostPoolAltToken": {
+      "type": "securestring",
+      "defaultValue": ""
+    },
+    "KeyVaultDomainOption": {
+      "type": "bool"
+    },
+    "KeyVaultLocalOption": {
+      "type": "bool"
+    },
+    "KeyVaultDomResId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "KeyVaultLocResId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "KeyVaultDomName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "KeyVaultLocName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "Location": {
+      "type": "string",
+      "defaultValue": "[deployment().location]"
+    },
+    "LogAnalyticsWorkspaceName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "LogAnalyticsSubId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "LogAnalyticsRG": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "NumSessionHosts": {
+      "type": "int"
+    },
+    "NumUsersPerHost": {
+      "type": "int",
+      "defaultValue": 0
+    },
+    "PostDeployContainerId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "PostDeployOption": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "PostDeployScript": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "PostDeployOptVDOT": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "Restart": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "Subnet": {
+      "type": "string"
+    },
+    "Tags": {
+      "type": "object",
+      "defaultValue": {}
+    },
+    "Timestamp": {
+      "type": "string",
+      "defaultValue": "[utcNow()]"
+    },
+    "UpdateWindows": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "UserIdentityName": {
+      "type": "string",
+      "defaultValue": "none"
+    },
+    "StartVmOnConnect": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "OUPath": {
+      "type": "string"
+    },
+    "UseCustomImage": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Optional. Set to deploy image from Azure Compute Gallery. (Default: false)"
+      }
+    },
+    "VmIndexStart": {
+      "type": "int",
+      "maxValue": 99
+    },
+    "VmPrefix": {
+      "type": "string",
+      "maxLength": 13
+    },
+    "ValidationEnvironment": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "The value determines whether the hostpool should receive early AVD updates for testing."
+      }
+    },
+    "VirtualNetwork": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual network for the AVD sessions hosts"
+      }
+    },
+    "VirtualNetworkResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Virtual network resource group for the AVD sessions hosts"
+      }
+    },
+    "VmPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Local administrator password for the AVD session hosts"
+      }
+    },
+    "VmSize": {
+      "type": "string",
+      "metadata": {
+        "description": "The VM SKU for the AVD session hosts."
+      }
+    },
+    "VmUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The Local Administrator Username for the Session Hosts"
+      }
+    }
+  },
+  "variables": {
+    "MaxResourcesPerTemplateDeployment": 79,
+    "DivisionValue": "[div(parameters('NumSessionHosts'), variables('MaxResourcesPerTemplateDeployment'))]",
+    "DivisionRemainderValue": "[mod(parameters('NumSessionHosts'), variables('MaxResourcesPerTemplateDeployment'))]",
+    "SessionHostBatchCount": "[if(greater(variables('DivisionRemainderValue'), 0), add(variables('DivisionValue'), 1), variables('DivisionValue'))]",
+    "varAvdAgentPackageLocation": "[format('https://wvdportalstorageblob.blob.{0}/galleryartifacts/Configuration_1.0.02454.213.zip', environment().suffixes.storage)]",
+    "HostPoolType": "[format('{0} {1}', parameters('HostPoolKind'), parameters('HostPoolLBType'))]",
+    "varKvDomSubId": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[2], 'none')]",
+    "varKvLocSubId": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[2], 'none')]",
+    "varKvNameDom": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[8], 'none')]",
+    "varKvNameLoc": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[8], 'none')]",
+    "varKvDomRg": "[if(parameters('KeyVaultDomainOption'), split(parameters('KeyVaultDomResId'), '/')[4], 'none')]",
+    "varKvLocRg": "[if(parameters('KeyVaultLocalOption'), split(parameters('KeyVaultLocResId'), '/')[4], 'none')]",
+    "PostDeployContainerName": "[if(parameters('PostDeployOption'), split(parameters('PostDeployContainerId'), '/')[12], '')]",
+    "PostDeployStorName": "[if(parameters('PostDeployOption'), split(parameters('PostDeployContainerId'), '/')[8], '')]",
+    "PostDeployStorRG": "[if(parameters('PostDeployOption'), split(parameters('PostDeployContainerId'), '/')[4], '')]",
+    "PostDeployEndpoint": "[if(parameters('PostDeployOption'), format('https://{0}.blob.{1}/{2}', variables('PostDeployStorName'), environment().suffixes.storage, variables('PostDeployContainerName')), '')]",
+    "DedicatedHostRG": "[if(not(empty(parameters('dedicatedHostId'))), split(parameters('dedicatedHostId'), '/')[4], '')]",
+    "DCRExistingName": "[if(not(empty(parameters('DCRExisting'))), split(parameters('DCRExisting'), '/')[8], '')]",
+    "RoleAssignments": {
+      "BlobDataRead": {
+        "Name": "Blob-Data-Reader",
+        "GUID": "2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
+      },
+      "ARMRead": {
+        "Name": "ARM-Reader",
+        "GUID": "acdd72a7-3385-48ef-bd42-f606fba81ae7"
+      }
+    },
+    "varMarketPlaceGalleryWindows": {
+      "win10_22h2_g2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "windows-10",
+        "sku": "win10-22h2-avd-g2",
+        "version": "latest"
+      },
+      "win10_22h2_office_g2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win10-21h2-avd-m365-g2",
+        "version": "latest"
+      },
+      "win11_21h2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "Windows-11",
+        "sku": "win11-21h2-avd",
+        "version": "latest"
+      },
+      "win11_21h2_office": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win11-21h2-avd-m365",
+        "version": "latest"
+      },
+      "win11_22h2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "Windows-11",
+        "sku": "win11-22h2-avd",
+        "version": "latest"
+      },
+      "win11_22h2_office": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win11-22h2-avd-m365",
+        "version": "latest"
+      },
+      "win11_23h2": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "Windows-11",
+        "sku": "win11-23h2-avd",
+        "version": "latest"
+      },
+      "win11_23h2_office": {
+        "publisher": "MicrosoftWindowsDesktop",
+        "offer": "office-365",
+        "sku": "win11-23h2-avd-m365",
+        "version": "latest"
+      },
+      "winServer_2022_Datacenter": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter",
+        "version": "latest"
+      },
+      "winServer_2022_datacenter_core": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter-core",
+        "version": "latest"
+      },
+      "winServer_2022_datacenter_azure_edition_core": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter-azure-edition-core",
+        "version": "latest"
+      },
+      "winServer_2022_Datacenter_core_smalldisk_g2": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2022-datacenter-core-smalldisk-g2",
+        "version": "latest"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_ResourceGroupHP",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "RGName": {
+            "value": "[parameters('ResourceGroupHP')]"
+          },
+          "RGStatus": {
+            "value": "[parameters('HostPoolRGStatus')]"
+          },
+          "Tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), createObject('value', parameters('Tags')['Microsoft.Resources/resourceGroups']), createObject('value', createObject()))]"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "6286527708151898998"
+            }
+          },
+          "parameters": {
+            "RGName": {
+              "type": "string"
+            },
+            "RGStatus": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[equals(parameters('RGStatus'), 'New')]",
+              "type": "Microsoft.Resources/resourceGroups",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('RGName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]"
+            }
+          ],
+          "outputs": {
+            "resourceGroupId": {
+              "type": "string",
+              "value": "[if(equals(parameters('RGStatus'), 'Existing'), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_ResourceGroupVMs",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "RGName": {
+            "value": "[parameters('ResourceGroupVMs')]"
+          },
+          "RGStatus": {
+            "value": "[parameters('RGVMsStatus')]"
+          },
+          "Tags": "[if(contains(parameters('Tags'), 'Microsoft.Resources/resourceGroups'), createObject('value', parameters('Tags')['Microsoft.Resources/resourceGroups']), createObject('value', createObject()))]"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "6286527708151898998"
+            }
+          },
+          "parameters": {
+            "RGName": {
+              "type": "string"
+            },
+            "RGStatus": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[equals(parameters('RGStatus'), 'New')]",
+              "type": "Microsoft.Resources/resourceGroups",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('RGName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]"
+            }
+          ],
+          "outputs": {
+            "resourceGroupId": {
+              "type": "string",
+              "value": "[if(equals(parameters('RGStatus'), 'Existing'), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')), subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('RGName')))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "condition": "[parameters('PostDeployOption')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_UserIdentityCreateAssign",
+      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "PostDeployOption": {
+            "value": "[parameters('PostDeployOption')]"
+          },
+          "PostDeployStorRG": {
+            "value": "[variables('PostDeployStorRG')]"
+          },
+          "PostDeployStorName": {
+            "value": "[variables('PostDeployStorName')]"
+          },
+          "RoleAssignments": {
+            "value": "[variables('RoleAssignments')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "UserIdentityName": {
+            "value": "[parameters('UserIdentityName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "6677134435063180403"
+            }
+          },
+          "parameters": {
+            "Location": {
+              "type": "string"
+            },
+            "PostDeployOption": {
+              "type": "bool"
+            },
+            "PostDeployStorName": {
+              "type": "string"
+            },
+            "PostDeployStorRG": {
+              "type": "string"
+            },
+            "RoleAssignments": {
+              "type": "object"
+            },
+            "Tags": {
+              "type": "object"
+            },
+            "UserIdentityName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "condition": "[parameters('PostDeployOption')]",
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2018-11-30",
+              "name": "[parameters('UserIdentityName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.ManagedIdentity/userAssignedIdentities'), parameters('Tags')['Microsoft.ManagedIdentity/userAssignedIdentities'], createObject())]"
+            },
+            {
+              "condition": "[parameters('PostDeployOption')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "linked_assignUserIDRole",
+              "resourceGroup": "[parameters('PostDeployStorRG')]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "PostDeployStorName": {
+                    "value": "[parameters('PostDeployStorName')]"
+                  },
+                  "UserIdentityName": {
+                    "value": "[parameters('UserIdentityName')]"
+                  },
+                  "RoleAssignments": {
+                    "value": "[parameters('RoleAssignments')]"
+                  },
+                  "UserIdentityPrincipalId": {
+                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName')), '2018-11-30').principalId]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.26.170.59819",
+                      "templateHash": "15416411500556387544"
+                    }
+                  },
+                  "parameters": {
+                    "PostDeployStorName": {
+                      "type": "string"
+                    },
+                    "RoleAssignments": {
+                      "type": "object"
+                    },
+                    "UserIdentityName": {
+                      "type": "string"
+                    },
+                    "UserIdentityPrincipalId": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "copy": {
+                        "name": "roleAssignment",
+                        "count": "[length(items(parameters('RoleAssignments')))]"
+                      },
+                      "type": "Microsoft.Authorization/roleAssignments",
+                      "apiVersion": "2022-04-01",
+                      "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('PostDeployStorName'))]",
+                      "name": "[guid(subscription().id, parameters('UserIdentityPrincipalId'), items(parameters('RoleAssignments'))[copyIndex()].value.GUID)]",
+                      "properties": {
+                        "description": "[format('Provides User Identity {0} read access for post deployment scripts.', parameters('UserIdentityName'))]",
+                        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', items(parameters('RoleAssignments'))[copyIndex()].value.GUID)]",
+                        "principalId": "[parameters('UserIdentityPrincipalId')]",
+                        "principalType": "ServicePrincipal"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "userIdentityResId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName'))]"
+            },
+            "userIdentityObjId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('UserIdentityName')), '2018-11-30').principalId]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_ResourceGroupHP')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_logAnalyticsWorkspace",
+      "subscriptionId": "[parameters('LogAnalyticsSubId')]",
+      "resourceGroup": "[parameters('LogAnalyticsRG')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "LogAnalyticsWorkspaceName": {
+            "value": "[parameters('LogAnalyticsWorkspaceName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "2335620364263170867"
+            }
+          },
+          "parameters": {
+            "LogAnalyticsWorkspaceName": {
+              "type": "string"
+            }
+          },
+          "resources": [],
+          "outputs": {
+            "logAnalyticsId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('LogAnalyticsWorkspaceName'))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "condition": "[not(equals(parameters('HostPoolOption'), 'AltTenant'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_HostPoolDeployment",
+      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AppGroupName": {
+            "value": "[parameters('AppGroupName')]"
+          },
+          "AppGroupType": {
+            "value": "[parameters('AppGroupType')]"
+          },
+          "ComputeGalleryImageId": {
+            "value": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1])]"
+          },
+          "CustomRdpProperty": {
+            "value": "[parameters('CustomRdpProperty')]"
+          },
+          "DiskSku": {
+            "value": "[parameters('DiskSku')]"
+          },
+          "DomainName": {
+            "value": "[parameters('DomainName')]"
+          },
+          "HostPoolStatus": {
+            "value": "[parameters('HostPoolOption')]"
+          },
+          "HostPoolName": {
+            "value": "[parameters('HostPoolName')]"
+          },
+          "HostPoolType": {
+            "value": "[variables('HostPoolType')]"
+          },
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "NumUsersPerHost": {
+            "value": "[parameters('NumUsersPerHost')]"
+          },
+          "StartVmOnConnect": {
+            "value": "[parameters('StartVmOnConnect')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "UseCustomImage": {
+            "value": "[parameters('UseCustomImage')]"
+          },
+          "ValidationEnvironment": {
+            "value": "[parameters('ValidationEnvironment')]"
+          },
+          "vmImage": {
+            "value": "[variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]]"
+          },
+          "VmPrefix": {
+            "value": "[parameters('VmPrefix')]"
+          },
+          "VmSize": {
+            "value": "[parameters('VmSize')]"
+          },
+          "HostPoolWorkspaceName": {
+            "value": "[parameters('HostPoolWorkspaceName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "4725487355362794897"
+            }
+          },
+          "parameters": {
+            "AppGroupName": {
+              "type": "string"
+            },
+            "AppGroupType": {
+              "type": "string"
+            },
+            "CustomRdpProperty": {
+              "type": "string"
+            },
+            "DiskSku": {
+              "type": "string"
+            },
+            "DomainName": {
+              "type": "string"
+            },
+            "HostPoolStatus": {
+              "type": "string"
+            },
+            "HostPoolName": {
+              "type": "string"
+            },
+            "HostPoolType": {
+              "type": "string"
+            },
+            "HostPoolWorkspaceName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "NumUsersPerHost": {
+              "type": "int"
+            },
+            "Tags": {
+              "type": "object"
+            },
+            "Timestamp": {
+              "type": "string",
+              "defaultValue": "[utcNow('u')]"
+            },
+            "UseCustomImage": {
+              "type": "bool"
+            },
+            "StartVmOnConnect": {
+              "type": "bool"
+            },
+            "ComputeGalleryImageId": {
+              "type": "string"
+            },
+            "vmImage": {
+              "type": "object"
+            },
+            "VmPrefix": {
+              "type": "string"
+            },
+            "ValidationEnvironment": {
+              "type": "bool"
+            },
+            "VmSize": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "vmImagePub": "[parameters('vmImage').publisher]",
+            "vmOffer": "[parameters('vmImage').offer]",
+            "vmSKU": "[parameters('vmImage').sku]",
+            "vmGalleryItemId": "[format('{0}.{1}{2}', variables('vmImagePub'), variables('vmOffer'), variables('vmSKU'))]",
+            "vmTemplateMS": "[format('{{\"domain\":\"{0}\",\"galleryImageOffer\":\"{1}\",\"galleryImagePublisher\":\"{2}\",\"galleryImageSKU\":\"{3}\",\"imageType\":\"Gallery\",\"customImageId\":null,\"namePrefix\":\"{4}\",\"osDiskType\":\"{5}\",\"vmSize\":{{\"id\":\"{6}\",\"cores\":null,\"ram\":null}},\"galleryItemId\":\"{7}\",\"hibernate\":false,\"diskSizeGB\":0,\"securityType\":\"TrustedLaunch\",\"secureBoot\":true,\"vTPM\":true}}', parameters('DomainName'), variables('vmOffer'), variables('vmImagePub'), variables('vmSKU'), parameters('VmPrefix'), parameters('DiskSku'), parameters('VmSize'), variables('vmGalleryItemId'))]",
+            "vmTemplateCompGal": "[format('{{\"domain\":\"{0}\",\"galleryImageOffer\":null,\"galleryImagePublisher\":null,\"galleryImageSKU\":null,\"imageType\":\"CustomImage\",\"imageUri\":null,\"customImageId\":\"{1}\",\"namePrefix\":\"{2}\",\"osDiskType\":\"{3}\",\"useManagedDisks\":true,\"vmSize\":{{\"id\":\"{4}\",\"cores\":null,\"ram\":null}},\"galleryItemId\":null}}', parameters('DomainName'), parameters('ComputeGalleryImageId'), parameters('VmPrefix'), parameters('DiskSku'), parameters('VmSize'))]",
+            "vmTemplate": "[if(parameters('UseCustomImage'), variables('vmTemplateCompGal'), variables('vmTemplateMS'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DesktopVirtualization/hostPools",
+              "apiVersion": "2022-10-14-preview",
+              "name": "[parameters('HostPoolName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/hostPools'), parameters('Tags')['Microsoft.DesktopVirtualization/hostPools'], createObject())]",
+              "properties": {
+                "hostPoolType": "[split(parameters('HostPoolType'), ' ')[0]]",
+                "maxSessionLimit": "[parameters('NumUsersPerHost')]",
+                "loadBalancerType": "[if(contains(parameters('HostPoolType'), 'Pooled'), split(parameters('HostPoolType'), ' ')[1], 'Persistent')]",
+                "validationEnvironment": "[parameters('ValidationEnvironment')]",
+                "registrationInfo": {
+                  "expirationTime": "[dateTimeAdd(parameters('Timestamp'), 'PT2H')]",
+                  "registrationTokenOperation": "Update"
+                },
+                "preferredAppGroupType": "[parameters('AppGroupType')]",
+                "customRdpProperty": "[parameters('CustomRdpProperty')]",
+                "personalDesktopAssignmentType": "[if(contains(parameters('HostPoolType'), 'Personal'), split(parameters('HostPoolType'), ' ')[1], null())]",
+                "startVMOnConnect": "[parameters('StartVmOnConnect')]",
+                "vmTemplate": "[variables('vmTemplate')]"
+              }
+            },
+            {
+              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
+              "type": "Microsoft.DesktopVirtualization/applicationGroups",
+              "apiVersion": "2022-10-14-preview",
+              "name": "[parameters('AppGroupName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/applicationGroups'), parameters('Tags')['Microsoft.DesktopVirtualization/applicationGroups'], createObject())]",
+              "properties": {
+                "hostPoolArmPath": "[resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))]",
+                "applicationGroupType": "Desktop"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))]"
+              ]
+            },
+            {
+              "condition": "[not(equals(parameters('HostPoolWorkspaceName'), 'none'))]",
+              "type": "Microsoft.DesktopVirtualization/workspaces",
+              "apiVersion": "2022-10-14-preview",
+              "name": "[parameters('HostPoolWorkspaceName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/workspaces'), parameters('Tags')['Microsoft.DesktopVirtualization/workspaces'], createObject())]",
+              "properties": {
+                "applicationGroupReferences": [
+                  "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', parameters('AppGroupName'))]"
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', parameters('AppGroupName'))]",
+                "[resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "HostPoolRegistrationToken": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token]"
+            },
+            "ComputeImageGalleryID": {
+              "type": "string",
+              "value": "[parameters('ComputeGalleryImageId')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_ResourceGroupHP')]"
+      ]
+    },
+    {
+      "condition": "[not(equals(parameters('HostPoolOption'), 'AltTenant'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_Diagnostics_Setup",
+      "resourceGroup": "[parameters('ResourceGroupHP')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "DCRStatus": {
+            "value": "[parameters('DCRStatus')]"
+          },
+          "DCRNewName": {
+            "value": "[parameters('DCRNewName')]"
+          },
+          "DCRExisting": {
+            "value": "[parameters('DCRExisting')]"
+          },
+          "HostPoolStatus": {
+            "value": "[parameters('HostPoolOption')]"
+          },
+          "HostPoolName": {
+            "value": "[parameters('HostPoolName')]"
+          },
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "LogAnalyticsWorkspaceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
+          },
+          "HostPoolWorkspaceName": {
+            "value": "[parameters('HostPoolWorkspaceName')]"
+          },
+          "ResGroupIdMonitor": {
+            "value": "[parameters('ResGroupIdMonitor')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "3610690398620404121"
+            }
+          },
+          "parameters": {
+            "DCRStatus": {
+              "type": "string"
+            },
+            "DCRNewName": {
+              "type": "string"
+            },
+            "DCRExisting": {
+              "type": "string"
+            },
+            "HostPoolStatus": {
+              "type": "string"
+            },
+            "HostPoolName": {
+              "type": "string"
+            },
+            "HostPoolWorkspaceName": {
+              "type": "string"
+            },
+            "LogAnalyticsWorkspaceId": {
+              "type": "string"
+            },
+            "ResGroupIdMonitor": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "variables": {
+            "PerfCounters": [
+              {
+                "streams": [
+                  "Microsoft-Perf"
+                ],
+                "samplingFrequencyInSeconds": 30,
+                "counterSpecifiers": [
+                  "\\LogicalDisk(C:)\\Avg. Disk Queue Length",
+                  "\\LogicalDisk(C:)\\Current Disk Queue Length",
+                  "\\Memory\\Available Mbytes",
+                  "\\Memory\\Page Faults/sec",
+                  "\\Memory\\Pages/sec",
+                  "\\Memory\\% Committed Bytes In Use",
+                  "\\PhysicalDisk(*)\\Avg. Disk Queue Length",
+                  "\\PhysicalDisk(*)\\Avg. Disk sec/Read",
+                  "\\PhysicalDisk(*)\\Avg. Disk sec/Transfer",
+                  "\\PhysicalDisk(*)\\Avg. Disk sec/Write",
+                  "\\Processor Information(_Total)\\% Processor Time",
+                  "\\User Input Delay per Process(*)\\Max Input Delay",
+                  "\\User Input Delay per Session(*)\\Max Input Delay",
+                  "\\RemoteFX Network(*)\\Current TCP RTT",
+                  "\\RemoteFX Network(*)\\Current UDP Bandwidth"
+                ],
+                "name": "perfCounterDataSource10"
+              },
+              {
+                "streams": [
+                  "Microsoft-Perf"
+                ],
+                "samplingFrequencyInSeconds": 60,
+                "counterSpecifiers": [
+                  "\\LogicalDisk(C:)\\% Free Space",
+                  "\\LogicalDisk(C:)\\Avg. Disk sec/Transfer",
+                  "\\Terminal Services(*)\\Active Sessions",
+                  "\\Terminal Services(*)\\Inactive Sessions",
+                  "\\Terminal Services(*)\\Total Sessions"
+                ],
+                "name": "perfCounterDataSource30"
+              }
+            ],
+            "WinEvents": [
+              {
+                "streams": [
+                  "Microsoft-Event"
+                ],
+                "xPathQueries": [
+                  "Microsoft-Windows-TerminalServices-RemoteConnectionManager/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                  "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                  "System!*",
+                  "Microsoft-FSLogix-Apps/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                  "Application!*[System[(Level=2 or Level=3)]]",
+                  "Microsoft-FSLogix-Apps/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]"
+                ],
+                "name": "eventLogsDataSource"
+              }
+            ]
+          },
+          "resources": [
+            {
+              "condition": "[not(equals(parameters('HostPoolWorkspaceName'), 'none'))]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.DesktopVirtualization/workspaces/{0}', parameters('HostPoolWorkspaceName'))]",
+              "name": "WVDInsights",
+              "properties": {
+                "logs": [
+                  {
+                    "categoryGroup": "AllLogs",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
+              }
+            },
+            {
+              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.DesktopVirtualization/hostPools/{0}', parameters('HostPoolName'))]",
+              "name": "WVDInsights",
+              "properties": {
+                "logs": [
+                  {
+                    "categoryGroup": "AllLogs",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
+              }
+            }
+          ],
+          "outputs": {
+            "WorkspaceInfo": {
+              "type": "object",
+              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/workspaces', parameters('HostPoolWorkspaceName')), '2021-07-12', 'full')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_ResourceGroupHP')]"
+      ]
+    },
+    {
+      "condition": "[equals(parameters('DCRStatus'), 'New')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_DataCollectionRule",
+      "resourceGroup": "[parameters('ResGroupIdMonitor')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "DCRNewName": {
+            "value": "[parameters('DCRNewName')]"
+          },
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "LogAnalyticsWorkspaceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "3584347735454649760"
+            }
+          },
+          "parameters": {
+            "DCRNewName": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "LogAnalyticsWorkspaceId": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            }
+          },
+          "variables": {
+            "PerfCounters": [
+              {
+                "streams": [
+                  "Microsoft-Perf"
+                ],
+                "samplingFrequencyInSeconds": 30,
+                "counterSpecifiers": [
+                  "\\LogicalDisk(C:)\\Avg. Disk Queue Length",
+                  "\\LogicalDisk(C:)\\Current Disk Queue Length",
+                  "\\Memory\\Available Mbytes",
+                  "\\Memory\\Page Faults/sec",
+                  "\\Memory\\Pages/sec",
+                  "\\Memory\\% Committed Bytes In Use",
+                  "\\PhysicalDisk(*)\\Avg. Disk Queue Length",
+                  "\\PhysicalDisk(*)\\Avg. Disk sec/Read",
+                  "\\PhysicalDisk(*)\\Avg. Disk sec/Transfer",
+                  "\\PhysicalDisk(*)\\Avg. Disk sec/Write",
+                  "\\Processor Information(_Total)\\% Processor Time",
+                  "\\User Input Delay per Process(*)\\Max Input Delay",
+                  "\\User Input Delay per Session(*)\\Max Input Delay",
+                  "\\RemoteFX Network(*)\\Current TCP RTT",
+                  "\\RemoteFX Network(*)\\Current UDP Bandwidth"
+                ],
+                "name": "perfCounterDataSource10"
+              },
+              {
+                "streams": [
+                  "Microsoft-Perf"
+                ],
+                "samplingFrequencyInSeconds": 60,
+                "counterSpecifiers": [
+                  "\\LogicalDisk(C:)\\% Free Space",
+                  "\\LogicalDisk(C:)\\Avg. Disk sec/Transfer",
+                  "\\Terminal Services(*)\\Active Sessions",
+                  "\\Terminal Services(*)\\Inactive Sessions",
+                  "\\Terminal Services(*)\\Total Sessions"
+                ],
+                "name": "perfCounterDataSource30"
+              }
+            ],
+            "WinEvents": [
+              {
+                "streams": [
+                  "Microsoft-Event"
+                ],
+                "xPathQueries": [
+                  "Microsoft-Windows-TerminalServices-RemoteConnectionManager/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                  "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                  "System!*",
+                  "Microsoft-FSLogix-Apps/Operational!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]",
+                  "Application!*[System[(Level=2 or Level=3)]]",
+                  "Microsoft-FSLogix-Apps/Admin!*[System[(Level=2 or Level=3 or Level=4 or Level=0)]]"
+                ],
+                "name": "eventLogsDataSource"
+              }
+            ]
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Insights/dataCollectionRules",
+              "apiVersion": "2022-06-01",
+              "name": "[parameters('DCRNewName')]",
+              "location": "[parameters('Location')]",
+              "tags": "[parameters('Tags')]",
+              "kind": "Windows",
+              "properties": {
+                "dataSources": {
+                  "performanceCounters": "[variables('PerfCounters')]",
+                  "windowsEventLogs": "[variables('WinEvents')]"
+                },
+                "destinations": {
+                  "logAnalytics": [
+                    {
+                      "workspaceResourceId": "[parameters('LogAnalyticsWorkspaceId')]",
+                      "name": "la-workspace"
+                    }
+                  ]
+                },
+                "dataFlows": [
+                  {
+                    "streams": [
+                      "Microsoft-Perf",
+                      "Microsoft-Event"
+                    ],
+                    "destinations": [
+                      "la-workspace"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": {
+            "dataCollectionRuleId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('DCRNewName'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]"
+      ]
+    },
+    {
+      "condition": "[not(equals(parameters('dedicatedHostId'), ''))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "linked_dedicatedHostInfo",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "dedicatedHostId": {
+            "value": "[parameters('dedicatedHostId')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "14766711526201482909"
+            }
+          },
+          "parameters": {
+            "dedicatedHostId": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "DedicatedHostGroupName": "[split(parameters('dedicatedHostId'), '/')[8]]",
+            "DedicatedHostName": "[split(parameters('dedicatedHostId'), '/')[10]]",
+            "DedicatedHostRG": "[split(parameters('dedicatedHostId'), '/')[4]]"
+          },
+          "resources": [],
+          "outputs": {
+            "Hosts": {
+              "type": "array",
+              "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostRG')), 'Microsoft.Compute/hostGroups', variables('DedicatedHostGroupName')), '2020-12-01').hosts]"
+            },
+            "Zones": {
+              "type": "array",
+              "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostRG')), 'Microsoft.Compute/hostGroups', variables('DedicatedHostGroupName')), '2020-12-01', 'full').zones]"
+            },
+            "DedicatedHostRG": {
+              "type": "string",
+              "value": "[variables('DedicatedHostRG')]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "copy": {
+        "name": "virtualMachines",
+        "count": "[length(range(1, variables('SessionHostBatchCount')))]",
+        "mode": "serial",
+        "batchSize": 1
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('linked_VirtualMachines_batch_{0}', sub(range(1, variables('SessionHostBatchCount'))[copyIndex()], 1))]",
+      "resourceGroup": "[parameters('ResourceGroupVMs')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "AgentPackageLocation": {
+            "value": "[variables('varAvdAgentPackageLocation')]"
+          },
+          "ComputeGalleryImageId": "[if(parameters('UseCustomImage'), createObject('value', format('{0}/versions/latest', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]))), createObject('value', 'none'))]",
+          "ComputeGalleryProperties": "[if(parameters('UseCustomImage'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')), createObject('value', createObject()))]",
+          "DedicatedHostResId": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', parameters('dedicatedHostId')), createObject('value', ''))]",
+          "DedicatedHostTagName": "[if(not(empty(parameters('dedicatedHostTagName'))), createObject('value', parameters('dedicatedHostTagName')), createObject('value', ''))]",
+          "DomainUser": {
+            "value": "[parameters('DomainUser')]"
+          },
+          "DomainPassword": "[if(parameters('KeyVaultDomainOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvDomSubId'), variables('varKvDomRg')), 'Microsoft.KeyVault/vaults', variables('varKvNameDom'))), 'secretName', parameters('KeyVaultDomName'))), createObject('value', parameters('DomainPassword')))]",
+          "DomainName": {
+            "value": "[parameters('DomainName')]"
+          },
+          "HostPoolName": {
+            "value": "[parameters('HostPoolName')]"
+          },
+          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPoolOption'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
+          "Location": {
+            "value": "[parameters('Location')]"
+          },
+          "NumSessionHosts": {
+            "value": "[parameters('NumSessionHosts')]"
+          },
+          "MarketPlaceGalleryWindows": "[if(parameters('UseCustomImage'), createObject('value', createObject()), createObject('value', variables('varMarketPlaceGalleryWindows')[parameters('avdOsImage')]))]",
+          "OUPath": {
+            "value": "[parameters('OUPath')]"
+          },
+          "PostDeployEndpoint": "[if(parameters('PostDeployOption'), createObject('value', variables('PostDeployEndpoint')), createObject('value', ''))]",
+          "PostDeployScript": "[if(parameters('PostDeployOption'), createObject('value', parameters('PostDeployScript')), createObject('value', ''))]",
+          "PostDeployOptVDOT": "[if(parameters('PostDeployOption'), createObject('value', parameters('PostDeployOptVDOT')), createObject('value', false()))]",
+          "PostDeployOption": {
+            "value": "[parameters('PostDeployOption')]"
+          },
+          "Restart": {
+            "value": "[parameters('Restart')]"
+          },
+          "Subnet": {
+            "value": "[parameters('Subnet')]"
+          },
+          "Tags": {
+            "value": "[parameters('Tags')]"
+          },
+          "Timestamp": {
+            "value": "[parameters('Timestamp')]"
+          },
+          "UpdateWindows": {
+            "value": "[parameters('UpdateWindows')]"
+          },
+          "UseCustomImage": {
+            "value": "[parameters('UseCustomImage')]"
+          },
+          "UserIdentityResId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value), createObject('value', ''))]",
+          "UserIdentityObjId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityObjId.value), createObject('value', ''))]",
+          "VirtualNetwork": {
+            "value": "[parameters('VirtualNetwork')]"
+          },
+          "VirtualNetworkResourceGroup": {
+            "value": "[parameters('VirtualNetworkResourceGroup')]"
+          },
+          "VmIndexStart": {
+            "value": "[parameters('VmIndexStart')]"
+          },
+          "VmSize": {
+            "value": "[parameters('VmSize')]"
+          },
+          "VmUsername": {
+            "value": "[parameters('VmUsername')]"
+          },
+          "VmPassword": "[if(parameters('KeyVaultLocalOption'), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', variables('varKvLocSubId'), variables('varKvLocRg')), 'Microsoft.KeyVault/vaults', variables('varKvNameLoc'))), 'secretName', parameters('KeyVaultLocName'))), createObject('value', parameters('VmPassword')))]",
+          "VmPrefix": {
+            "value": "[parameters('VmPrefix')]"
+          },
+          "Zones": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_dedicatedHostInfo'), '2022-09-01').outputs.Zones.value), createObject('value', createArray()))]"
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "17780314986710485123"
+            }
+          },
+          "parameters": {
+            "AgentPackageLocation": {
+              "type": "string"
+            },
+            "ComputeGalleryImageId": {
+              "type": "string"
+            },
+            "ComputeGalleryProperties": {
+              "type": "object"
+            },
+            "DedicatedHostResId": {
+              "type": "string"
+            },
+            "DedicatedHostTagName": {
+              "type": "string"
+            },
+            "DomainName": {
+              "type": "securestring"
+            },
+            "DomainUser": {
+              "type": "string"
+            },
+            "DomainPassword": {
+              "type": "securestring"
+            },
+            "HostPoolName": {
+              "type": "string"
+            },
+            "HostPoolRegistrationToken": {
+              "type": "string"
+            },
+            "Location": {
+              "type": "string"
+            },
+            "NumSessionHosts": {
+              "type": "int"
+            },
+            "MarketPlaceGalleryWindows": {
+              "type": "object",
+              "metadata": {
+                "description": "Market Place OS image."
+              }
+            },
+            "PostDeployEndpoint": {
+              "type": "string"
+            },
+            "PostDeployScript": {
+              "type": "string"
+            },
+            "PostDeployOption": {
+              "type": "bool"
+            },
+            "PostDeployOptVDOT": {
+              "type": "bool"
+            },
+            "Restart": {
+              "type": "bool"
+            },
+            "Subnet": {
+              "type": "string"
+            },
+            "Tags": {
+              "type": "object"
+            },
+            "Timestamp": {
+              "type": "string"
+            },
+            "UpdateWindows": {
+              "type": "bool"
+            },
+            "UseCustomImage": {
+              "type": "bool",
+              "metadata": {
+                "description": "Optional. Set to deploy image from Azure Compute Gallery. (Default: false)"
+              }
+            },
+            "UserIdentityResId": {
+              "type": "string"
+            },
+            "UserIdentityObjId": {
+              "type": "string"
+            },
+            "OUPath": {
+              "type": "string"
+            },
+            "VirtualNetwork": {
+              "type": "string"
+            },
+            "VirtualNetworkResourceGroup": {
+              "type": "string"
+            },
+            "VmIndexStart": {
+              "type": "int"
+            },
+            "VmPrefix": {
+              "type": "string"
+            },
+            "VmSize": {
+              "type": "string"
+            },
+            "VmUsername": {
+              "type": "string"
+            },
+            "VmPassword": {
+              "type": "securestring"
+            },
+            "Zones": {
+              "type": "array"
+            }
+          },
+          "variables": {
+            "ImgDefSecType": "[parameters('ComputeGalleryProperties').features[0]]",
+            "SecurityType": "[if(contains(variables('ImgDefSecType').value, 'TrustedLaunch'), 'TrustedLaunch', 'Standard')]",
+            "securityProfileJson": {
+              "uefiSettings": {
+                "secureBootEnabled": true,
+                "vTpmEnabled": true
+              },
+              "securityType": "[variables('SecurityType')]"
+            },
+            "imageToUse": "[if(parameters('UseCustomImage'), createObject('id', parameters('ComputeGalleryImageId')), parameters('MarketPlaceGalleryWindows'))]",
+            "DedicatedHostName": "[if(not(empty(parameters('DedicatedHostResId'))), split(parameters('DedicatedHostResId'), '/')[10], '')]",
+            "vmTagDH": "[if(not(empty(parameters('DedicatedHostTagName'))), createObject('DedicatedHostTagName', variables('DedicatedHostName')), createObject())]",
+            "vmTags": "[if(not(empty(parameters('DedicatedHostTagName'))), union(variables('vmTagDH'), parameters('Tags')), parameters('Tags'))]"
+          },
+          "resources": [
+            {
+              "copy": {
+                "name": "networkInterface",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-11-01",
+              "name": "[format('nic-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Network/networkInterfaces'), parameters('Tags')['Microsoft.Network/networkInterfaces'], createObject())]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[resourceId(subscription().subscriptionId, parameters('VirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetwork'), parameters('Subnet'))]"
+                      },
+                      "primary": true,
+                      "privateIPAddressVersion": "IPv4"
+                    }
+                  }
+                ],
+                "enableAcceleratedNetworking": true,
+                "enableIPForwarding": false
+              }
+            },
+            {
+              "copy": {
+                "name": "virtualMachine",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2022-11-01",
+              "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(variables('vmTags'), 'Microsoft.Compute/virtualMachines'), variables('vmTags')['Microsoft.Compute/virtualMachines'], createObject())]",
+              "identity": "[if(parameters('PostDeployOption'), createObject('type', 'SystemAssigned, UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserIdentityResId')), createObject())), createObject('type', 'SystemAssigned'))]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('VmSize')]"
+                },
+                "storageProfile": {
+                  "imageReference": "[variables('imageToUse')]",
+                  "osDisk": {
+                    "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+                    "osType": "Windows",
+                    "createOption": "FromImage",
+                    "caching": "ReadOnly",
+                    "deleteOption": "Delete"
+                  },
+                  "dataDisks": []
+                },
+                "osProfile": {
+                  "computerName": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+                  "adminUsername": "[parameters('VmUsername')]",
+                  "adminPassword": "[parameters('VmPassword')]",
+                  "windowsConfiguration": {
+                    "provisionVMAgent": true,
+                    "enableAutomaticUpdates": false
+                  },
+                  "secrets": [],
+                  "allowExtensionOperations": true
+                },
+                "host": "[if(not(empty(parameters('DedicatedHostResId'))), createObject('id', parameters('DedicatedHostResId')), null())]",
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0')))]",
+                      "properties": {
+                        "deleteOption": "Delete"
+                      }
+                    }
+                  ]
+                },
+                "securityProfile": "[if(equals(variables('SecurityType'), 'TrustedLaunch'), variables('securityProfileJson'), null())]",
+                "diagnosticsProfile": {
+                  "bootDiagnostics": {
+                    "enabled": false
+                  }
+                },
+                "licenseType": "Windows_Client"
+              },
+              "zones": "[if(not(empty(parameters('Zones'))), parameters('Zones'), null())]",
+              "dependsOn": [
+                "networkInterface"
+              ]
+            },
+            {
+              "copy": {
+                "name": "extension_AzureMonitorWindowsAgent",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}{1}/AzureMonitorWindowsAgent', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
+              "properties": {
+                "publisher": "Microsoft.Azure.Monitor",
+                "type": "AzureMonitorWindowsAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "enableAutomaticUpgrade": true
+              },
+              "dependsOn": [
+                "virtualMachine"
+              ]
+            },
+            {
+              "copy": {
+                "name": "extension_JsonADDomainExtension",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}{1}/JsonADDomainExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
+              "properties": {
+                "forceUpdateTag": "[parameters('Timestamp')]",
+                "publisher": "Microsoft.Compute",
+                "type": "JsonADDomainExtension",
+                "typeHandlerVersion": "1.3",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "Name": "[parameters('DomainName')]",
+                  "User": "[parameters('DomainUser')]",
+                  "Restart": "true",
+                  "Options": "3",
+                  "OUPath": "[parameters('OUPath')]"
+                },
+                "protectedSettings": {
+                  "Password": "[parameters('DomainPassword')]"
+                }
+              },
+              "dependsOn": [
+                "extension_AzureMonitorWindowsAgent"
+              ]
+            },
+            {
+              "copy": {
+                "name": "extension_CustomScriptExtension",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "condition": "[parameters('PostDeployOption')]",
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}{1}/CustomScriptExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
+              "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "fileUris": [
+                    "[format('{0}/{1}', parameters('PostDeployEndpoint'), parameters('PostDeployScript'))]"
+                  ],
+                  "timestamp": "[parameters('Timestamp')]"
+                },
+                "protectedSettings": {
+                  "managedIdentity": {
+                    "objectId": "[parameters('UserIdentityObjId')]"
+                  },
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} -WindowsUpdate {1} -Restart {2} -VDOT {3}', parameters('PostDeployScript'), parameters('UpdateWindows'), parameters('Restart'), parameters('PostDeployOptVDOT'))]"
+                }
+              },
+              "dependsOn": [
+                "extension_JsonADDomainExtension"
+              ]
+            },
+            {
+              "copy": {
+                "name": "addToHostPool",
+                "count": "[length(range(0, parameters('NumSessionHosts')))]"
+              },
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-03-01",
+              "name": "[format('{0}{1}/HostPoolRegistration', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "location": "[parameters('Location')]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
+              "properties": {
+                "publisher": "Microsoft.PowerShell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.73",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "modulesUrl": "[parameters('AgentPackageLocation')]",
+                  "configurationFunction": "Configuration.ps1\\AddSessionHost",
+                  "properties": {
+                    "hostPoolName": "[parameters('HostPoolName')]",
+                    "registrationInfoToken": "[parameters('HostPoolRegistrationToken')]",
+                    "aadJoin": false
+                  }
+                }
+              },
+              "dependsOn": [
+                "extension_CustomScriptExtension",
+                "extension_JsonADDomainExtension"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_dedicatedHostInfo')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Diagnostics_Setup')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
+      ]
+    }
+  ]
+}
