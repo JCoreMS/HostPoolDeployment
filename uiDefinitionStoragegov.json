@@ -34,25 +34,6 @@
 							}
 						},
 						{
-							"name": "callGraphGroups",
-							"type": "Microsoft.Solutions.GraphApiControl",
-							"request": {
-								"method": "GET",
-								"path": "/v1.0/groups",
-								"transforms": {
-									"list": "value|[*].{label:displayName, value:displayName, description:description}"
-								}
-							}
-						},
-						{
-							"name": "callGraphTenant",
-							"type": "Microsoft.Solutions.GraphApiControl",
-							"request": {
-								"method": "GET",
-								"path": "/v1.0/organization"
-							}
-						},
-						{
 							"name": "storageAccountSelector",
 							"type": "Microsoft.Storage.StorageAccountSelector",
 							"label": "Storage account",
@@ -154,22 +135,20 @@
 						},
 						{
 							"name": "groupUsersName",
-							"type": "Microsoft.Common.DropDown",
+							"type": "Microsoft.Common.TextBox",
 							"label": "AVD Users Group",
-							"multiLine": true,
+							"toolTip": "Provide the name of the group that will be used for the AVD Users. This group will be used to set the NTFS Permissions on the File Share.",
 							"constraints": {
-								"required": true,
-								"allowedValues": "[coalesce(steps('basics').callGraphGroups.transformed.list, parse('[]'))]"
+								"required": true
 							}
 						},
 						{
 							"name": "groupAdminsName",
-							"type": "Microsoft.Common.DropDown",
+							"type": "Microsoft.Common.TextBox",
 							"label": "AVD Admins Group",
-							"multiLine": true,
+							"toolTip": "Provide the name of the group that will be used for the AVD Admins. This group will be used to set the NTFS Permissions on the File Share.",
 							"constraints": {
-								"required": true,
-								"allowedValues": "[coalesce(steps('basics').callGraphGroups.transformed.list, parse('[]'))]"
+								"required": true
 							}
 						}
 					]
