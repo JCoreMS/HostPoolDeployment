@@ -216,7 +216,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 // Assign Managed Identity to Storage Account
 resource assignIdentity2StorageSMB 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, 'assignIdentity2StorageSMB')
-  scope: keyVault
+  scope: storageAccount
   properties: {
     description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
     principalId: identityStorageSetup.properties.principalId
@@ -234,7 +234,7 @@ resource assignIdentity2StorageSMB 'Microsoft.Authorization/roleAssignments@2022
 // Assign Managed Identity to Storage Account
 resource assignIdentity2StorageRead 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, 'assignIdentity2StorageRead')
-  scope: keyVault
+  scope: storageAccount
   properties: {
     description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
     principalId: identityStorageSetup.properties.principalId
