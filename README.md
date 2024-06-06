@@ -26,6 +26,8 @@ This is what provides a way to reuse code by having an answer file sort of appro
 
 ## Deploy A Host Pool or Add Session Hosts
 
+If you need to deploy a Host Pool, add Session Hosts to an existing Host Pool and even deploy to either an alternate Tenant (including cross-cloud) as well as a Dedicated Host, you can utilize this deployment.
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2Fsolution.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinition.json) [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2Fsolution.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinition.json)
 
 ## Deploy Zero Trust Storage - AD Domain Joined Only
@@ -39,10 +41,11 @@ This will deploy the following considering Zero Trusts configuration:
 
 The overall solution provides a quick way to create a Storage Account for your FSLogix needs with an AD Domain Joined scenario and assumes you have a VNet with DNS to your Domain Controllers already configured. Additionally, you'll need to ensure you have an existing Private DNS Zone for Azure Files to store the endpoint created. Lastly, you'll need to ensure the deployment has access to this GitHub site in order to pull the needed "domainJoinStorage.ps1" script to the Management VM. 
 
-Note: Upon completion of the deployment, there will be a running VM that you'll need to shutdown or remove if not needed. Eventually there will be an update to provide an option for the following:
-a. Shutdown Management VM
-b. Remove/ Delete Management VM
-c. Additional Storage Scenarios (i.e. Entra ID Joined and Hybrid Joined)
+Note: Upon completion of the deployment, there will be a running VM that you'll need to shutdown or remove if not needed. Eventually there will be an update to provide an option for the following:  
+
+A. Shutdown Management VM  
+B. Remove/ Delete Management VM  
+C. Additional Storage Scenarios (i.e. Entra ID Joined and Hybrid Joined)  
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FsolutionStorage.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinitionStorage.json) [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FsolutionStorage.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinitionStorage.json)
 
