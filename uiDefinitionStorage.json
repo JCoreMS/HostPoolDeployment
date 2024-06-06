@@ -440,7 +440,6 @@
 		"outputs": {
 			"parameters": {
 				"domainJoinUserName": "[steps('domainJoinInfo').identityDomainCredentials.DomainUser]",
-				"domainJoinUserPassword": "[steps('domainJoinInfo').identityDomainCredentials.DomainPassword]",
 				"groupAdmins": "[steps('basics').groupAdminsName]",
 				"groupUsers": "[steps('basics').groupUsersName]",
 				"keyVaultName": "[steps('basics').keyVaultName]",
