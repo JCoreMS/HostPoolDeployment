@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "11660038562208632300"
+      "templateHash": "13897740257341719729"
     }
   },
   "parameters": {
@@ -95,7 +95,7 @@
   "variables": {
     "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
     "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
-    "smbSettings": "[if(or(equals(parameters('storageSKU'), 'Premium_LRS'), equals(parameters('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'NTLMv2;Kerberos', 'channelEncryption', 'AES-256-GCM;AES-128-GCM;AES-128-CCM', 'kerberosTicketEncryption', 'AES-256;RC4-HMAC', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'NTLMv2;Kerberos', 'channelEncryption', 'AES-256-GCM;AES-128-GCM;AES-128-CCM', 'kerberosTicketEncryption', 'AES-256;RC4-HMAC', 'versions', 'SMB3.0;SMB3.1.1'))]",
+    "smbSettings": "[if(or(equals(parameters('storageSKU'), 'Premium_LRS'), equals(parameters('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'versions', 'SMB3.0;SMB3.1.1'))]",
     "storageSetupScript": "domainJoinStorageAcct.ps1",
     "tenantId": "[subscription().tenantId]"
   },

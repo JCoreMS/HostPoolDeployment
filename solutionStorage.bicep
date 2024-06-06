@@ -60,16 +60,16 @@ var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts' // URL with NO trailing slash
 var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'
   ? {
-      authenticationMethods: 'NTLMv2;Kerberos'
-      channelEncryption: 'AES-256-GCM;AES-128-GCM;AES-128-CCM'
-      kerberosTicketEncryption: 'AES-256;RC4-HMAC'
+      authenticationMethods: 'Kerberos'
+      channelEncryption: 'AES-256-GCM'
+      kerberosTicketEncryption: 'AES-256'
       mulitchannel: { enabled: true }
       versions: 'SMB3.0;SMB3.1.1'
     }
   : {
-      authenticationMethods: 'NTLMv2;Kerberos'
-      channelEncryption: 'AES-256-GCM;AES-128-GCM;AES-128-CCM'
-      kerberosTicketEncryption: 'AES-256;RC4-HMAC'
+      authenticationMethods: 'Kerberos'
+      channelEncryption: 'AES-256-GCM'
+      kerberosTicketEncryption: 'AES-256'
       versions: 'SMB3.0;SMB3.1.1'
     }
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
