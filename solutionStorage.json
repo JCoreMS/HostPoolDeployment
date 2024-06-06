@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "5020389972657858566"
+      "templateHash": "9222001038934220658"
     }
   },
   "parameters": {
@@ -38,7 +38,10 @@
     "managedIdentityName": {
       "type": "string"
     },
-    "ouPath": {
+    "ouPathStorage": {
+      "type": "string"
+    },
+    "ouPathVm": {
       "type": "string"
     },
     "privateDNSZoneId": {
@@ -355,7 +358,7 @@
             "value": "[variables('domainJoinFQDN')]"
           },
           "domainJoinOUPath": {
-            "value": "[parameters('ouPath')]"
+            "value": "[parameters('ouPathStorage')]"
           },
           "domainJoinUserName": {
             "value": "[parameters('domainJoinUserName')]"
@@ -610,7 +613,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "8869462203632893604"
+              "templateHash": "15399082792000363237"
             }
           },
           "parameters": {
@@ -635,17 +638,13 @@
             "PrincipalType": {
               "type": "string",
               "defaultValue": "ServicePrincipal"
-            },
-            "Timestamp": {
-              "type": "string",
-              "defaultValue": "[utcNow('yyyy-MM-ddTHH:mm:ssZ')]"
             }
           },
           "resources": [
             {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
-              "name": "[guid(parameters('AccountId'), parameters('ApplyToResourceName'), parameters('RoleName'), parameters('Timestamp'))]",
+              "name": "[guid(parameters('AccountId'), parameters('ApplyToResourceName'), parameters('RoleName'))]",
               "properties": {
                 "description": "[parameters('RoleDescription')]",
                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
@@ -673,7 +672,7 @@
         "mode": "Incremental",
         "parameters": {
           "domainJoinOUPath": {
-            "value": "[parameters('ouPath')]"
+            "value": "[parameters('ouPathVm')]"
           },
           "domainJoinUserName": {
             "value": "[parameters('domainJoinUserName')]"
