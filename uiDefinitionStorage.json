@@ -447,7 +447,7 @@
 				"location": "[steps('basics').resourceScope.location.name]",
 				"managedIdentityName": "[steps('basics').identityName]",
 				"ouPathStorage": "[steps('domainJoinInfo').domainInformation.OUPathStorage]",
-				"ouPathVm": "[steps('mgmtVMInfo').ouPathVm]",
+				"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
 				"privateDNSZoneId": "[steps('basics').pvtDNSZone]",
 				"storageAcctName": "[steps('basics').storageAccountSelector.name]",
 				"storageFileShareName": "[steps('basics').shareName]",
