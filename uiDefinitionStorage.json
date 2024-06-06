@@ -445,9 +445,9 @@
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
 				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
 			},
-			"kind": "Subscription",
+			"kind": "ResourceGroup",
 			"location": "[steps('basics').resourceScope.location.name]",
-			"subscriptionId": "[steps('basics').resourceScope.subscription.id]"
+			"resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
 		}
 	}
 }
