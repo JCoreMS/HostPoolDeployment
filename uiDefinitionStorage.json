@@ -317,7 +317,7 @@
 								"validationMessage": ""
 							},
 							"visible": true
-						}
+						},
 						{
 							"name": "virtualNetworkSelection",
 							"type": "Microsoft.Solutions.ResourceSelector",
