@@ -7,7 +7,7 @@
 			"steps": [
 				{
 					"name": "basics",
-					"label": "Storage Setup",
+					"label": "Basics",
 					"elements": [
 						{
 							"name": "resourceScope",
