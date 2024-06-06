@@ -1265,7 +1265,6 @@
 				"StartVmOnConnect": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').StartVmOnConnect, steps('hostPool').hostPoolApi.properties.startVMOnConnect)]",
 				"UserIdentityName": "[steps('imageInfo').PostDeploySection.UserIdentityName]",
 				"OUPath": "[steps('hostInfo').domainInformation.OUPath]",
-				"VODT": "[steps('imageInfo').PostDeploySection.VDOT]",
 				"VmIndexStart": "[steps('hostInfo').vmInformation.VmIndexStart]",
 				"VmPrefix": "[steps('hostInfo').vmInformation.VmPrefix]",
 				"ValidationEnvironment": "[steps('hostPool').ValidationEnvironment]",
@@ -1273,8 +1272,7 @@
 				"VirtualNetworkResourceGroup": "[first(skip(split(steps('networking').virtualNetworkSelection.id, '/'),4))]",
 				"VmPassword": "[if(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityLocalCredentials.VmPassword.password)]",
 				"VmSize": "[steps('hostInfo').vmInformation.VmSize]",
-				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]",
-				"WorkspaceName": "[steps('hostPool').WorkspaceName]"
+				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]"
 			},
 			"kind": "Subscription",
 			"location": "[steps('basics').resourceScope.location.name]",
