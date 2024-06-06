@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "9222001038934220658"
+      "templateHash": "10145158347841314806"
     }
   },
   "parameters": {
@@ -101,13 +101,6 @@
         "RoleName": "Storage Account Key Operator Service Role",
         "RoleShortName": "StorageAcctKeyOp",
         "RoleDescription": "[format('Storage Account Key Operators are allowed to list and regenerate keys on Storage Accounts (VM: {0})', parameters('vmName'))]"
-      },
-      {
-        "Scope": "ResourceGroup",
-        "RoleDefinitionId": "b24988ac-6180-42a0-ab88-20f7382dd24c",
-        "RoleName": "Contributor",
-        "RoleShortName": "Contributor",
-        "RoleDescription": "[format('Allows the management VM ({0}) to domian join the storage account ({1})', parameters('vmName'), parameters('storageAcctName'))]"
       },
       {
         "Scope": "StorageAccount",
@@ -599,6 +592,10 @@
           "RoleName": {
             "value": "[variables('roleAssignmentsList')[copyIndex()].RoleName]"
           },
+          "Scope": {
+            "value": "[variables('roleAssignmentsList')[copyIndex()].Scope]"
+          },
+          "ScopeResourceId": "[if(equals(variables('roleAssignmentsList')[copyIndex()].Scope, 'StorageAccount'), createObject('value', resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))), if(equals(variables('roleAssignmentsList')[copyIndex()].Scope, 'KeyVault'), createObject('value', resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))), createObject('value', subscriptionResourceId(parameters('storageAcctName'), 'Microsoft.Resources/resourceGroups', parameters('storageResourceGroup')))))]",
           "PrincipalId": {
             "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]"
           },
@@ -613,7 +610,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "15399082792000363237"
+              "templateHash": "8931268839293707182"
             }
           },
           "parameters": {
@@ -632,6 +629,12 @@
             "RoleName": {
               "type": "string"
             },
+            "Scope": {
+              "type": "string"
+            },
+            "ScopeResourceId": {
+              "type": "string"
+            },
             "PrincipalId": {
               "type": "string"
             },
@@ -639,6 +642,9 @@
               "type": "string",
               "defaultValue": "ServicePrincipal"
             }
+          },
+          "variables": {
+            "resourceName": "[split(parameters('ScopeResourceId'), '/')[8]]"
           },
           "resources": [
             {

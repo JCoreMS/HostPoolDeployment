@@ -64,13 +64,13 @@ var roleAssignmentsList = [
     RoleShortName: 'StorageAcctKeyOp'
     RoleDescription: 'Storage Account Key Operators are allowed to list and regenerate keys on Storage Accounts (VM: ${vmName})'
   }
-  {
+/*   {
     Scope: 'ResourceGroup'
     RoleDefinitionId: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
     RoleName: 'Contributor'
     RoleShortName: 'Contributor'
     RoleDescription: 'Allows the management VM (${vmName}) to domian join the storage account (${storageAcctName})'
-  }
+  } */
   {
     Scope: 'StorageAccount'
     RoleDefinitionId: 'a7264617-510b-434b-a828-9731dc254ea7'
@@ -238,7 +238,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   dependsOn: [
     assignIdentity2Vault
-    identityStorageSetup
+    keyVaultKey
   ]
 }
 
@@ -337,6 +337,8 @@ module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
       RoleDefinitionId: role.RoleDefinitionId
       RoleDescription: role.RoleDescription
       RoleName: role.RoleName
+      Scope: role.Scope
+      ScopeResourceId: role.Scope == 'StorageAccount' ? storageAccount.id : role.Scope == 'KeyVault' ? keyVault.id : storageRG.id
       PrincipalId: identityStorageSetup.properties.principalId
       PrincipalType: 'ServicePrincipal'
     }
