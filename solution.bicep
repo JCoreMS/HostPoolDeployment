@@ -1,7 +1,6 @@
 targetScope = 'subscription'
 
 param AppGroupName string = 'none'
-param AppGroupExisting string = 'none'
 
 @allowed([
   'Desktop'
