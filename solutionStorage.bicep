@@ -241,8 +241,8 @@ resource assignIdentity2StorageRead 'Microsoft.Authorization/roleAssignments@202
     principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
-      'c12c1c16-33a1-487b-954d-41c89c60f349'
-    ) // Reader and Data Access (Storage)
+      '81a9662b-bebf-436f-a333-f67b29880f12'
+    ) // Storage Account Key Operator Service Role
   }
   dependsOn: [
     storageAccount

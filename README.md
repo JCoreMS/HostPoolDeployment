@@ -1,3 +1,4 @@
+
 # AVD Host Pool Deployment
 
 ## **NOTE: Beginning May 2023 to Aug 15, 2023 4pm EST this solution broke the ability to add Session Hosts via the AVD Portal!**  
