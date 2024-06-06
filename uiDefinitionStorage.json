@@ -7,7 +7,7 @@
 			"steps": [
 				{
 					"name": "basics",
-					"label": "Basics",
+					"label": "Storage Setup",
 					"elements": [
 						{
 							"name": "resourceScope",
@@ -184,7 +184,6 @@
 										"Microsoft.Storage/storageAccounts",
 										"Microsoft.Compute/virtualMachines",
 										"Microsoft.Network/networkInterfaces",
-										"Microsoft.Resources/resourceGroups",
 										"Microsoft.Network/privateEndpoints"
 									],
 									"visible": true
