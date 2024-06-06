@@ -18,7 +18,9 @@ param location string = resourceGroup().location
 
 param managedIdentityName string
 
-param ouPath string
+param ouPathStorage string
+
+param ouPathVm string
 
 param privateDNSZoneId string
 
@@ -313,7 +315,7 @@ module managementVm './modules/storage/managementVm.bicep' = {
   params: {
     assignedIdentityId: identityStorageSetup.id
     domainJoinFQDN: domainJoinFQDN
-    domainJoinOUPath: ouPath
+    domainJoinOUPath: ouPathStorage
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
     location: location
@@ -344,7 +346,7 @@ module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
 module managementVmScript './modules/storage/managementVmScript.bicep' = {
   name: 'managementVMscript'
   params: {
-    domainJoinOUPath: ouPath
+    domainJoinOUPath: ouPathVm
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
     location: location

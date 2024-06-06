@@ -171,24 +171,6 @@
 								"required": true,
 								"allowedValues": "[coalesce(steps('basics').callGraphGroups.transformed.list, parse('[]'))]"
 							}
-						},
-						{
-							"name": "TagsSection",
-							"type": "Microsoft.Common.Section",
-							"label": "Tags",
-							"elements": [
-								{
-									"name": "Tags",
-									"type": "Microsoft.Common.TagsByResource",
-									"resources": [
-										"Microsoft.Storage/storageAccounts",
-										"Microsoft.Compute/virtualMachines",
-										"Microsoft.Network/networkInterfaces",
-										"Microsoft.Network/privateEndpoints"
-									],
-									"visible": true
-								}
-							]
 						}
 					]
 				},
@@ -213,11 +195,11 @@
 									}
 								},
 								{
-									"name": "OUPath",
+									"name": "OUPathStorage",
 									"type": "Microsoft.Common.TextBox",
-									"label": "OU Path",
+									"label": "OU Path for Storage Account",
 									"defaultValue": "",
-									"placeholder": "OU=workstations,DC=contos,DC=com",
+									"placeholder": "OU=workstations,DC=contoso,DC=com",
 									"toolTip": "It's best to consider an OU with no or limited Group Policies for initial deployments. This value should be the distinguished name of the OU.",
 									"constraints": {
 										"required": true,
@@ -318,10 +300,24 @@
 							"visible": "true",
 							"constraints": {
 								"required": true,
-								"regex": "^[a-z0-9][a-z0-9-]{1,15}[a-z0-9]$",
+								"regex": "^[a-z0-9]{1,15}[a-z0-9]$",
 								"validationMessage": "Must be 1-15 characters and alphanumeric. Can contain hyphens. (non-consecutive)"
 							}
 						},
+						{
+							"name": "OUPathVm",
+							"type": "Microsoft.Common.TextBox",
+							"label": "OU Path for Management VM",
+							"defaultValue": "",
+							"placeholder": "OU=workstations,DC=contoso,DC=com",
+							"toolTip": "It's best to consider an OU with no or limited Group Policies for initial deployments. This value should be the distinguished name of the OU.",
+							"constraints": {
+								"required": true,
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": true
+						}
 						{
 							"name": "virtualNetworkSelection",
 							"type": "Microsoft.Solutions.ResourceSelector",
@@ -418,6 +414,24 @@
 									"osPlatform": "Windows"
 								}
 							]
+						},
+						{
+							"name": "TagsSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Tags",
+							"elements": [
+								{
+									"name": "Tags",
+									"type": "Microsoft.Common.TagsByResource",
+									"resources": [
+										"Microsoft.Storage/storageAccounts",
+										"Microsoft.Compute/virtualMachines",
+										"Microsoft.Network/networkInterfaces",
+										"Microsoft.Network/privateEndpoints"
+									],
+									"visible": true
+								}
+							]
 						}
 					]
 				}
@@ -432,7 +446,8 @@
 				"keyVaultName": "[steps('basics').keyVaultName]",
 				"location": "[steps('basics').resourceScope.location.name]",
 				"managedIdentityName": "[steps('basics').identityName]",
-				"ouPath": "[steps('domainJoinInfo').domainInformation.OUPath]",
+				"ouPathStorage": "[steps('domainJoinInfo').domainInformation.OUPathStorage]",
+				"ouPathVm": "[steps('mgmtVMInfo').ouPathVm]",
 				"privateDNSZoneId": "[steps('basics').pvtDNSZone]",
 				"storageAcctName": "[steps('basics').storageAccountSelector.name]",
 				"storageFileShareName": "[steps('basics').shareName]",
@@ -440,7 +455,7 @@
 				"storageShareSize": "[steps('basics').shareSize]",
 				"storageSKU": "[steps('basics').storageAccountSelector.type]",
 				"subnetId": "[steps('mgmtVMInfo').subnet]",
-				"tags": "[steps('basics').TagsSection.Tags]",
+				"tags": "[steps('mgmtVMInfo').TagsSection.Tags]",
 				"vmName": "[steps('mgmtVMInfo').vmName]",
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
 				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"

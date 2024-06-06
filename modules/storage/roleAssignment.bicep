@@ -7,11 +7,10 @@ param RoleDescription string
 param RoleName string
 param PrincipalId string
 param PrincipalType string = 'ServicePrincipal'
-param Timestamp string = utcNow('yyyy-MM-ddTHH:mm:ssZ')
 
 
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(AccountId, ApplyToResourceName, RoleName, Timestamp)
+  name: guid(AccountId, ApplyToResourceName, RoleName)
   properties: {
     description: RoleDescription
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', RoleDefinitionId)
