@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "13153974846965857828"
+      "templateHash": "275406954827786840"
     }
   },
   "parameters": {
@@ -264,7 +264,7 @@
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
-      "name": "[guid(subscription().subscriptionId, 'assignIdentity2Vault')]",
+      "name": "[guid(subscription().subscriptionId, 'assignIdentity2Storage')]",
       "properties": {
         "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
@@ -736,7 +736,7 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2Vault'))]",
+        "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2Storage'))]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
         "[resourceId('Microsoft.Resources/deployments', 'managementVm')]",
         "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[0], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[1], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[2])]"
