@@ -82,39 +82,51 @@ try {
         }
         else { $true }
 
-    Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'INFO'
+    Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'PRE-REQ'
 
-    Write-Log -Message "Verifying PowerShell Modules Needed" -Type 'INFO'
+    Write-Log -Message "Verifying PowerShell Modules Needed" -Type 'PRE-REQ'
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-    Write-Log -Message "...Checking and loading NuGet provider" -Type 'INFO'
+    Write-Log -Message "...Checking and loading NuGet provider" -Type 'PRE-REQ'
     $providers = get-packageprovider -ListAvailable
     If ($providers.Name -notcontains "NuGet") {
         Install-packageprovider -Name "NuGet" -Force | Out-Null
     }
-    else { Write-Log -Message "---NuGet provider already installed" -Type 'INFO' }
+    else { Write-Log -Message "---NuGet provider already installed" -Type 'PRE-REQ' }
 
-    Write-Log -Message "...Checking and installing RSAT for Active Directory" -Type 'INFO'
+    Write-Log -Message "...Checking and installing RSAT for Active Directory" -Type 'PRE-REQ'
     $RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where-Object DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State
     If ($RSATAD.State -eq "NotPresent") {
         Get-WindowsCapability -Name RSAT* -Online | Where-Object DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online
     }
-    else { Write-Log -Message "---RSAT for Active Directory already installed" -Type 'INFO' }
+    else { Write-Log -Message "---RSAT for Active Directory already installed" -Type 'PRE-REQ' }
 
     $modules = get-module -ListAvailable
 
-    Write-Log -Message "...Checking and loading ActiveDirectory Module" -Type 'INFO'
+    Write-Log -Message "...Checking and loading ActiveDirectory Module" -Type 'PRE-REQ'
     If ($modules.name -notcontains "ActiveDirectory") {
         Install-Module -Name "ActiveDirectory" -Force | Out-Null
     }
-    else { Write-Log -Message "---ActiveDirectory Module already installed" -Type 'INFO' }
+    else { Write-Log -Message "---ActiveDirectory Module already installed" -Type 'PRE-REQ' }
 
-    Write-Log -Message "...Checking and loading Az.Storage Module" -Type 'INFO'
+    Write-Log -Message "...Checking and loading Az.Storage Module" -Type 'PRE-REQ'
     If ($modules.name -notcontains "Az.Storage") {
         Install-Module -Name "Az.Storage" -Force | Out-Null
     }
-    else { Write-Log -Message "---Az.Storage Module already installed" -Type 'INFO' }
+    else { Write-Log -Message "---Az.Storage Module already installed" -Type 'PRE-REQ' }
+
+    # Disable Edge First Run
+    Write-Log -Message "Disable Edge First Run Experience via Registry" -Type 'PRE-REQ'
+    reg add HKLM\Software\Policies\Microsoft\Edge /v HideFirstRunExperience /t REG_DWORD /d 1 /f
+
+    # Disable Windows Welcome Screen
+    Write-Log -Message "Disable Windows Welcome Screen via Registry" -Type 'PRE-REQ'
+    reg add HKEY_USERS\.DEFAULT\Software\Policies\Microsoft\Windows\CloudContent /v disablewindowsSpotlightwindowswelcomeExperience /t REG_DWORD /d 1 /f
+    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement /v ScoobeSystemSettingEnabled /t REG_DWORD /d 0 /f
+    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager /v SubscribedContent-310093Enabled /t REG_DWORD /d 0 /f
+    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager /v SubscribedContent-338389Enabled /t REG_DWORD /d 0 /f
+    reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE /v DisablePrivacyExperience /t REG_DWORD /d 1 /f
 
 
     ##############################################################
@@ -262,7 +274,7 @@ try {
     # Unmount file share
     Remove-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Force | Out-Null
     Start-Sleep -Seconds 5 | Out-Null
-    Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
+    Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'CLEANUP'
 
     # Remove NTLMv2 if not pre-existing
     If($RemoveNTLMv2){

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "275406954827786840"
+      "templateHash": "998287654593603724"
     }
   },
   "parameters": {
@@ -94,22 +94,6 @@
   },
   "variables": {
     "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
-    "roleAssignmentsList": [
-      {
-        "Scope": "KeyVault",
-        "RoleDefinitionId": "81a9662b-bebf-436f-a333-f67b29880f12",
-        "RoleName": "Storage Account Key Operator Service Role",
-        "RoleShortName": "StorageAcctKeyOp",
-        "RoleDescription": "[format('Storage Account Key Operators are allowed to list and regenerate keys on Storage Accounts (VM: {0})', parameters('vmName'))]"
-      },
-      {
-        "Scope": "StorageAccount",
-        "RoleDefinitionId": "a7264617-510b-434b-a828-9731dc254ea7",
-        "RoleName": "Storage File Data SMB Share Elevated Contributor",
-        "RoleShortName": "SMBElevatedContrib",
-        "RoleDescription": "Allows for read, write, delete and modify NTFS permission access in Azure Storage file shares over SMB"
-      }
-    ],
     "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
     "smbSettings": "[if(or(equals(parameters('storageSKU'), 'Premium_LRS'), equals(parameters('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'NTLMv2;Kerberos', 'channelEncryption', 'AES-256-GCM;AES-128-GCM;AES-128-CCM', 'kerberosTicketEncryption', 'AES-256;RC4-HMAC', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'NTLMv2;Kerberos', 'channelEncryption', 'AES-256-GCM;AES-128-GCM;AES-128-CCM', 'kerberosTicketEncryption', 'AES-256;RC4-HMAC', 'versions', 'SMB3.0;SMB3.1.1'))]",
     "storageSetupScript": "domainJoinStorageAcct.ps1",
@@ -264,12 +248,29 @@
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
       "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
-      "name": "[guid(subscription().subscriptionId, 'assignIdentity2Storage')]",
+      "name": "[guid(subscription().subscriptionId, 'assignIdentity2StorageSMB')]",
       "properties": {
         "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
         "principalType": "ServicePrincipal",
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a7264617-510b-434b-a828-9731dc254ea7')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
+      "name": "[guid(subscription().subscriptionId, 'assignIdentity2StorageRead')]",
+      "properties": {
+        "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
+        "principalType": "ServicePrincipal",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'c12c1c16-33a1-487b-954d-41c89c60f349')]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
@@ -354,7 +355,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "managementVm",
+      "name": "linked_managementVm",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -585,7 +586,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "managementVMscript",
+      "name": "linked_managementVMscript",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -736,9 +737,10 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2Storage'))]",
+        "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2StorageRead'))]",
+        "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2StorageSMB'))]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-        "[resourceId('Microsoft.Resources/deployments', 'managementVm')]",
+        "[resourceId('Microsoft.Resources/deployments', 'linked_managementVm')]",
         "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[0], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[1], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[2])]"
       ]
     }

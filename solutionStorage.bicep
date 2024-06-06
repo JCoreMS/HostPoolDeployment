@@ -56,29 +56,7 @@ param vmAdminUsername string
 param vmAdminPassword string
 
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
-var roleAssignmentsList = [
-  {
-    Scope: 'KeyVault'
-    RoleDefinitionId: '81a9662b-bebf-436f-a333-f67b29880f12'
-    RoleName: 'Storage Account Key Operator Service Role'
-    RoleShortName: 'StorageAcctKeyOp'
-    RoleDescription: 'Storage Account Key Operators are allowed to list and regenerate keys on Storage Accounts (VM: ${vmName})'
-  }
-/*   {
-    Scope: 'ResourceGroup'
-    RoleDefinitionId: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
-    RoleName: 'Contributor'
-    RoleShortName: 'Contributor'
-    RoleDescription: 'Allows the management VM (${vmName}) to domian join the storage account (${storageAcctName})'
-  } */
-  {
-    Scope: 'StorageAccount'
-    RoleDefinitionId: 'a7264617-510b-434b-a828-9731dc254ea7'
-    RoleName: 'Storage File Data SMB Share Elevated Contributor'
-    RoleShortName: 'SMBElevatedContrib'
-    RoleDescription: 'Allows for read, write, delete and modify NTFS permission access in Azure Storage file shares over SMB'
-  }
-]
+
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts' // URL with NO trailing slash
 var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'
   ? {
@@ -96,13 +74,6 @@ var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'
     }
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 var tenantId = subscription().tenantId
-
-
-// Get existing Resource Group
-resource storageRG 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
-  name: storageResourceGroup
-  scope: subscription(storageAcctName)
-}
 
 
 // Create User Assigned Managed Identity
@@ -243,8 +214,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 }
 
 // Assign Managed Identity to Storage Account
-resource assignIdentity2Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, 'assignIdentity2Storage')
+resource assignIdentity2StorageSMB 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, 'assignIdentity2StorageSMB')
   scope: keyVault
   properties: {
     description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
@@ -259,6 +230,25 @@ resource assignIdentity2Storage 'Microsoft.Authorization/roleAssignments@2022-04
     storageAccount
   ]
 }
+
+// Assign Managed Identity to Storage Account
+resource assignIdentity2StorageRead 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, 'assignIdentity2StorageRead')
+  scope: keyVault
+  properties: {
+    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
+    principalId: identityStorageSetup.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'c12c1c16-33a1-487b-954d-41c89c60f349'
+    ) // Reader and Data Access (Storage)
+  }
+  dependsOn: [
+    storageAccount
+  ]
+}
+
 
 // Private Endpoint for Storage Account
 resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
@@ -330,7 +320,7 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
 //     System Managed Identity to access storage
 
 module managementVm './modules/storage/managementVm.bicep' = {
-  name: 'managementVm'
+  name: 'linked_managementVm'
   params: {
     assignedIdentityId: identityStorageSetup.id
     domainJoinFQDN: domainJoinFQDN
@@ -351,26 +341,9 @@ module managementVm './modules/storage/managementVm.bicep' = {
 }
 
 
-/* module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
-  for role in roleAssignmentsList: {
-    name: 'linked_roleAssignmentVM-Storage-${role.RoleShortName}'
-    scope: role.Scope == 'StorageAccount' ? storageAccount : role.Scope == 'KeyVault' ? keyVault : storageRG
-    params: {
-      ApplyToResourceName: vmName
-      AccountId: storageAccount.id
-      RoleDefinitionId: role.RoleDefinitionId
-      RoleDescription: role.RoleDescription
-      RoleName: role.RoleName
-      Scope: role.Scope
-      ScopeResourceId: role.Scope == 'StorageAccount' ? storageAccount.id : role.Scope == 'KeyVault' ? keyVault.id : storageRG.id
-      PrincipalId: identityStorageSetup.properties.principalId
-      PrincipalType: 'ServicePrincipal'
-    }
-  }
-] */
 
 module managementVmScript './modules/storage/managementVmScript.bicep' = {
-  name: 'managementVMscript'
+  name: 'linked_managementVMscript'
   params: {
     domainJoinOUPath: ouPathVm
     domainJoinUserName: domainJoinUserName
@@ -391,7 +364,8 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
   }
   dependsOn: [
     managementVm
-    assignIdentity2Storage
+    assignIdentity2StorageSMB
+    assignIdentity2StorageRead
     storageFileShare
   ]
 }
