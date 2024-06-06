@@ -26,7 +26,12 @@ This is what provides a way to reuse code by having an answer file sort of appro
 
 ## Deploy A Host Pool or Add Session Hosts
 
-If you need to deploy a Host Pool, add Session Hosts to an existing Host Pool and even deploy to either an alternate Tenant (including cross-cloud) as well as a Dedicated Host, you can utilize this deployment.
+This was created to expand on what is in the Azure Portal natively due to some scenarios that may require post move or deployment activities. The functionalities are:  
+1. Deploy new Host Pool and Session Hosts
+2. Deploy additional Session Hosts to existing Host Pool
+3. Deploy Session Hosts to an Alternate Tenant (Including Cross Cloud)
+4. Deploy Session Hosts to a Dedicated Host (Per IL5 requirements)
+
 
 **Deploy Host Pool or Session Hosts**
 
