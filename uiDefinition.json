@@ -1231,7 +1231,7 @@
 				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
 				"DomainPassword": "[if(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityDomainCredentials.DomainPassword)]",
 				"ResourceGroupHP": "[if(equals(steps('hostPool').hostPool, 'Existing'), first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)), if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), steps('hostPool').hpRGExisting, steps('hostPool').hpRGNameNew))]",
-				"HostPool": "[steps('hostPool').hostPool]",
+				"HostPoolOption": "[steps('hostPool').hostPool]",
 				"HostPoolRGStatus": "[steps('hostPool').rgNewExistingHP]",
 				"HostPoolName": "[if(equals(steps('hostPool').hostPool, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
 				"HostPoolAltToken": "[steps('hostPool').CrossTenantHPToken]",

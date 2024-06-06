@@ -9,8 +9,6 @@ param groupAdmins string
 
 param groupUsers string
 
-param kerberosEncryptionType string = 'AES256'
-
 @description('Expiration time of the key')
 param keyExpiration int = dateTimeToEpoch(dateTimeAdd(utcNow(), 'P1Y'))
 

@@ -185,13 +185,7 @@
 										"Microsoft.Compute/virtualMachines",
 										"Microsoft.Network/networkInterfaces",
 										"Microsoft.Resources/resourceGroups",
-										"Microsoft.Automation/automationAccounts",
-										"Microsoft.Compute/availabilitySets",
-										"Microsoft.DesktopVirtualization/hostPools",
-										"Microsoft.DesktopVirtualization/applicationGroups",
-										"Microsoft.DesktopVirtualization/workspaces",
-										"Microsoft.OperationalInsights/workspaces",
-										"Microsoft.Insights/diagnosticSettings"
+										"Microsoft.Network/privateEndpoints"
 									],
 									"visible": true
 								}
@@ -352,7 +346,7 @@
 							"defaultValue": "",
 							"toolTip": "Select an existing subnet for AIB build virtual machines. This enables the use of Private Link and prevents the deployment of public IP addresses.",
 							"constraints": {
-								"allowedValues": "[map(steps('mgmtVMInfo').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+								"allowedValues": "[map(steps('mgmtVMInfo').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
 								"required": true
 							}
 						},
@@ -431,7 +425,27 @@
 			]
 		},
 		"outputs": {
-			"parameters": {},
+			"parameters": {
+				"domainJoinUserName": "[steps('domainJoinInfo').identityDomainCredentials.DomainUser]",
+				"domainJoinUserPassword": "[steps('domainJoinInfo').identityDomainCredentials.DomainPassword]",
+				"groupAdmins": "[steps('basics').groupAdminsName]",
+				"groupUsers": "[steps('basics').groupUsersName]",
+				"keyVaultName": "[steps('basics').keyVaultName]",
+				"location": "[steps('basics').resourceScope.location.name]",
+				"managedIdentityName": "[steps('basics').identityName]",
+				"ouPath": "[steps('domainJoinInfo').domainInformation.OUPath]",
+				"privateDNSZoneId": "[steps('basics').pvtDNSZone]",
+				"storageAcctName": "[steps('basics').storageAccountSelector.name]",
+				"storageFileShareName": "[steps('basics').shareName]",
+				"storageResourceGroup": "[steps('basics').storageAccountSelector.resourceGroup]",
+				"storageShareSize": "[steps('basics').shareSize]",
+				"storageSKU": "[steps('basics').storageAccountSelector.type]",
+				"subnetId": "[steps('mgmtVMInfo').subnet]",
+				"tags": "[steps('basics').TagsSection.Tags]",
+				"vmName": "[steps('mgmtVMInfo').vmName]",
+				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
+				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
+			},
 			"kind": "Subscription",
 			"location": "[steps('basics').resourceScope.location.name]",
 			"subscriptionId": "[steps('basics').resourceScope.subscription.id]"

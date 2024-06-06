@@ -50,35 +50,14 @@ param DomainUser string
 @secure()
 param DomainPassword string
 
-param ResourceGroupHP string = ''
-param ResGroupIdMonitor string = ''
-param HostPoolName string = 'none'
-param HostPoolWorkspaceName string = 'none'
-@allowed([
-  'New'
-  'Existing'
-  'Same'
-])
-param RGVMsStatus string
-param ResourceGroupVMs string = ''
-
-@allowed([
-  'New'
-  'Existing'
-  'AltTenant'
-])
-@description('Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud.')
-param HostPoolOption string
-
-param HostPoolRGStatus string = 'Existing'
-
+@secure()
+param HostPoolAltToken string = ''
 @allowed([
   'Pooled'
   'Personal'
 ])
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
 param HostPoolKind string = 'Pooled'
-
 @allowed([
   'DepthFirst'
   'BreadthFirst'
@@ -87,34 +66,54 @@ param HostPoolKind string = 'Pooled'
 ])
 @description('These options specify the host pool type and depending on the type provides the load balancing options and assignment types.')
 param HostPoolLBType string = 'DepthFirst'
-
-@secure()
-param HostPoolAltToken string = ''
+param HostPoolName string = 'none'
+@allowed([
+  'New'
+  'Existing'
+  'AltTenant'
+])
+@description('Host Pool to be created, use existing, or with Token supplied for alternate Tenant or Cross Cloud.')
+param HostPoolOption string
+param HostPoolRGStatus string = 'Existing'
+param HostPoolWorkspaceName string = 'none'
 
 param KeyVaultDomainOption bool
-param KeyVaultLocalOption bool
-param KeyVaultDomResId string = ''
-param KeyVaultLocResId string = ''
 param KeyVaultDomName string = ''
+param KeyVaultDomResId string = ''
+param KeyVaultLocalOption bool
 param KeyVaultLocName string = ''
+param KeyVaultLocResId string = ''
 
 param Location string = deployment().location
-param LogAnalyticsWorkspaceName string = ''
-param LogAnalyticsSubId string = ''
 param LogAnalyticsRG string = ''
+param LogAnalyticsSubId string = ''
+param LogAnalyticsWorkspaceName string = ''
+
 param NumSessionHosts int
 param NumUsersPerHost int = 0
+
 param PostDeployContainerId string = ''
 param PostDeployOption bool = false
-param PostDeployScript string = ''
 param PostDeployOptVDOT bool = false
+param PostDeployScript string = ''
+
+param ResGroupIdMonitor string = ''
+param ResourceGroupHP string = ''
+param ResourceGroupVMs string = ''
 param Restart bool = true
+@allowed([
+  'New'
+  'Existing'
+  'Same'
+])
+param RGVMsStatus string
+param StartVmOnConnect bool = true
 param Subnet string
 param Tags object = {}
 param Timestamp string = utcNow()
 param UpdateWindows bool = false
 param UserIdentityName string = 'none'
-param StartVmOnConnect bool = true
+
 param OUPath string
 
 @description('Optional. Set to deploy image from Azure Compute Gallery. (Default: false)')
