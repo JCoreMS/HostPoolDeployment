@@ -286,6 +286,7 @@ try {
     Disconnect-AzAccount | Out-Null
     Write-Log -Message "Disconnection from Azure succeeded" -Type 'INFO'
     Write-Log -Message "Storage Account Domain Joined, NTFS Permissions configured!" -Type 'COMPLETED'
+
 }
 catch {
     Write-Log -Message $_ -Type 'ERROR'

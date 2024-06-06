@@ -232,7 +232,7 @@ resource assignIdentity2StorageSMB 'Microsoft.Authorization/roleAssignments@2022
 }
 
 // Assign Managed Identity to Storage Account
-resource assignIdentity2StorageRead 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource assignIdentity2StorageContrib 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, 'assignIdentity2StorageRead')
   scope: storageAccount
   properties: {
@@ -241,8 +241,8 @@ resource assignIdentity2StorageRead 'Microsoft.Authorization/roleAssignments@202
     principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
-      '81a9662b-bebf-436f-a333-f67b29880f12'
-    ) // Storage Account Key Operator Service Role
+      '17d1049b-9a84-46fb-8f53-869881c3d3ab'
+    ) // Storage Account Contributor Role
   }
   dependsOn: [
     storageAccount
@@ -365,7 +365,7 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
   dependsOn: [
     managementVm
     assignIdentity2StorageSMB
-    assignIdentity2StorageRead
+    assignIdentity2StorageContrib
     storageFileShare
   ]
 }
