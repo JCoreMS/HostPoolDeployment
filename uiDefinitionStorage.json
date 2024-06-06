@@ -247,7 +247,7 @@
 									"constraints": {
 										"required": true
 									},
-									"visible": "[steps('domainJoinInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
+									"visible": false
 								},
 								{
 									"name": "kvDomainSecretName",
@@ -255,7 +255,7 @@
 									"defaultValue": "domainJoinUserPassword",
 									"label": "KeyVault Secret Name (Domain Credential)",
 									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
-									"visible": "[steps('domainJoinInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
+									"visible": false
 								},
 								{
 									"name": "DomainPassword",
@@ -271,7 +271,7 @@
 									"options": {
 										"hideConfirmation": false
 									},
-									"visible": "[equals(steps('domainJoinInfo').identityDomainCredentials.optionDomainCredsKeyvault, false)]"
+									"visible": true
 								}
 							]
 						}
@@ -382,9 +382,9 @@
 									"resourceType": "Microsoft.KeyVault/vaults",
 									"toolTip": "Select Keyvault which contains the secrets for the Local Admin Credentials.",
 									"constraints": {
-										"required": true
+										"required": false
 									},
-									"visible": "[steps('mgmtVMInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
+									"visible": false
 								},
 								{
 									"name": "kvLocalSecretName",
@@ -392,7 +392,7 @@
 									"defaultValue": "vmLocalUserPassword",
 									"label": "KeyVault Secret Name (Local Admin Credential)",
 									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
-									"visible": "[steps('mgmtVMInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
+									"visible": false
 								},
 								{
 									"name": "VmPassword",
