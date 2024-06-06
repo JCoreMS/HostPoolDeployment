@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "10145158347841314806"
+      "templateHash": "13153974846965857828"
     }
   },
   "parameters": {
@@ -198,7 +198,7 @@
         "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
         "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
         "principalType": "ServicePrincipal",
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '14b46e9e-c2b7-41b4-b07b-48a6ebf60603')]"
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'e147488a-f6f5-4113-8e2d-b22465e65bf6')]"
       },
       "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
@@ -258,6 +258,23 @@
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
         "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
         "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
+      "name": "[guid(subscription().subscriptionId, 'assignIdentity2Vault')]",
+      "properties": {
+        "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
+        "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
+        "principalType": "ServicePrincipal",
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a7264617-510b-434b-a828-9731dc254ea7')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
       ]
     },
     {
@@ -560,111 +577,9 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
-      ]
-    },
-    {
-      "copy": {
-        "name": "roleAssignmentsVMStorage",
-        "count": "[length(variables('roleAssignmentsList'))]"
-      },
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "name": "[format('linked_roleAssignmentVM-Storage-{0}', variables('roleAssignmentsList')[copyIndex()].RoleShortName)]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "ApplyToResourceName": {
-            "value": "[parameters('vmName')]"
-          },
-          "AccountId": {
-            "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
-          },
-          "RoleDefinitionId": {
-            "value": "[variables('roleAssignmentsList')[copyIndex()].RoleDefinitionId]"
-          },
-          "RoleDescription": {
-            "value": "[variables('roleAssignmentsList')[copyIndex()].RoleDescription]"
-          },
-          "RoleName": {
-            "value": "[variables('roleAssignmentsList')[copyIndex()].RoleName]"
-          },
-          "Scope": {
-            "value": "[variables('roleAssignmentsList')[copyIndex()].Scope]"
-          },
-          "ScopeResourceId": "[if(equals(variables('roleAssignmentsList')[copyIndex()].Scope, 'StorageAccount'), createObject('value', resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))), if(equals(variables('roleAssignmentsList')[copyIndex()].Scope, 'KeyVault'), createObject('value', resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))), createObject('value', subscriptionResourceId(parameters('storageAcctName'), 'Microsoft.Resources/resourceGroups', parameters('storageResourceGroup')))))]",
-          "PrincipalId": {
-            "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]"
-          },
-          "PrincipalType": {
-            "value": "ServicePrincipal"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "8931268839293707182"
-            }
-          },
-          "parameters": {
-            "AccountId": {
-              "type": "string"
-            },
-            "ApplyToResourceName": {
-              "type": "string"
-            },
-            "RoleDefinitionId": {
-              "type": "string"
-            },
-            "RoleDescription": {
-              "type": "string"
-            },
-            "RoleName": {
-              "type": "string"
-            },
-            "Scope": {
-              "type": "string"
-            },
-            "ScopeResourceId": {
-              "type": "string"
-            },
-            "PrincipalId": {
-              "type": "string"
-            },
-            "PrincipalType": {
-              "type": "string",
-              "defaultValue": "ServicePrincipal"
-            }
-          },
-          "variables": {
-            "resourceName": "[split(parameters('ScopeResourceId'), '/')[8]]"
-          },
-          "resources": [
-            {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "name": "[guid(parameters('AccountId'), parameters('ApplyToResourceName'), parameters('RoleName'))]",
-              "properties": {
-                "description": "[parameters('RoleDescription')]",
-                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
-                "principalId": "[parameters('PrincipalId')]",
-                "principalType": "[parameters('PrincipalType')]"
-              }
-            }
-          ]
-        }
-      },
-      "dependsOn": [
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[0], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[1], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[2])]"
       ]
     },
     {
@@ -821,17 +736,11 @@
         }
       },
       "dependsOn": [
+        "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2Vault'))]",
         "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
         "[resourceId('Microsoft.Resources/deployments', 'managementVm')]",
-        "roleAssignmentsVMStorage",
         "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[0], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[1], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[2])]"
       ]
     }
-  ],
-  "outputs": {
-    "AccountId": {
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').clientId]"
-    }
-  }
+  ]
 }

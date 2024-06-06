@@ -182,8 +182,8 @@ resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-0
     principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
-      '14b46e9e-c2b7-41b4-b07b-48a6ebf60603'
-    ) // Key Vault Crypto Officer Role
+      'e147488a-f6f5-4113-8e2d-b22465e65bf6'
+    ) // Key Vault Crypto Service Encryption User
   }
 }
 
@@ -239,6 +239,24 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   dependsOn: [
     assignIdentity2Vault
     keyVaultKey
+  ]
+}
+
+// Assign Managed Identity to Storage Account
+resource assignIdentity2Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, 'assignIdentity2Vault')
+  scope: keyVault
+  properties: {
+    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
+    principalId: identityStorageSetup.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'a7264617-510b-434b-a828-9731dc254ea7'
+    ) // Storage File Data SMB Share Elevated Contributor
+  }
+  dependsOn: [
+    storageAccount
   ]
 }
 
@@ -307,6 +325,7 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
   }
 }
 
+
 // Create Management Virtual Machine and domain join storage
 //     System Managed Identity to access storage
 
@@ -325,9 +344,14 @@ module managementVm './modules/storage/managementVm.bicep' = {
     vmAdminPassword: vmAdminPassword
     vmAdminUsername: vmAdminUsername
   }
+  dependsOn: [
+    storageAccount
+    storageFileShare
+  ]
 }
 
-module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
+
+/* module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
   for role in roleAssignmentsList: {
     name: 'linked_roleAssignmentVM-Storage-${role.RoleShortName}'
     scope: role.Scope == 'StorageAccount' ? storageAccount : role.Scope == 'KeyVault' ? keyVault : storageRG
@@ -343,7 +367,7 @@ module roleAssignmentsVMStorage 'modules/storage/roleAssignment.bicep' = [
       PrincipalType: 'ServicePrincipal'
     }
   }
-]
+] */
 
 module managementVmScript './modules/storage/managementVmScript.bicep' = {
   name: 'managementVMscript'
@@ -367,9 +391,7 @@ module managementVmScript './modules/storage/managementVmScript.bicep' = {
   }
   dependsOn: [
     managementVm
-    roleAssignmentsVMStorage
+    assignIdentity2Storage
     storageFileShare
   ]
 }
-
-output AccountId string = identityStorageSetup.properties.clientId
