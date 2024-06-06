@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "5532767058354343435"
+      "templateHash": "5020389972657858566"
     }
   },
   "parameters": {
@@ -610,7 +610,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "15399082792000363237"
+              "templateHash": "8869462203632893604"
             }
           },
           "parameters": {
@@ -635,13 +635,17 @@
             "PrincipalType": {
               "type": "string",
               "defaultValue": "ServicePrincipal"
+            },
+            "Timestamp": {
+              "type": "string",
+              "defaultValue": "[utcNow('yyyy-MM-ddTHH:mm:ssZ')]"
             }
           },
           "resources": [
             {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
-              "name": "[guid(parameters('AccountId'), parameters('ApplyToResourceName'), parameters('RoleName'))]",
+              "name": "[guid(parameters('AccountId'), parameters('ApplyToResourceName'), parameters('RoleName'), parameters('Timestamp'))]",
               "properties": {
                 "description": "[parameters('RoleDescription')]",
                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
