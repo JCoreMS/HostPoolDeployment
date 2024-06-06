@@ -270,6 +270,9 @@ resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
       id: subnetId
     }
   }
+  dependsOn:[
+    keyVaultKey
+  ]
 }
 
 resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
