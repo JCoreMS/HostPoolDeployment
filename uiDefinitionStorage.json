@@ -78,7 +78,7 @@
 							"defaultValue": "fslogix01",
 							"constraints": {
 								"required": true,
-								"regex": "^[a-z0-9][A-Z0-9-]{1,61}[a-z0-9]$",
+								"regex": "",
 								"validationMessage": "Must be between 3 and 64 characters long, alpha-numeric,all lowercase and can contain hyphens. (non-consecutive)"
 							}
 						},
@@ -115,7 +115,7 @@
 							"defaultValue": "id-stgcontosofslgx01",
 							"constraints": {
 								"required": true,
-								"regex": "^(?!.*--)[a-z0-9-]{3,24}$",
+								"regex": "",
 								"validationMessage": "Must be between 3 and 24 characters long, alpha-numeric and can contain hyphens. (non-consecutive)"
 							}
 						},
@@ -127,7 +127,7 @@
 							"defaultValue": "kv-stgcontosofslgx01",
 							"constraints": {
 								"required": true,
-								"regex": "^[A-Za-z][A-Za-z0-9-]{1,22}$",
+								"regex": "",
 								"validationMessage": "Must be between 3 and 24 characters long, alpha-numeric and can contain hyphens. (non-consecutive)"
 							}
 						},
@@ -300,7 +300,7 @@
 							"visible": "true",
 							"constraints": {
 								"required": true,
-								"regex": "^[a-z0-9]{1,15}[a-z0-9]$",
+								"regex": "",
 								"validationMessage": "Must be 1-15 characters and alphanumeric. Can contain hyphens. (non-consecutive)"
 							}
 						},
