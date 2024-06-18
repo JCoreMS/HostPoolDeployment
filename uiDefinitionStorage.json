@@ -78,7 +78,7 @@
 							"defaultValue": "fslogix01",
 							"constraints": {
 								"required": true,
-								"regex": "^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$",
+								"regex": "^[a-z0-9][A-Z0-9-]{1,61}[a-z0-9]$",
 								"validationMessage": "Must be between 3 and 64 characters long, alpha-numeric,all lowercase and can contain hyphens. (non-consecutive)"
 							}
 						},
