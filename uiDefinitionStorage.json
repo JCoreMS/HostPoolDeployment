@@ -391,7 +391,7 @@
 								{
 									"name": "VmPassword",
 									"type": "Microsoft.Compute.CredentialsCombo",
-									"visible": "[equals(steps('mgmtVMInfo').identityLocalCredentials.optionLocalCredsKeyvault, false)]",
+									"visible": true,
 									"label": {
 										"password": "Password",
 										"confirmPassword": "Confirm password"
