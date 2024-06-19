@@ -76,7 +76,7 @@
                                 "resourceGroupName": "[steps('basics').resourceScope.resourceGroup.name]",
                                 "location": "[steps('basics').resourceScope.location.name]"
                             }
-                        }
+                        },
 						{
 							"name": "shareName",
 							"type": "Microsoft.Common.TextBox",
