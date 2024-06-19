@@ -55,11 +55,15 @@
 						{
 							"name": "storageSelectorElement",
 							"type": "Microsoft.Storage.StorageAccountSelector",
-							"label": "Storage account name",
+							"label": "Storage account",
 							"toolTip": "",
 							"defaultValue": {
 								"name": "storageaccount01",
 								"type": "Premium_LRS"
+							},
+							"constraints": {
+								"allowedTypes": [],
+								"excludedTypes": []
 							},
 							"options": {
 								"hideExisting": false
