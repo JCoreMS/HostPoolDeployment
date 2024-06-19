@@ -53,16 +53,73 @@
 							}
 						},
 						{
-							"name": "storageAccountSelector",
-							"type": "Microsoft.Storage.StorageAccountSelector",
-							"label": "Storage account name",
-							"toolTip": "",
-							"defaultValue": {
-								"name": "weihasdkfjgaiwegbir013843",
-								"type": "Premium_LRS"
-							},
+							"name": "storageTier",
+							"type": "Microsoft.Common.DropDown",
+							"visible": true,
+							"label": "File share peformance",
+							"filter": true,
+							"defaultValue": "Premium",
+							"toolTip": "Storage account performance for FSLogix storage. Recommended tier is Premium.",
+							"constraints": {
+								"required": true,
+								"allowedValues": [
+									{
+										"label": "Premium",
+										"description": "",
+										"value": "Premium"
+									},
+									{
+										"label": "Standard",
+										"description": "",
+										"value": "Standard"
+									}
+								]
+							}
+						},
+						{
+							"name": "storageRedundancy",
+							"type": "Microsoft.Common.DropDown",
+							"visible": true,
+							"label": "Storage Redundancy",
+							"filter": true,
+							"defaultValue": "Zone Redundant",
+							"toolTip": "Storage redundancy for FSLogix is typically recommended to be either Zone or Local only.",
+							"constraints": {
+								"required": true,
+								"allowedValues": [
+									{
+										"label": "Zone Redundant",
+										"description": "",
+										"value": "ZRS"
+									},
+									{
+										"label": "Locally Redundant",
+										"description": "",
+										"value": "LRS"
+									}
+								]
+							}
+						},
+						{
+							"name": "StorageDeploymentLocationAndAvailability",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": true,
 							"options": {
-								"hideExisting": true
+								"text": "Storage resources will be deployed on the same location on the Session Hosts section.",
+								"uri": "https://learn.microsoft.com/azure/reliability/availability-zones-service-support#azure-regions-with-availability-zone-support",
+								"style": "Info"
+							}
+						},
+						{
+							"name": "storageName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Storage Account Name",
+							"defaultValue": "str",
+							"placeholder": "Example: strcontosoavdsflgx01",
+							"toolTip": "Storage Account Name must be globally unique. Consider including the company abbreviation in the name and what it's used for to ensure uniqueness.",
+							"constraints": {
+								"required": true,
+								"validationMessage": ""
 							},
 							"visible": true
 						},
@@ -349,7 +406,6 @@
 							"toolTip": "It's best to consider an OU with no or limited Group Policies for initial deployments. This value should be the distinguished name of the OU.",
 							"constraints": {
 								"required": true,
-								"regex": "",
 								"validationMessage": ""
 							},
 							"visible": true
@@ -486,21 +542,22 @@
 				"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
 				"privateDNSZoneId": "[steps('zeroTrustSetup').pvtDNSZone]",
 				"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
-				"storageAcctName": "[steps('basics').storageAccountSelector.name]",
+				"storageAcctName": "[steps('basics').storageName]",
 				"storageFileShareName": "[steps('basics').shareName]",
 				"storageResourceGroup": "[steps('basics').resourceScope.resourceGroup.name]",
 				"storageResourceGroupMode": "[steps('basics').resourceScope.resourceGroup.mode]",
+				"storageRedundancy": "[steps('basics').storageRedundancy]",
 				"storageShareSize": "[steps('basics').shareSize]",
-				"storageSKU": "[steps('basics').storageAccountSelector.type]",
+				"storageTier": "[steps('basics').storageTier]",
 				"subnetId": "[steps('mgmtVMInfo').subnet]",
 				"tags": "[steps('mgmtVMInfo').TagsSection.Tags]",
 				"vmName": "[steps('mgmtVMInfo').vmName]",
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
 				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
 			},
-            "kind": "ResourceGroup",
-            "location": "[steps('basics').resourceScope.location.name]",
-            "resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
+			"kind": "ResourceGroup",
+			"location": "[steps('basics').resourceScope.location.name]",
+			"resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
 		}
 	}
 }

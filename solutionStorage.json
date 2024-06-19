@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "11749377058591006305"
+      "templateHash": "11060899739757840157"
     }
   },
   "parameters": {
@@ -65,20 +65,21 @@
         "Existing"
       ]
     },
+    "storageRedundancy": {
+      "type": "string",
+      "allowedValues": [
+        "ZRS",
+        "LRS"
+      ]
+    },
     "storageShareSize": {
       "type": "int"
     },
-    "storageSKU": {
+    "storageTier": {
       "type": "string",
       "allowedValues": [
-        "Premium_LRS",
-        "Premium_ZRS",
-        "Standard_GRS",
-        "Standard_GZRS",
-        "Standard_LRS",
-        "Standard_RAGRS",
-        "Standard_RAGZRS",
-        "Standard_ZRS"
+        "Standard",
+        "Premium"
       ]
     },
     "subnetId": {
@@ -103,8 +104,9 @@
   },
   "variables": {
     "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
+    "storageSKU": "[format('{0}_{1}', parameters('storageTier'), parameters('storageRedundancy'))]",
     "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
-    "smbSettings": "[if(or(equals(parameters('storageSKU'), 'Premium_LRS'), equals(parameters('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'versions', 'SMB3.0;SMB3.1.1'))]",
+    "smbSettings": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'versions', 'SMB3.0;SMB3.1.1'))]",
     "storageSetupScript": "domainJoinStorageAcct.ps1",
     "tenantId": "[subscription().tenantId]"
   },
@@ -153,7 +155,7 @@
             "value": "[parameters('storageAcctName')]"
           },
           "storageSKU": {
-            "value": "[parameters('storageSKU')]"
+            "value": "[variables('storageSKU')]"
           },
           "subnetId": {
             "value": "[parameters('subnetId')]"

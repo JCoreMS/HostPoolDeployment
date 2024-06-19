@@ -38,19 +38,19 @@ param storageResourceGroup string
 ])
 param storageResourceGroupMode string
 
+@allowed([
+  'ZRS'
+  'LRS'
+])
+param storageRedundancy string
+
 param storageShareSize int
 
 @allowed([
-  'Premium_LRS'
-  'Premium_ZRS'
-  'Standard_GRS'
-  'Standard_GZRS'
-  'Standard_LRS'
-  'Standard_RAGRS'
-  'Standard_RAGZRS'
-  'Standard_ZRS'
+  'Standard'
+  'Premium'
 ])
-param storageSKU string
+param storageTier string
 
 param subnetId string
 
@@ -64,9 +64,11 @@ param vmAdminUsername string
 param vmAdminPassword string
 
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
-
+var storageSKU = '${storageTier}_${storageRedundancy}'
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts' // URL with NO trailing slash
-var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'
+
+var storageKind = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? 'FileStorage' : 'StorageV2'
+var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'  // SMB Multichannel is only supported on Premium storage
   ? {
       authenticationMethods: 'Kerberos'
       channelEncryption: 'AES-256-GCM'
@@ -120,6 +122,7 @@ module rgResources 'modules/storage/rgResources.bicep' = {
     scriptLocation: scriptLocation
     smbSettings: smbSettings
     storageFileShareName: storageFileShareName
+    storageKind: storageKind
     storageResourceGroup: storageResourceGroup
     storageSetupScript: storageSetupScript
     storageShareSize: storageShareSize

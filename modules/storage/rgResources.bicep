@@ -20,6 +20,7 @@ param scriptLocation string
 param smbSettings object
 param storageAcctName string
 param storageFileShareName string
+param storageKind string
 param storageResourceGroup string
 param storageShareSize int
 param storageSetupScript string
@@ -128,7 +129,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   sku: {
     name: storageSKU
   }
-  kind: 'StorageV2'
+  kind: storageKind
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
