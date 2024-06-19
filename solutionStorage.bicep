@@ -24,6 +24,8 @@ param ouPathVm string
 
 param privateDNSZoneId string
 
+param privateDNSZoneKvId string
+
 param storageAcctName string
 
 param storageFileShareName string
@@ -273,6 +275,46 @@ resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
   dependsOn:[
     keyVaultKey
   ]
+}
+
+// Private Endpoint for Storage Account
+resource keyvaultPvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
+  name: 'pep-${keyVaultName}'
+  location: location
+  properties: {
+    privateLinkServiceConnections: [
+      {
+        name: 'pep-${keyVaultName}'
+        properties: {
+          privateLinkServiceId: keyVault.id
+          groupIds: [
+            'vault'
+          ]
+        }
+      }
+    ]
+    subnet: {
+      id: subnetId
+    }
+  }
+  dependsOn:[
+    keyVaultKey
+  ]
+}
+
+resource vaultPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
+  name: 'vaultPrivateDnsZoneGroup'
+  parent: keyvaultPvtEndpoint
+  properties: {
+    privateDnsZoneConfigs: [
+      {
+        name: 'dnsConfig'
+        properties: {
+          privateDnsZoneId: privateDNSZoneKvId
+        }
+      }
+    ]
+  }
 }
 
 resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {

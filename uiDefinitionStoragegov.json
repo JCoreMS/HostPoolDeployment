@@ -7,7 +7,7 @@
 			"steps": [
 				{
 					"name": "basics",
-					"label": "Storage Setup",
+					"label": "Storage Basics",
 					"elements": [
 						{
 							"name": "resourceScope",
@@ -23,13 +23,13 @@
 							}
 						},
 						{
-							"name": "privateDNSZonesApi",
+							"name": "subscriptionsApi",
 							"type": "Microsoft.Solutions.ArmApiControl",
 							"request": {
 								"method": "GET",
-								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.Network/privateDnsZones?api-version=2018-09-01')]",
+								"path": "/subscriptions?api-version=2022-12-01",
 								"transforms": {
-									"list": "value|[*].{label: name, value:id, description:id}"
+									"list": "value|[*].{label: displayName, value:id}"
 								}
 							}
 						},
@@ -106,6 +106,66 @@
 								"uri": "https://github.com/Azure/avdaccelerator/blob/main/workload/bicep/brownfield/autoIncreasePremiumFileShareQuota/readme.md",
 								"style": "Warning"
 							}
+						}
+					]
+				},
+				{
+					"name": "zeroTrustSetup",
+					"label": "Zero Trust Setup",
+					"elements": [
+						{
+							"name": "pvtDNSZoneSub",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Private DNS Zone Subscription",
+							"toolTip": "Choose the subscription where the Private DNS Zone resides.",
+							"defaultValue": "[steps('basics').resourceScope.subscription]",
+							"constraints": {
+								"required": true,
+								"allowedValues": "[steps('basics').subscriptionsApi.transformed.list]"
+							}
+						},
+						{
+							"name": "privateDNSZonesApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('zeroTrustSetup').pvtDNSZoneSub, '/providers/Microsoft.Network/privateDnsZones?api-version=2018-09-01')]",
+								"transforms": {
+									"list": "value|[*].{label: name, value:id, description:id}"
+								}
+							}
+						},
+						{
+							"name": "pvtDNSZone",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Private DNS Zone (File)",
+							"toolTip": "Select the Private DNS Zone to use for the Storage Private Link. It's recommended to have a central Private DNS Zone for all files based records in a hub type subscription or resource group.",
+							"defaultValue": "privatelink.file.core.usgovcloudapi.net",
+							"constraints": {
+								"required": true,
+								"allowedValues": "[steps('zeroTrustSetup').privateDNSZonesApi.transformed.list]"
+							}
+						},
+						{
+							"name": "pvtDNSZoneKV",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Private DNS Zone (VaultCore)",
+							"toolTip": "Select the Private DNS Zone to use for the KeyVault Private Link. It's recommended to have a central Private DNS Zone for all files based records in a hub type subscription or resource group.",
+							"defaultValue": "privatelink.vaultcore.usgovcloudapi.net",
+							"constraints": {
+								"required": true,
+								"allowedValues": "[steps('zeroTrustSetup').privateDNSZonesApi.transformed.list]"
+							}
+						},
+						{
+							"name": "basicsInfoWarn2",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": "true",
+							"options": {
+								"text": "The Private DNS Zone must already be configured and you MUST select a 'FILE' based zone for Azure Files.\nAdditionally, for On-Prem resources to resolve the storage please click this box for more details.",
+								"uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
+								"style": "Warning"
+							}
 						},
 						{
 							"name": "identityName",
@@ -129,45 +189,6 @@
 								"required": true,
 								"regex": "^[A-Za-z][A-Za-z0-9-]{1,22}$",
 								"validationMessage": "Must be between 3 and 24 characters long, alpha-numeric and can contain hyphens. (non-consecutive)"
-							}
-						},
-						{
-							"name": "pvtDNSZone",
-							"type": "Microsoft.Common.DropDown",
-							"label": "Private DNS Zone",
-							"toolTip": "Type in a name for the Key Vault to be used for encryption of the Storage Account using a created Customer Managed Key",
-							"defaultValue": "privatelink.file.core.windows.net",
-							"constraints": {
-								"required": true,
-								"allowedValues": "[steps('basics').privateDNSZonesApi.transformed.list]"
-							}
-						},
-						{
-							"name": "basicsInfoWarn2",
-							"type": "Microsoft.Common.InfoBox",
-							"visible": "true",
-							"options": {
-								"text": "The Private DNS Zone must already be configured and you MUST select a 'FILE' based zone for Azure Files.\nAdditionally, for On-Prem resources to resolve the storage please click this box for more details.",
-								"uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
-								"style": "Warning"
-							}
-						},
-						{
-							"name": "groupUsersName",
-							"type": "Microsoft.Common.TextBox",
-							"label": "AVD Users Group",
-							"toolTip": "Provide the name of the group that will be used for the AVD Users. This group will be used to set the NTFS Permissions on the File Share.",
-							"constraints": {
-								"required": true
-							}
-						},
-						{
-							"name": "groupAdminsName",
-							"type": "Microsoft.Common.TextBox",
-							"label": "AVD Admins Group",
-							"toolTip": "Provide the name of the group that will be used for the AVD Admins. This group will be used to set the NTFS Permissions on the File Share.",
-							"constraints": {
-								"required": true
 							}
 						}
 					]
@@ -205,6 +226,32 @@
 										"validationMessage": ""
 									},
 									"visible": true
+								}
+							]
+						},
+						{
+							"name": "ntfsSetup",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "NTFS Setup",
+							"elements": [
+								{
+									"name": "groupUsersName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "AVD Users Group",
+									"toolTip": "Provide the name of the group that will be used for the AVD Users. This group will be used to set the NTFS Permissions on the File Share.",
+									"constraints": {
+										"required": true
+									}
+								},
+								{
+									"name": "groupAdminsName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "AVD Admins Group",
+									"toolTip": "Provide the name of the group that will be used for the AVD Admins. This group will be used to set the NTFS Permissions on the File Share.",
+									"constraints": {
+										"required": true
+									}
 								}
 							]
 						},
@@ -336,8 +383,8 @@
 							"type": "Microsoft.Common.DropDown",
 							"visible": true,
 							"label": "Subnet",
-							"defaultValue": "",
-							"toolTip": "Select an existing subnet for AIB build virtual machines. This enables the use of Private Link and prevents the deployment of public IP addresses.",
+							"defaultValue": "[steps('basics').re",
+							"toolTip": "Select an existing subnet with an existing Private DNS Zone for creating the file based Private Link.",
 							"constraints": {
 								"allowedValues": "[map(steps('mgmtVMInfo').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
 								"required": true
@@ -439,14 +486,15 @@
 			"parameters": {
 				"domainJoinUserName": "[steps('domainJoinInfo').identityDomainCredentials.DomainUser]",
 				"domainJoinUserPassword": "[steps('domainJoinInfo').identityDomainCredentials.DomainPassword]",
-				"groupAdmins": "[steps('basics').groupAdminsName]",
-				"groupUsers": "[steps('basics').groupUsersName]",
-				"keyVaultName": "[steps('basics').keyVaultName]",
+				"groupAdmins": "[steps('domainJoinInfo').ntfsSetup.groupAdminsName]",
+				"groupUsers": "[steps('domainJoinInfo').ntfsSetup.groupUsersName]",
+				"keyVaultName": "[steps('zeroTrustSetup').keyVaultName]",
 				"location": "[steps('basics').resourceScope.location.name]",
-				"managedIdentityName": "[steps('basics').identityName]",
+				"managedIdentityName": "[steps('zeroTrustSetup').identityName]",
 				"ouPathStorage": "[steps('domainJoinInfo').domainInformation.OUPathStorage]",
 				"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
-				"privateDNSZoneId": "[steps('basics').pvtDNSZone]",
+				"privateDNSZoneId": "[steps('zeroTrustSetup').pvtDNSZone]",
+				"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
 				"storageAcctName": "[steps('basics').storageAccountSelector.name]",
 				"storageFileShareName": "[steps('basics').shareName]",
 				"storageResourceGroup": "[steps('basics').storageAccountSelector.resourceGroup]",

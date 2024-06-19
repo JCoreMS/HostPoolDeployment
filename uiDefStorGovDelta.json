@@ -1,0 +1,20 @@
+{
+    "name": "groupUsersName",
+    "type": "Microsoft.Common.TextBox",
+    "label": "AVD Users Group",
+    "toolTip": "Provide the name of the group that will be used for the AVD Users. This group will be used to set the NTFS Permissions on the File Share.",
+    "constraints": {
+        "required": true
+    }
+},
+{
+    "name": "groupAdminsName",
+    "type": "Microsoft.Common.TextBox",
+    "label": "AVD Admins Group",
+    "toolTip": "Provide the name of the group that will be used for the AVD Admins. This group will be used to set the NTFS Permissions on the File Share.",
+    "constraints": {
+        "required": true
+    }
+}
+
+

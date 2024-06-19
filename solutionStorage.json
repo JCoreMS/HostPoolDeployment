@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "6469040265458030184"
+      "templateHash": "18049493183427366686"
     }
   },
   "parameters": {
@@ -45,6 +45,9 @@
       "type": "string"
     },
     "privateDNSZoneId": {
+      "type": "string"
+    },
+    "privateDNSZoneKvId": {
       "type": "string"
     },
     "storageAcctName": {
@@ -302,6 +305,50 @@
       "dependsOn": [
         "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
         "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2020-07-01",
+      "name": "[format('pep-{0}', parameters('keyVaultName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "privateLinkServiceConnections": [
+          {
+            "name": "[format('pep-{0}', parameters('keyVaultName'))]",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+              "groupIds": [
+                "vault"
+              ]
+            }
+          }
+        ],
+        "subnet": {
+          "id": "[parameters('subnetId')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2020-06-01",
+      "name": "[format('{0}/{1}', format('pep-{0}', parameters('keyVaultName')), 'vaultPrivateDnsZoneGroup')]",
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "dnsConfig",
+            "properties": {
+              "privateDnsZoneId": "[parameters('privateDNSZoneKvId')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('keyVaultName')))]"
       ]
     },
     {
