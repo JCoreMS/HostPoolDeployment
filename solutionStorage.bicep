@@ -66,7 +66,7 @@ param vmAdminPassword string
 var domainJoinFQDN = split(domainJoinUserName, '@')[1]
 var storageSKU = '${storageTier}_${storageRedundancy}'
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts' // URL with NO trailing slash
-
+var subscriptionId = subscription().subscriptionId
 var storageKind = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? 'FileStorage' : 'StorageV2'
 var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'  // SMB Multichannel is only supported on Premium storage
   ? {
@@ -126,6 +126,7 @@ module rgResources 'modules/storage/rgResources.bicep' = {
     storageResourceGroup: storageResourceGroup
     storageSetupScript: storageSetupScript
     storageShareSize: storageShareSize
+    subscriptionId: subscriptionId
     vmAdminPassword: vmAdminPassword
     vmAdminUsername: vmAdminUsername
     vmName: vmName

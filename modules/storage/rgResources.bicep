@@ -26,6 +26,7 @@ param storageShareSize int
 param storageSetupScript string
 param storageSKU string
 param subnetId string
+param subscriptionId string
 param tags object
 param tenantId string
 param timestamp string
@@ -354,6 +355,7 @@ module managementVmScript 'managementVmScript.bicep' = {
     storageAccountName: storageAcctName
     storageFileShareName: storageFileShareName
     storageResourceGroup: storageResourceGroup
+    subscriptionId: subscriptionId
     tags: tags
     tenantId: tenantId
     timestamp: timestamp

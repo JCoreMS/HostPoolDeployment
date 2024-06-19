@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "3482627703669181167"
+      "templateHash": "10879276395810554806"
     }
   },
   "parameters": {
@@ -107,6 +107,7 @@
     "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
     "storageSKU": "[format('{0}_{1}', parameters('storageTier'), parameters('storageRedundancy'))]",
     "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
+    "subscriptionId": "[subscription().subscriptionId]",
     "storageKind": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), 'FileStorage', 'StorageV2')]",
     "smbSettings": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'versions', 'SMB3.0;SMB3.1.1'))]",
     "storageSetupScript": "domainJoinStorageAcct.ps1",
@@ -210,6 +211,9 @@
           "storageShareSize": {
             "value": "[parameters('storageShareSize')]"
           },
+          "subscriptionId": {
+            "value": "[variables('subscriptionId')]"
+          },
           "vmAdminPassword": {
             "value": "[parameters('vmAdminPassword')]"
           },
@@ -227,7 +231,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "13951193908673804377"
+              "templateHash": "5515920134202158553"
             }
           },
           "parameters": {
@@ -298,6 +302,9 @@
               "type": "string"
             },
             "subnetId": {
+              "type": "string"
+            },
+            "subscriptionId": {
               "type": "string"
             },
             "tags": {
@@ -890,6 +897,9 @@
                   "storageResourceGroup": {
                     "value": "[parameters('storageResourceGroup')]"
                   },
+                  "subscriptionId": {
+                    "value": "[parameters('subscriptionId')]"
+                  },
                   "tags": {
                     "value": "[parameters('tags')]"
                   },
@@ -916,7 +926,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.28.1.47646",
-                      "templateHash": "1618256626729685004"
+                      "templateHash": "1505055709102177552"
                     }
                   },
                   "parameters": {
@@ -956,6 +966,9 @@
                     "storageSetupScriptName": {
                       "type": "string"
                     },
+                    "subscriptionId": {
+                      "type": "string"
+                    },
                     "tags": {
                       "type": "object"
                     },
@@ -971,8 +984,7 @@
                   },
                   "variables": {
                     "cloud": "[environment().name]",
-                    "subscriptionId": "[subscription().subscriptionId]",
-                    "scriptParams": "[format('-OuPath {0} -StorageAccountName {1} -StorageAccountResourceGroupName {2} -SubscriptionId {3} -TenantId {4} -AclUsers {5} -AclAdmins {6} -StorageFileShareName {7} -DomainJoinUserPrincipalName {8} -DomainJoinPassword {9} -StorageSetupId {10} -Cloud {11}', parameters('domainJoinOUPath'), parameters('storageAccountName'), parameters('storageResourceGroup'), variables('subscriptionId'), parameters('tenantId'), parameters('groupUsers'), parameters('groupAdmins'), parameters('storageFileShareName'), parameters('domainJoinUserName'), parameters('domainJoinUserPassword'), parameters('storageSetupId'), variables('cloud'))]"
+                    "scriptParams": "[format('-OuPath {0} -StorageAccountName {1} -StorageAccountResourceGroupName {2} -SubscriptionId {3} -TenantId {4} -AclUsers {5} -AclAdmins {6} -StorageFileShareName {7} -DomainJoinUserPrincipalName {8} -DomainJoinPassword {9} -StorageSetupId {10} -Cloud {11}', parameters('domainJoinOUPath'), parameters('storageAccountName'), parameters('storageResourceGroup'), parameters('subscriptionId'), parameters('tenantId'), parameters('groupUsers'), parameters('groupAdmins'), parameters('storageFileShareName'), parameters('domainJoinUserName'), parameters('domainJoinUserPassword'), parameters('storageSetupId'), variables('cloud'))]"
                   },
                   "resources": [
                     {
