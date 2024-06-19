@@ -53,6 +53,20 @@
 							}
 						},
 						{
+							"name": "storageAccountSelector",
+							"type": "Microsoft.Storage.StorageAccountSelector",
+							"label": "Storage account name",
+							"toolTip": "",
+							"defaultValue": {
+								"name": "weihasdkfjgaiwegbir013843",
+								"type": "Premium_LRS"
+							},
+							"options": {
+								"hideExisting": true
+							},
+							"visible": true
+						},
+						{
 							"name": "shareName",
 							"type": "Microsoft.Common.TextBox",
 							"label": "File Share Name",
@@ -472,19 +486,21 @@
 				"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
 				"privateDNSZoneId": "[steps('zeroTrustSetup').pvtDNSZone]",
 				"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
+				"storageAcctName": "[steps('basics').storageAccountSelector.name]",
 				"storageFileShareName": "[steps('basics').shareName]",
 				"storageResourceGroup": "[steps('basics').resourceScope.resourceGroup.name]",
 				"storageResourceGroupMode": "[steps('basics').resourceScope.resourceGroup.mode]",
 				"storageShareSize": "[steps('basics').shareSize]",
+				"storageSKU": "[steps('basics').storageAccountSelector.type]",
 				"subnetId": "[steps('mgmtVMInfo').subnet]",
 				"tags": "[steps('mgmtVMInfo').TagsSection.Tags]",
 				"vmName": "[steps('mgmtVMInfo').vmName]",
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
 				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
 			},
-			"kind": "ResourceGroup",
+			"kind": "Subscription",
 			"location": "[steps('basics').resourceScope.location.name]",
-			"resourceGroupId": "[steps('basics').resourceScope.id]"
+			"subscriptionId": "[steps('basics').resourceScope.subscription.id]"
 		}
 	}
 }
