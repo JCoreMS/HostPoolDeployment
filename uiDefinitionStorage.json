@@ -62,7 +62,7 @@
 								"type": "Premium_LRS"
 							},
 							"options": {
-								"hideExisting": false
+								"hideExisting": true
 							},
 							"visible": true
 						},
