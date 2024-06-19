@@ -36,7 +36,7 @@ param storageResourceGroup string
   'New'
   'Existing'
 ])
-param storageResourceGroupMode string
+param storageResourceGroupMode string = 'Existing'
 
 @allowed([
   'ZRS'

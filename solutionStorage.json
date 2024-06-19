@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "16689180537673986994"
+      "templateHash": "3482627703669181167"
     }
   },
   "parameters": {
@@ -60,6 +60,7 @@
     },
     "storageResourceGroupMode": {
       "type": "string",
+      "defaultValue": "Existing",
       "allowedValues": [
         "New",
         "Existing"
