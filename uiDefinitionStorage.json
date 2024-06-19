@@ -53,19 +53,30 @@
 							}
 						},
 						{
-							"name": "storageAccountSelector",
-							"type": "Microsoft.Storage.StorageAccountSelector",
-							"label": "Storage account name",
-							"toolTip": "",
-							"defaultValue": {
-								"name": "storageaccount01",
-								"type": "Premium_LRS"
-							},
-							"options": {
-								"hideExisting": true
-							},
-							"visible": true
-						},
+                            "name": "storageAccountSelector",
+                            "type": "Microsoft.Storage.MultiStorageAccountCombo",
+                            "label": {
+                                "prefix": "Storage account name prefix",
+                                "type": "Storage account type"
+                            },
+                            "defaultValue": {
+                                "prefix": "strcontoso",
+                                "type": "Standard_LRS"
+                            },
+                            "constraints": {
+                                "allowedTypes": [
+                                    "Premium_LRS",
+                                    "Standard_LRS",
+                                    "Standard_GRS"
+                                ]
+                            },
+                            "count": 1,
+                            "scope": {
+                                "subscriptionId": "[steps('basics').resourceScope.subscription.subscriptionId]",
+                                "resourceGroupName": "[steps('basics').resourceScope.resourceGroup.name]",
+                                "location": "[steps('basics').resourceScope.location.name]"
+                            }
+                        }
 						{
 							"name": "shareName",
 							"type": "Microsoft.Common.TextBox",
