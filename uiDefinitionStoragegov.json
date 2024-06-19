@@ -58,7 +58,7 @@
 							"label": "Storage account",
 							"toolTip": "",
 							"defaultValue": {
-								"name": "stgeus2contosofslgx01",
+								"name": "",
 								"type": "Premium_LRS"
 							},
 							"constraints": {
