@@ -19,7 +19,10 @@
 							"type": "Microsoft.Solutions.ArmApiControl",
 							"request": {
 								"method": "GET",
-								"path": "[concat(steps('basics').resourceScope.subscription.id, '/resourceGroups?api-version=2022-09-01')]"
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/resourceGroups?api-version=2022-09-01')]",
+								"transforms": {
+									"list": "value|[*].{label: name, value:name}"
+								}
 							}
 						},
 						{
@@ -50,6 +53,17 @@
 							"request": {
 								"method": "GET",
 								"path": "/v1.0/organization"
+							}
+						},
+						{
+							"name": "resourceGroupExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Resource Group",
+							"toolTip": "Choose the existing Resource Group to deploy the storage account and associated resources to.",
+							"defaultValue": "[steps('basics').resourceScope.subscription]",
+							"constraints": {
+								"required": true,
+								"allowedValues": "[steps('basics').resourceGroupsApi.transformed.list]"
 							}
 						},
 						{
@@ -546,7 +560,7 @@
 				"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
 				"storageAcctName": "[steps('basics').storageName]",
 				"storageFileShareName": "[steps('basics').shareName]",
-				"storageResourceGroup": "[steps('basics').resourceScope.resourceGroup.name]",
+				"storageResourceGroup": "[steps('basics').resourceGroupExisting]",
 				"storageResourceGroupMode": "[steps('basics').resourceScope.resourceGroup.mode]",
 				"storageRedundancy": "[steps('basics').storageRedundancy]",
 				"storageShareSize": "[steps('basics').shareSize]",
