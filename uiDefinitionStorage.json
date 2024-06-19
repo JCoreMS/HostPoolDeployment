@@ -493,7 +493,8 @@
 				"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
 				"storageAcctName": "[steps('basics').storageAccountSelector.name]",
 				"storageFileShareName": "[steps('basics').shareName]",
-				"storageResourceGroup": "[steps('basics').storageAccountSelector.resourceGroup]",
+				"storageResourceGroup": "[steps('basics').resourceScope.resourceGroup.name]",
+				"storageResourceGroupMode": "[steps('basics').resourceScope.resourceGroup.mode]",
 				"storageShareSize": "[steps('basics').shareSize]",
 				"storageSKU": "[steps('basics').storageAccountSelector.type]",
 				"subnetId": "[steps('mgmtVMInfo').subnet]",
@@ -502,9 +503,9 @@
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
 				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
 			},
-			"kind": "ResourceGroup",
+			"kind": "Subscription",
 			"location": "[steps('basics').resourceScope.location.name]",
-			"resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
+			"subscriptionId": "[steps('basics').resourceScope.subscription.id]"
 		}
 	}
 }
