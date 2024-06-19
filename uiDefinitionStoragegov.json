@@ -53,20 +53,6 @@
 							}
 						},
 						{
-							"name": "storageAccountSelector",
-							"type": "Microsoft.Storage.StorageAccountSelector",
-							"label": "Storage account name",
-							"toolTip": "",
-							"defaultValue": {
-								"name": "weihasdkfjgaiwegbir013843",
-								"type": "Premium_LRS"
-							},
-							"options": {
-								"hideExisting": true
-							},
-							"visible": true
-						},
-						{
 							"name": "shareName",
 							"type": "Microsoft.Common.TextBox",
 							"label": "File Share Name",
