@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "11060899739757840157"
+      "templateHash": "16689180537673986994"
     }
   },
   "parameters": {
@@ -106,6 +106,7 @@
     "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
     "storageSKU": "[format('{0}_{1}', parameters('storageTier'), parameters('storageRedundancy'))]",
     "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
+    "storageKind": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), 'FileStorage', 'StorageV2')]",
     "smbSettings": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'versions', 'SMB3.0;SMB3.1.1'))]",
     "storageSetupScript": "domainJoinStorageAcct.ps1",
     "tenantId": "[subscription().tenantId]"
@@ -196,6 +197,9 @@
           "storageFileShareName": {
             "value": "[parameters('storageFileShareName')]"
           },
+          "storageKind": {
+            "value": "[variables('storageKind')]"
+          },
           "storageResourceGroup": {
             "value": "[parameters('storageResourceGroup')]"
           },
@@ -222,7 +226,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "16733537324934322042"
+              "templateHash": "13951193908673804377"
             }
           },
           "parameters": {
@@ -275,6 +279,9 @@
               "type": "string"
             },
             "storageFileShareName": {
+              "type": "string"
+            },
+            "storageKind": {
               "type": "string"
             },
             "storageResourceGroup": {
@@ -410,7 +417,7 @@
               "sku": {
                 "name": "[parameters('storageSKU')]"
               },
-              "kind": "StorageV2",
+              "kind": "[parameters('storageKind')]",
               "identity": {
                 "type": "UserAssigned",
                 "userAssignedIdentities": {
