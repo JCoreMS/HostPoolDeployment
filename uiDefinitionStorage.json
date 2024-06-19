@@ -499,9 +499,9 @@
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
 				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
 			},
-			"kind": "Subscription",
-			"location": "[steps('basics').resourceScope.location.name]",
-			"subscriptionId": "[steps('basics').resourceScope.subscription.id]"
+            "kind": "ResourceGroup",
+            "location": "[steps('basics').resourceScope.location.name]",
+            "resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
 		}
 	}
 }
