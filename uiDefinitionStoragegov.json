@@ -11,8 +11,7 @@
 					"elements": [
 						{
 							"name": "resourceScope",
-							"type": "Microsoft.Common.ResourceScope",
-							"instanceDetailsLabel": "Storage Account Essentials"
+							"type": "Microsoft.Common.ResourceScope"
 						},
 						{
 							"name": "resourceGroupsApi",
