@@ -6,7 +6,7 @@ param domainJoinOUPath string
 param domainJoinUserName string
 @secure()
 param domainJoinUserPassword string
-param location string = resourceGroup().location
+param location string
 
 param subnetId string
 param tags object
