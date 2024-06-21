@@ -107,6 +107,31 @@ resource keyVaultKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
 }
 
 
+// Private Endpoint for Storage Account
+resource keyvaultPvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
+  name: 'pep-${keyVaultName}'
+  location: location
+  properties: {
+    privateLinkServiceConnections: [
+      {
+        name: 'pep-${keyVaultName}'
+        properties: {
+          privateLinkServiceId: keyVault.id
+          groupIds: [
+            'vault'
+          ]
+        }
+      }
+    ]
+    subnet: {
+      id: subnetId
+    }
+  }
+  dependsOn:[
+    keyVaultKey
+  ]
+}
+
 // Assign Managed Identity to Key Vault
 resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, 'assignIdentity2Vault')
@@ -205,30 +230,6 @@ resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
   ]
 }
 
-// Private Endpoint for Storage Account
-resource keyvaultPvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: 'pep-${keyVaultName}'
-  location: location
-  properties: {
-    privateLinkServiceConnections: [
-      {
-        name: 'pep-${keyVaultName}'
-        properties: {
-          privateLinkServiceId: keyVault.id
-          groupIds: [
-            'vault'
-          ]
-        }
-      }
-    ]
-    subnet: {
-      id: subnetId
-    }
-  }
-  dependsOn:[
-    keyVaultKey
-  ]
-}
 
 resource storageFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
   name: '${storageAccount.name}/default/${storageFileShareName}'
