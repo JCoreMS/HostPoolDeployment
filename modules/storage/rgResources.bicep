@@ -120,6 +120,10 @@ resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-0
       'e147488a-f6f5-4113-8e2d-b22465e65bf6'
     ) // Key Vault Crypto Service Encryption User
   }
+  dependsOn: [
+    keyVaultKey
+    keyvaultPvtEndpoint
+  ]
 }
 
 // Create Storage Account
@@ -173,7 +177,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
   dependsOn: [
     assignIdentity2Vault
-    keyVaultKey
   ]
 }
 

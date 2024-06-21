@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "1803864957489083882"
+      "templateHash": "8077200233956606933"
     }
   },
   "parameters": {
@@ -218,7 +218,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "8479621999298295778"
+              "templateHash": "1888154722926418549"
             }
           },
           "parameters": {
@@ -400,7 +400,9 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('keyVaultName')))]"
               ]
             },
             {
