@@ -556,9 +556,10 @@
 			}
 		},
 		"resourceTypes": [
-			"Microsoft.Compute/virtualMachines",
-			"Microsoft.Compute/virtualMachines/extensions",
-			"Microsoft.Network/networkInterfaces"
-		]
+            "Microsoft.Compute/virtualMachines",
+            "Microsoft.Network/networkInterfaces",
+            "Microsoft.Network/privateEndpoints",
+            "Microsoft.Storage/storageAccounts"
+        ]
 	}
 }
