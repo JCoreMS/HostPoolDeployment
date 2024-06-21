@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "10879276395810554806"
+      "templateHash": "11858104951545403717"
     }
   },
   "parameters": {
@@ -86,6 +86,10 @@
     "subnetId": {
       "type": "string"
     },
+    "subscriptionId": {
+      "type": "string",
+      "defaultValue": "[subscription().subscriptionId]"
+    },
     "tags": {
       "type": "object"
     },
@@ -107,7 +111,6 @@
     "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
     "storageSKU": "[format('{0}_{1}', parameters('storageTier'), parameters('storageRedundancy'))]",
     "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
-    "subscriptionId": "[subscription().subscriptionId]",
     "storageKind": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), 'FileStorage', 'StorageV2')]",
     "smbSettings": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'mulitchannel', createObject('enabled', true()), 'versions', 'SMB3.0;SMB3.1.1'), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'versions', 'SMB3.0;SMB3.1.1'))]",
     "storageSetupScript": "domainJoinStorageAcct.ps1",
@@ -212,7 +215,7 @@
             "value": "[parameters('storageShareSize')]"
           },
           "subscriptionId": {
-            "value": "[variables('subscriptionId')]"
+            "value": "[parameters('subscriptionId')]"
           },
           "vmAdminPassword": {
             "value": "[parameters('vmAdminPassword')]"
