@@ -70,12 +70,12 @@ var WinEvents = [
   }
 ]
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = if(HostPoolWorkspaceName != 'none') {
+/* resource workspace 'Microsoft.DesktopVirtualization/workspaces@2021-07-12' existing = if(HostPoolWorkspaceName != 'none') {
   name: HostPoolWorkspaceName
 }
 
 // Name is the same as WVD Insights created to avoid conflict with AVD Conifuguration Workbook
-resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (HostPoolWorkspaceName != 'none') {
+resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if(HostPoolWorkspaceName != 'none') {
   name: 'WVDInsights'
   scope: workspace
   properties: {
@@ -87,7 +87,7 @@ resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
     ]
     workspaceId: LogAnalyticsWorkspaceId
   }
-}
+} */
 
 resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = if(HostPoolStatus != 'Existing') {
   name: HostPoolName
@@ -108,4 +108,4 @@ resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-p
 }
 
 
-output WorkspaceInfo object = workspace
+//output WorkspaceInfo object = workspace

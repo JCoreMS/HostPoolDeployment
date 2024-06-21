@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "2421156910199576272"
+      "templateHash": "6959771521616495309"
     }
   },
   "parameters": {
@@ -1029,7 +1029,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "15978595227429195987"
+              "templateHash": "4519746122556212830"
             }
           },
           "parameters": {
@@ -1124,22 +1124,6 @@
           },
           "resources": [
             {
-              "condition": "[not(equals(parameters('HostPoolWorkspaceName'), 'none'))]",
-              "type": "Microsoft.Insights/diagnosticSettings",
-              "apiVersion": "2021-05-01-preview",
-              "scope": "[format('Microsoft.DesktopVirtualization/workspaces/{0}', parameters('HostPoolWorkspaceName'))]",
-              "name": "WVDInsights",
-              "properties": {
-                "logs": [
-                  {
-                    "categoryGroup": "AllLogs",
-                    "enabled": true
-                  }
-                ],
-                "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
-              }
-            },
-            {
               "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2021-05-01-preview",
@@ -1155,13 +1139,7 @@
                 "workspaceId": "[parameters('LogAnalyticsWorkspaceId')]"
               }
             }
-          ],
-          "outputs": {
-            "WorkspaceInfo": {
-              "type": "object",
-              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/workspaces', parameters('HostPoolWorkspaceName')), '2021-07-12', 'full')]"
-            }
-          }
+          ]
         }
       },
       "dependsOn": [

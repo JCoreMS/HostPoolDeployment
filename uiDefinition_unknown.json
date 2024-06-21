@@ -1,0 +1,1367 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2021-09-09/uiFormDefinition.schema.json",
+	"view": {
+		"kind": "Form",
+		"properties": {
+			"title": "Deploy or Update AVD HostPool",
+			"steps": [
+				{
+					"name": "basics",
+					"label": "Basics",
+					"elements": [
+						{
+							"name": "resourceScope",
+							"type": "Microsoft.Common.ResourceScope",
+							"instanceDetailsLabel": "Host Pool Deployment Details"
+						},
+						{
+							"name": "resourceGroupsApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/resourceGroups?api-version=2022-09-01')]"
+							}
+						},
+						{
+							"name": "hostGroupApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.Compute/hostGroups?api-version=2023-09-01')]"
+							}
+						},
+						{
+							"name": "appGroupApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.DesktopVirtualization/applicationGroups?api-version=2022-02-10-preview')]",
+								"transforms": {
+									"list": "value|[*].{label:name, value:{name:name, id:id, kind:kind, properties:properties}, description:kind}"
+								}
+							}
+						},
+						{
+							"name": "workSpaceApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.DesktopVirtualization/workspaces?api-version=2022-02-10-preview')]",
+								"transforms": {
+									"list": "value|[*].{label:name, value:{name:name, id:id, properties:properties}, description:properties.friendlyName}"
+								}
+							}
+						},
+						{
+							"name": "dcrApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.Insights/dataCollectionRules?api-version=2022-06-01')]",
+								"transforms": {
+									"list": "value|[*].{label:name, value:id, description:properties.destinations.logAnalytics[0].name}"
+								}
+							}
+						},
+						{
+							"name": "TagsSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Tags",
+							"elements": [
+								{
+									"name": "Tags",
+									"type": "Microsoft.Common.TagsByResource",
+									"resources": [
+										"Microsoft.Storage/storageAccounts",
+										"Microsoft.Compute/virtualMachines",
+										"Microsoft.Network/networkInterfaces",
+										"Microsoft.Resources/resourceGroups",
+										"Microsoft.Automation/automationAccounts",
+										"Microsoft.Compute/availabilitySets",
+										"Microsoft.DesktopVirtualization/hostPools",
+										"Microsoft.DesktopVirtualization/applicationGroups",
+										"Microsoft.DesktopVirtualization/workspaces",
+										"Microsoft.OperationalInsights/workspaces",
+										"Microsoft.Insights/diagnosticSettings"
+									],
+									"visible": true
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "hostPool",
+					"label": "Host Pool",
+					"elements": [
+						{
+							"name": "hostPool",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Host Pool",
+							"defaultValue": "Existing",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "New",
+										"value": "New"
+									},
+									{
+										"label": "Existing",
+										"value": "Existing"
+									},
+									{
+										"label": "Alternate Tenant",
+										"value": "AltTenant"
+									}
+								],
+								"required": true
+							},
+							"visible": true
+						},
+						{
+							"name": "hostPoolSelection",
+							"type": "Microsoft.Solutions.ResourceSelector",
+							"visible": "[if(equals(steps('hostPool').hostPool, 'Existing'), true, false)]",
+							"label": "Host Pool Selection",
+							"resourceType": "Microsoft.DesktopVirtualization/hostPools",
+							"scope": {
+								"subscriptionId": "[steps('basics').resourceScope.subscription.subscriptionId]",
+								"location": "[steps('basics').resourceScope.location.name]"
+							},
+							"constraints": {
+								"required": "[if(equals(steps('hostPool').hostPool, 'Existing'), true, false)]"
+							}
+						},
+						{
+							"name": "hostPoolApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('hostPool').hostPoolSelection.id, '?api-version=2022-04-01-preview')]"
+							}
+						},
+						{
+							"name": "hostPoolAppGroupApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('hostPool').hostPoolApi.properties.applicationGroupReferences, '?api-version=2022-04-01-preview')]"
+							}
+						},
+						{
+							"name": "HostPoolName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Host Pool Name",
+							"defaultValue": "",
+							"toolTip": "",
+							"placeholder": "hp-",
+							"constraints": {
+								"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
+							"name": "rgNewExistingHP",
+							"type": "Microsoft.Common.DropDown",
+							"label": "New or Existing Resouce Group",
+							"defaultValue": "New",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "New",
+										"value": "New"
+									},
+									{
+										"label": "Existing",
+										"value": "Existing"
+									}
+								],
+								"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
+							"name": "hpRGExisting",
+							"type": "Microsoft.Common.DropDown",
+							"visible": "[if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), true, false)]",
+							"filter": true,
+							"label": "Resource Group for HostPool Resources",
+							"defaultValue": "[steps('basics').resourceScope.resourceGroup.name]",
+							"toolTip": "Select the primary location to store the host pool resources. (host pool, workspace, application group, etc.)",
+							"constraints": {
+								"allowedValues": "[map(steps('basics').resourceGroupsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+								"required": "[if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), true, false)]"
+							}
+						},
+						{
+							"name": "hpRGNameNew",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Resource Group Name",
+							"defaultValue": "",
+							"toolTip": "",
+							"placeholder": "rg-<region>-avd",
+							"constraints": {
+								"required": "[if(equals(steps('hostPool').rgNewExistingHP, 'New'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('hostPool').rgNewExistingHP, 'New'), true, false)]"
+						},
+						{
+							"name": "hostPoolType",
+							"type": "Microsoft.Common.OptionsGroup",
+							"label": "Host Pool Type",
+							"defaultValue": "Pooled",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "Pooled",
+										"value": "Pooled"
+									},
+									{
+										"label": "Personal / Persistent",
+										"value": "Personal"
+									}
+								],
+								"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
+							"name": "hostPoolPooled",
+							"type": "Microsoft.Common.Section",
+							"label": "Pooled Configuration",
+							"elements": [
+								{
+									"name": "HostPoolBalance",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Choose balance option",
+									"defaultValue": "Depth First",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Depth First",
+												"value": "DepthFirst"
+											},
+											{
+												"label": "Breadth First",
+												"value": "BreadthFirst"
+											}
+										],
+										"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+									},
+									"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+								},
+								{
+									"name": "AppGroupType",
+									"type": "Microsoft.Common.DropDown",
+									"label": "App Group Type",
+									"defaultValue": "Full Desktop",
+									"toolTip": "",
+									"constraints": {
+										"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
+										"allowedValues": [
+											{
+												"label": "Full Desktop",
+												"value": "Desktop"
+											},
+											{
+												"label": "Remote Apps",
+												"value": "RemoteApp"
+											}
+										]
+									},
+									"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+								},
+								{
+									"name": "NumUsersPerHost",
+									"type": "Microsoft.Common.Slider",
+									"min": 1,
+									"max": 30,
+									"label": "Number of Users Per Host",
+									"defaultValue": 2,
+									"showStepMarkers": false,
+									"toolTip": "",
+									"constraints": {
+										"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+									},
+									"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+								}
+							],
+							"visible": "[if(equals(steps('hostPool').hostPoolType, 'Pooled'), true, false)]"
+						},
+						{
+							"name": "hostPoolPersonal",
+							"type": "Microsoft.Common.Section",
+							"label": "Personal Configuration",
+							"elements": [
+								{
+									"name": "PersonalAssignment",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Choose assignment option",
+									"defaultValue": "Automatic",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Automatic",
+												"value": "Automatic"
+											},
+											{
+												"label": "Manually Assign",
+												"value": "Direct"
+											}
+										],
+										"required": true
+									},
+									"visible": true
+								}
+							],
+							"visible": "[if(equals(steps('hostPool').hostPoolType, 'Personal'), true, false)]"
+						},
+						{
+							"name": "NumSessionHosts",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Session Hosts",
+							"defaultValue": "2",
+							"toolTip": "",
+							"constraints": {
+								"required": true,
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": true
+						},
+						{
+							"name": "StartVmOnConnect",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Start Vm On Connect",
+							"toolTip": "Enables ability for VM to start if VMs are turned off but deployed to the host pool.",
+							"constraints": {
+								"required": false,
+								"validationMessage": "Ideally you'd enable this for multisession when you have Scaling Plans or Personal Desktops in which VMs may be powered down."
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
+							"name": "ValidationEnvironment",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Validation Environment",
+							"toolTip": "The value determines whether the hostpool should receive early AVD updates for testing.",
+							"constraints": {
+								"required": false,
+								"validationMessage": "This should be set for test and development environments."
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
+							"name": "WorkSpaceNew",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Create New Workspace",
+							"toolTip": "Select this option to then create a new AVD Workspace that the Application Group will be associated with.",
+							"constraints": {
+								"required": false,
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), false, true)]"
+						},
+						{
+							"name": "AppGroupNew",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Create New Application Group",
+							"toolTip": "Select this option to then create a new AVD Application Group. Consider including DAG for Desktop and RAIL for Remote Apps in the name.",
+							"constraints": {
+								"required": false,
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), false, true)]"
+						},
+						{
+							"name": "WorkspaceName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Workspace Name",
+							"defaultValue": "",
+							"toolTip": "",
+							"placeholder": "ws-",
+							"constraints": {
+								"required": "[steps('hostPool').WorkSpaceNew]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[steps('hostPool').WorkSpaceNew]"
+						},
+						{
+							"name": "workSpaceExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Existing Workspace",
+							"placeholder": "",
+							"defaultValue": "",
+							"toolTip": "Select the existing Workspace to associate the Application Group to.",
+							"multiselect": false,
+							"selectAll": false,
+							"filter": true,
+							"filterPlaceholder": "Filter items ...",
+							"multiLine": true,
+							"defaultDescription": "No Friendly Name",
+							"constraints": {
+								"allowedValues": "[steps('basics').workSpaceApi.transformed.list]",
+								"required": "[not(steps('hostPool').WorkSpaceNew)]"
+							},
+							"visible": "[not(steps('hostPool').WorkSpaceNew)]"
+						},
+						{
+							"name": "AppGroupName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "App Group Name",
+							"defaultValue": "",
+							"toolTip": "",
+							"placeholder": "appgrp-",
+							"constraints": {
+								"required": "[steps('hostPool').AppGroupNew]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[steps('hostPool').AppGroupNew]"
+						},
+						{
+							"name": "appGroupExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Existing Application Group",
+							"placeholder": "",
+							"defaultValue": "",
+							"toolTip": "Select the existing Application Group to associate to the Host Pool.",
+							"multiselect": false,
+							"selectAll": false,
+							"filter": true,
+							"filterPlaceholder": "Filter items ...",
+							"multiLine": true,
+							"defaultDescription": "No Friendly Name",
+							"constraints": {
+								"allowedValues": "[steps('basics').appGroupApi.transformed.list]",
+								"required": "[not(steps('hostPool').AppGroupNew)]"
+							},
+							"visible": "[not(steps('hostPool').AppGroupNew)]"
+						},
+						{
+							"name": "CustomRdpProperty",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Custom RDP Property",
+							"defaultValue": "audiocapturemode:i:1;camerastoredirect:s:*;use multimon:i:0;drivestoredirect:s:;",
+							"toolTip": "",
+							"placeholder": "audiocapturemode:i:1;camerastoredirect:s:*;use multimon:i:0;drivestoredirect:s:;",
+							"constraints": {
+								"required": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'New'), true, false)]"
+						},
+						{
+							"name": "CrossTenantHPToken",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Host Pool Token",
+							"toolTip": "Valid Host Pool Token from alternate Tenant. Can be alternate Azure Cloud.",
+							"multiLine": true,
+							"constraints": {
+								"required": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), true, false)]"
+						}
+					]
+				},
+				{
+					"name": "monitoring",
+					"label": "Monitoring",
+					"elements": [
+						{
+							"name": "deployMonitoringInfo1",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": true,
+							"options": {
+								"text": "Azure Virtual Desktop monitoring requires an existing Azure Log Analytics Workspace or the creation of a new one.",
+								"uri": "https://docs.microsoft.com/azure/virtual-desktop/azure-monitor",
+								"style": "Info"
+							}
+						},
+						{
+							"name": "lawNewExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "New or Existing Log Analytics",
+							"defaultValue": "Existing",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "New",
+										"value": "New"
+									},
+									{
+										"label": "Existing",
+										"value": "Existing"
+									}
+								],
+								"required": true
+							},
+							"visible": true
+						},
+						{
+							"name": "alaWorkspaceExistingWorkspacesSelection",
+							"type": "Microsoft.Solutions.ResourceSelector",
+							"visible": "[if(equals(steps('monitoring').lawNewExisting, 'Existing'), true, false)]",
+							"label": "Existing workspace",
+							"resourceType": "Microsoft.OperationalInsights/workspaces",
+							"constraints": {
+								"required": "[if(equals(steps('monitoring').lawNewExisting, 'Existing'), true, false)]"
+							}
+						},
+						{
+							"name": "lawNewName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "New Log Analytics Name",
+							"defaultValue": "",
+							"toolTip": "Consider your current naming standards when creating a new name.",
+							"constraints": {
+								"required": "[if(equals(steps('monitoring').lawNewExisting, 'New'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('monitoring').lawNewExisting, 'New'), true, false)]"
+						},
+						{
+							"name": "dcrNewExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "New or Existing Data Collection Rule",
+							"defaultValue": "Existing",
+							"toolTip": "",
+							"constraints": {
+								"allowedValues": [
+									{
+										"label": "New",
+										"value": "New"
+									},
+									{
+										"label": "Existing",
+										"value": "Existing"
+									}
+								],
+								"required": true
+							},
+							"visible": true
+						},
+						{
+							"name": "dcrExisting",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Existing Data Collection Rule",
+							"placeholder": "",
+							"defaultValue": "",
+							"toolTip": "Select the existing Data Collection Rule that was configured per AVD Insights.",
+							"multiselect": false,
+							"selectAll": false,
+							"filter": true,
+							"filterPlaceholder": "Filter items ...",
+							"multiLine": true,
+							"defaultDescription": "A value for selection",
+							"constraints": {
+								"allowedValues": "[steps('basics').dcrApi.transformed.list]",
+								"required": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), true, false)]"
+							},
+							"visible": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), true, false)]"
+						},
+						{
+							"name": "dcrNewName",
+							"type": "Microsoft.Common.TextBox",
+							"label": "New Data Collection Rule Name",
+							"defaultValue": "",
+							"toolTip": "Consider your current naming standards when creating a new name.",
+							"constraints": {
+								"required": "[if(equals(steps('monitoring').dcrNewExisting, 'New'), true, false)]",
+								"regex": "",
+								"validationMessage": ""
+							},
+							"visible": "[if(equals(steps('monitoring').dcrNewExisting, 'New'), true, false)]"
+						},
+						{
+							"name": "monitoringRGExisting",
+							"type": "Microsoft.Common.DropDown",
+							"visible": "[if(or(equals(steps('monitoring').lawNewExisting, 'New'), equals(steps('monitoring').dcrNewExisting, 'New')), true, false)]",
+							"filter": true,
+							"label": "Resource Group for Monitoring",
+							"defaultValue": "",
+							"toolTip": "Select the Resource Group where you'd like to create the new Log Analytics Workspace and/or Data Collection Rule for AVD.",
+							"constraints": {
+								"allowedValues": "[map(steps('basics').resourceGroupsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+								"required": "[if(equals(steps('monitoring').lawNewExisting, 'New'), true, false)]"
+							}
+						},
+						{
+							"name": "deployMonitoringInfo2",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": true,
+							"options": {
+								"text": "Deployment will configure all required settings to use the AVD insights workbook.",
+								"uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
+								"style": "Info"
+							}
+						},
+						{
+							"name": "deployMonitoringInfo3",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": "[if(equals(steps('hostPool').hostPool, 'AltTenant'), true, false)]",
+							"options": {
+								"text": "You selected an Alternate Tenant or deploying Cross Cloud. Only the VM specific settings will be configured.",
+								"uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
+								"style": "Warning"
+							}
+						}
+					]
+				},
+				{
+					"name": "hostInfo",
+					"label": "Host Information",
+					"elements": [
+						{
+							"name": "vmInformation",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "Vm Information",
+							"elements": [
+								{
+									"name": "vmRGselection",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Option Vm Resource Group?",
+									"defaultValue": "Same Resource Group",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Same Resource Group",
+												"value": "Same"
+											},
+											{
+												"label": "Existing Resource Group",
+												"value": "Existing"
+											},
+											{
+												"label": "New Resource Group",
+												"value": "New"
+											}
+										],
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "vmRGexisting",
+									"type": "Microsoft.Common.DropDown",
+									"visible": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), true, false)]",
+									"filter": true,
+									"label": "Vm Resources Deployment Location",
+									"defaultValue": "[steps('basics').resourceScope.resourceGroup.name]",
+									"toolTip": "Select the primary location to store the Image Version. This location should coincide with your AVD session hosts.",
+									"constraints": {
+										"allowedValues": "[map(steps('basics').resourceGroupsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+										"required": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), true, false)]"
+									}
+								},
+								{
+									"name": "vmRGnew",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Vm Resource Group Name",
+									"toolTip": "Input a custom name for the shared services resource group.",
+									"placeholder": "Example: rg-avd-shared-services",
+									"constraints": {
+										"required": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'New'), true, false)]",
+										"regex": "^(?!.*[\\.]$)[a-zA-Z0-9_\\.()-]{1,90}$",
+										"validationMessage": "The value must be alphanumerics, underscores, hyphens, periods, and parentheses. The value must not end with a period. The length must be 1 to 90 characters."
+									},
+									"visible": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'New'), true, false)]"
+								},
+								{
+									"name": "VmIndexStart",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Vm Index Start",
+									"defaultValue": "",
+									"toolTip": "This would be the starting index number for the VM name. For example, if you have VMs with 0-4 and want to start with 5.",
+									"constraints": {
+										"required": true,
+										"regex": "",
+										"validationMessage": ""
+									},
+									"visible": true
+								},
+								{
+									"name": "VmPrefix",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Vm Prefix",
+									"defaultValue": "",
+									"toolTip": "",
+									"constraints": {
+										"required": true,
+										"regex": "",
+										"validationMessage": ""
+									},
+									"visible": true
+								},
+								{
+									"name": "VmSize",
+									"type": "Microsoft.Compute.SizeSelector",
+									"label": "VM Size",
+									"toolTip": "",
+									"recommendedSizes": [
+										"Standard_D4s_v5"
+									],
+									"constraints": {
+										"allowedSizes": []
+									},
+									"options": {
+										"hideDiskTypeFilter": false
+									},
+									"osPlatform": "Windows",
+									"imageReference": {
+										"publisher": "MicrosoftWindowsDesktop",
+										"offer": "Windows-11",
+										"sku": "21h2-avd"
+									},
+									"count": "[steps('hostPool').NumSessionHosts]",
+									"visible": true
+								},
+								{
+									"name": "DiskSku",
+									"type": "Microsoft.Common.DropDown",
+									"label": "OS Disk Sku",
+									"defaultValue": "Standard SSD",
+									"toolTip": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS.",
+									"constraints": {
+										"required": true,
+										"allowedValues": [
+											{
+												"label": "Standard HDD (Not Recommended for Production)",
+												"value": "Standard_LRS"
+											},
+											{
+												"label": "Standard SSD",
+												"value": "StandardSSD_LRS"
+											},
+											{
+												"label": "Premium",
+												"value": "Premium_LRS"
+											}
+										]
+									},
+									"visible": true
+								}
+							]
+						},
+						{
+							"name": "domainInformation",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "Domain join information",
+							"elements": [
+								{
+									"name": "DomainName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Domain Name",
+									"toolTip": "Provide identity service domain name.",
+									"placeholder": "Example: contoso.com",
+									"constraints": {
+										"required": true
+									}
+								},
+								{
+									"name": "OUPath",
+									"type": "Microsoft.Common.TextBox",
+									"label": "OU Path (optional)",
+									"defaultValue": "",
+									"placeholder": "OU=workstations,DC=contos,DC=com",
+									"toolTip": "It's best to consider an OU with no or limited Group Policies for initial deployments. This value should be the distinguished name of the OU.",
+									"constraints": {
+										"required": false,
+										"regex": "",
+										"validationMessage": ""
+									},
+									"visible": true
+								}
+							]
+						},
+						{
+							"name": "identityDomainCredentials",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "Domain join credentials",
+							"elements": [
+								{
+									"name": "DomainUser",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Username",
+									"toolTip": "Provide username with permissions to join session host to the domain.",
+									"placeholder": "Example: avdadmin@contoso.com",
+									"defaultValue": "",
+									"constraints": {
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "optionDomainCredsKeyvault",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Use Keyvault for Credentials",
+									"toolTip": "Use credentials stored in an existing Keyvault.",
+									"constraints": {
+										"required": false
+									},
+									"visible": true
+								},
+								{
+									"name": "kvDomain",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Select Keyvault",
+									"resourceType": "Microsoft.KeyVault/vaults",
+									"toolTip": "Select Keyvault which contains the secrets for the Domain Credentials.",
+									"constraints": {
+										"required": true
+									},
+									"visible": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
+								},
+								{
+									"name": "kvDomainSecretName",
+									"type": "Microsoft.Common.TextBox",
+									"defaultValue": "domainJoinUserPassword",
+									"label": "KeyVault Secret Name (Domain Credential)",
+									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
+									"visible": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]"
+								},
+								{
+									"name": "DomainPassword",
+									"type": "Microsoft.Common.PasswordBox",
+									"label": {
+										"password": "Password",
+										"confirmPassword": "Confirm Password"
+									},
+									"toolTip": "Provide password for domain join account.",
+									"constraints": {
+										"required": true
+									},
+									"options": {
+										"hideConfirmation": false
+									},
+									"visible": "[equals(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, false)]"
+								}
+							]
+						},
+						{
+							"name": "identityLocalCredentials",
+							"type": "Microsoft.Common.Section",
+							"visible": true,
+							"label": "Session host local admin credentials",
+							"elements": [
+								{
+									"name": "VmUsername",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Username",
+									"toolTip": "Provide username for session host local admin account. Administrator can't be used as username, it is reserved by the system.",
+									"placeholder": "Example: avdadmin",
+									"defaultValue": "",
+									"constraints": {
+										"regex": "^(?!.*[aA]dministrator).*$",
+										"validationMessage": "This username can't be used, it is a reserved word.",
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "optionLocalCredsKeyvault",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Use Keyvault for Credentials",
+									"toolTip": "Use credentials stored in an existing Keyvault.",
+									"constraints": {
+										"required": false
+									},
+									"visible": true
+								},
+								{
+									"name": "kvLocal",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Select Keyvault",
+									"resourceType": "Microsoft.KeyVault/vaults",
+									"toolTip": "Select Keyvault which contains the secrets for the Local Admin Credentials.",
+									"constraints": {
+										"required": true
+									},
+									"visible": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
+								},
+								{
+									"name": "kvLocalSecretName",
+									"type": "Microsoft.Common.TextBox",
+									"defaultValue": "vmLocalUserPassword",
+									"label": "KeyVault Secret Name (Local Admin Credential)",
+									"toolTip": "The Name of the KeyVault secret that contains the encrypted password as a value.",
+									"visible": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]"
+								},
+								{
+									"name": "VmPassword",
+									"type": "Microsoft.Compute.CredentialsCombo",
+									"visible": "[equals(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, false)]",
+									"label": {
+										"password": "Password",
+										"confirmPassword": "Confirm password"
+									},
+									"toolTip": {
+										"password": "The password must be alphanumeric, contain at least 12 characters, have at least 1 letter,1 number and 1 special character."
+									},
+									"constraints": {
+										"required": true
+									},
+									"options": {
+										"hideConfirmation": false
+									},
+									"osPlatform": "Windows"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "dedicatedHostInfo",
+					"label": "Dedicated Host Option",
+					"elements": [
+						{
+							"name": "vmDedicatedHostOpt",
+							"type": "Microsoft.Common.CheckBox",
+							"label": "Deploy VM(s) on Dedicated Host",
+							"toolTip": "Select this if you would like to deploy VMs on a Dedicated Azure Host already created. Ensuring the VM SKU and Host SKU match.",
+							"constraints": {
+								"required": false,
+								"validationMessage": "IF you have a hard requirement for Compute isolation like those noted for IL5, this may be an option to consider."
+							},
+							"visible": true
+						},
+						{
+							"name": "dedicatedHostInfobox1",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": true,
+							"options": {
+								"text": "In some environments it is required to have a dedicated Azure Host or Server to isolate Compute. This is most common in IL5 type environments. Selecting this option will ensure the VMs are deployed on a pre-existing Dedicated Host. Click this box for more information.",
+								"uri": "https://learn.microsoft.com/en-us/azure/azure-government/documentation-government-impact-level-5#compute-isolation",
+								"style": "Info"
+							}
+						},
+						{
+							"name": "dedicatedHostConfig",
+							"type": "Microsoft.Common.Section",
+							"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
+							"label": "Dedicated Host Configuration",
+							"elements": [
+								{
+									"name": "vmDedicatedHostGroup",
+									"type": "Microsoft.Common.DropDown",
+									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
+									"filter": true,
+									"label": "Select the Dedicated Host",
+									"defaultValue": "",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": "[map(steps('basics').hostGroupApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+										"required": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]"
+									}
+								},
+								{
+									"name": "dedicatedHostApi",
+									"type": "Microsoft.Solutions.ArmApiControl",
+									"request": {
+										"method": "GET",
+										"path": "[concat(steps('dedicatedHostInfo').dedicatedHostConfig.vmDedicatedHostGroup, '/hosts?api-version=2023-09-01')]"
+									}
+								},
+								{
+									"name": "dedicatedHost",
+									"type": "Microsoft.Common.DropDown",
+									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
+									"filter": true,
+									"label": "Select the Dedicated Host",
+									"defaultValue": "",
+									"toolTip": "",
+									"constraints": {
+										"allowedValues": "[map(steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHostApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]",
+										"required": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]"
+									}
+								},
+								{
+									"name": "dedicatedHostTagName",
+									"type": "Microsoft.Common.TextBox",
+									"label": "Tag Name for VM(s)",
+									"defaultValue": "DedicatedHost",
+									"toolTip": "Name for the Tag Key denoting this is VM will be on a dedicated Host. The Value will be the Dedicated Host Name. For NO added tag, remove the value and leave blank.",
+									"placeholder": "",
+									"multiLine": false,
+									"constraints": {
+										"required": false,
+										"validations": [
+											{
+												"regex": "^[a-zA-Z0-9_-]{1,256}$",
+												"message": "Only alphanumeric characters, dashes and hyphens are allowed, and the value must be 1-256 characters long."
+											}
+										]
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "networking",
+					"label": "Virtual Networking",
+					"elements": [
+						{
+							"name": "virtualNetworkSelection",
+							"type": "Microsoft.Solutions.ResourceSelector",
+							"visible": true,
+							"label": "Virtual network",
+							"resourceType": "Microsoft.Network/virtualNetworks"
+						},
+						{
+							"name": "subnetsApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('networking').virtualNetworkSelection.id, '/subnets?api-version=2022-05-01')]"
+							}
+						},
+						{
+							"name": "subnet",
+							"type": "Microsoft.Common.DropDown",
+							"visible": true,
+							"label": "Subnet",
+							"defaultValue": "",
+							"toolTip": "Select an existing subnet for AIB build virtual machines. This enables the use of Private Link and prevents the deployment of public IP addresses.",
+							"constraints": {
+								"allowedValues": "[map(steps('networking').subnetsApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+								"required": true
+							}
+						}
+					]
+				},
+				{
+					"name": "imageInfo",
+					"label": "Image Information",
+					"elements": [
+						{
+							"name": "ImageSource",
+							"type": "Microsoft.Common.DropDown",
+							"label": "Image Source",
+							"defaultValue": "Microsoft Gallery",
+							"toolTip": "Select whether to use a Microsoft Gallery Image or your own Compute Gallery Image.",
+							"constraints": {
+								"required": false,
+								"allowedValues": [
+									{
+										"label": "Microsoft Gallery",
+										"value": "MSGallery"
+									},
+									{
+										"label": "Compute Gallery",
+										"value": "ComputeGallery"
+									}
+								]
+							},
+							"visible": true
+						},
+						{
+							"name": "computeGallerySelection",
+							"type": "Microsoft.Solutions.ResourceSelector",
+							"visible": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
+							"label": "Azure Compute Gallery Selection",
+							"resourceType": "Microsoft.Compute/galleries",
+							"constraints": {
+								"required": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]"
+							}
+						},
+						{
+							"name": "computeGalleryApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('imageInfo').computeGallerySelection.id,'/images?api-version=2021-10-01')]"
+							}
+						},
+						{
+							"name": "imageSelection",
+							"type": "Microsoft.Common.DropDown",
+							"visible": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
+							"label": "Gallery Image",
+							"defaultValue": "",
+							"toolTip": "Select an existing Image Definition to use as a source.",
+							"constraints": {
+								"allowedValues": "[map(steps('imageInfo').computeGalleryApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.name, '\"}')))]",
+								"required": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]"
+							}
+						},
+						{
+							"name": "computeGalleryImageApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('imageInfo').computeGallerySelection.id,'/images/versions?api-version=2021-10-01')]"
+							}
+						},
+						{
+							"name": "sessionHostsOsImage",
+							"type": "Microsoft.Common.DropDown",
+							"visible": "[if(equals(steps('imageInfo').ImageSource, 'MSGallery'), true, false)]",
+							"label": "OS version",
+							"filter": true,
+							"defaultValue": "Windows 11 23H2 - Office 365 (Gen2)",
+							"toolTip": "Select the operating system version of the session hosts.",
+							"constraints": {
+								"required": "[if(equals(steps('imageInfo').ImageSource, 'MSGallery'), true, false)]",
+								"allowedValues": [
+									{
+										"label": "Windows 10 21H2",
+										"value": "win10_21h2"
+									},
+									{
+										"label": "Windows 10 21H2 - Office 365",
+										"value": "win10_21h2_office"
+									},
+									{
+										"label": "Windows 10 22H2 (Gen2)",
+										"value": "win10_22h2_g2"
+									},
+									{
+										"label": "Windows 10 22H2 - Office 365 (Gen2)",
+										"value": "win10_22h2_office_g2"
+									},
+									{
+										"label": "Windows 11",
+										"value": "win11_21h2"
+									},
+									{
+										"label": "Windows 11 - Office 365",
+										"value": "win11_21h2_office"
+									},
+									{
+										"label": "Windows 11 22H2 (Gen2)",
+										"value": "win11_22h2"
+									},
+									{
+										"label": "Windows 11 22H2 - Office 365 (Gen2)",
+										"value": "win11_22h2_office"
+									},
+									{
+										"label": "Windows 11 23H2 (Gen2)",
+										"value": "win11_23h2"
+									},
+									{
+										"label": "Windows 11 23H2 - Office 365 (Gen2)",
+										"value": "win11_23h2_office"
+									}
+								]
+							}
+						},
+						{
+							"name": "PostDeploySection",
+							"label": "Post Deploy Configuration",
+							"type": "Microsoft.Common.Section",
+							"elements": [
+								{
+									"name": "optionPostDeploy",
+									"type": "Microsoft.Common.OptionsGroup",
+									"label": "Use Post Deployment Script",
+									"defaultValue": "No",
+									"toolTip": "Optionally you can customize the image post deployment which will utilize a PowerShell script on a Blob Storage Account. This is also where you'd add options that would cary over to your PowerShell Script.",
+									"constraints": {
+										"allowedValues": [
+											{
+												"label": "Yes",
+												"value": true
+											},
+											{
+												"label": "No",
+												"value": false
+											}
+										],
+										"required": true
+									},
+									"visible": true
+								},
+								{
+									"name": "storageSelection",
+									"type": "Microsoft.Solutions.ResourceSelector",
+									"label": "Storage Account with Post Deploy Script",
+									"resourceType": "Microsoft.Storage/storageAccounts",
+									"toolTip": "Select a storage account",
+									"scope": {
+										"subscriptionId": "[steps('basics').resourceScope.subscription.subscriptionId]",
+										"location": "[steps('basics').resourceScope.location.name]"
+									},
+									"constraints": {
+										"required": "[steps('imageInfo').PostDeploySection.optionPostDeploy]"
+									},
+									"visible": "[steps('imageInfo').PostDeploySection.optionPostDeploy]"
+								},
+								{
+									"name": "storageAcctApi",
+									"type": "Microsoft.Solutions.ArmApiControl",
+									"request": {
+										"method": "GET",
+										"path": "[concat(steps('imageInfo').PostDeploySection.storageSelection.id, '?api-version=2022-05-01')]"
+									}
+								},
+								{
+									"name": "containerApi",
+									"type": "Microsoft.Solutions.ArmApiControl",
+									"request": {
+										"method": "GET",
+										"path": "[concat(steps('imageInfo').PostDeploySection.storageSelection.id, '/blobServices/default/containers?api-version=2023-01-01')]"
+									}
+								},
+								{
+									"name": "containerResourceId",
+									"type": "Microsoft.Common.DropDown",
+									"visible": "[steps('imageInfo').PostDeploySection.optionPostDeploy]",
+									"label": "Container",
+									"defaultValue": "",
+									"toolTip": "Select an existing container.",
+									"constraints": {
+										"required": "[steps('imageInfo').PostDeploySection.optionPostDeploy]",
+										"allowedValues": "[map(steps('imageInfo').PostDeploySection.containerApi.value, (item) => parse(concat('{\"label\":\"', item.name, '\",\"value\":\"', item.id, '\"}')))]"
+									}
+								},
+								{
+									"name": "postScriptName",
+									"type": "Microsoft.Common.TextBox",
+									"visible": "[steps('imageInfo').PostDeploySection.optionPostDeploy]",
+									"label": "Post Deployment PowerShell Script Name",
+									"toolTip": "",
+									"defaultValue": "PostConfig.ps1"
+								},
+								{
+									"name": "UserIdentityName",
+									"type": "Microsoft.Common.TextBox",
+									"visible": "[steps('imageInfo').PostDeploySection.optionPostDeploy]",
+									"label": "User Identity Name.",
+									"toolTip": "User Identity is needed for access to blob storage when SaS tokens are not allowed and for additional security.",
+									"defaultValue": "id-usr-AVD-Deployment",
+									"placeholder": ""
+								},
+								{
+									"name": "UpdateWindows",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Update Windows Post Deployment",
+									"toolTip": "If enabled Windows Update will run post deployment. This could delay the deployment and take additional time. It's recommended that you consider putting the VMs in drain mode until complete.",
+									"constraints": {
+										"required": false,
+										"validationMessage": ""
+									},
+									"visible": true
+								},
+								{
+									"name": "VDOT",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Configure Optimizations (VDOT)",
+									"defaultValue": true,
+									"toolTip": "Deploys All Standard Optimizations per https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool",
+									"constraints": {
+										"required": false,
+										"validationMessage": ""
+									},
+									"visible": true
+								},
+								{
+									"name": "restart",
+									"type": "Microsoft.Common.CheckBox",
+									"label": "Restart VMs after Post Config",
+									"defaultValue": true,
+									"toolTip": "It's recommended to restart after post deployment configurations, especially after Windows Updates.",
+									"constraints": {
+										"required": false,
+										"validationMessage": ""
+									},
+									"visible": true
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		"outputs": {
+			"parameters": {
+				"AppGroupNameNew": "[if(steps('hostPool').AppGroupNew, steps('hostPool').AppGroupName, 'none')]",
+				"AppGroupExisting": "[if(equals(steps('hostPool').AppGroupNew, false), steps('hostPool').appGroupExisting, 'none')]",
+				"AppGroupType": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').hostPoolPooled.AppGroupType, steps('hostPool').hostPoolApi.properties.preferredAppGroupType)]",
+				"avdOsImage": "[steps('imageInfo').sessionHostsOsImage]",
+				"ComputeGalleryName": "[steps('imageInfo').computeGallerySelection.name]",
+				"ComputeGallerySubId": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),2))]",
+				"ComputeGalleryRG": "[first(skip(split(steps('imageInfo').computeGallerySelection.id, '/'),4))]",
+				"ComputeGalleryImage": "[steps('imageInfo').imageSelection]",
+				"CustomRdpProperty": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').CustomRdpProperty, steps('hostPool').hostPoolApi.properties.customRdpProperty)]",
+				"DCRStatus": "[steps('monitoring').dcrNewExisting]",
+				"DCRNewName": "[if(equals(steps('monitoring').dcrNewExisting, 'New'), steps('monitoring').dcrNewName, '')]",
+				"DCRExisting": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), steps('monitoring').dcrExisting, '')]",
+				"dedicatedHostId": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHost]",
+				"dedicatedHostTagName": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHostTagName]",
+				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
+				"DomainName": "[steps('hostInfo').domainInformation.DomainName]",
+				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
+				"DomainPassword": "[if(steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityDomainCredentials.DomainPassword)]",
+				"ResourceGroupHP": "[if(equals(steps('hostPool').hostPool, 'Existing'), first(skip(split(steps('hostPool').hostPoolSelection.id, '/'),4)), if(equals(steps('hostPool').rgNewExistingHP, 'Existing'), steps('hostPool').hpRGExisting, steps('hostPool').hpRGNameNew))]",
+				"HostPoolOption": "[steps('hostPool').hostPool]",
+				"HostPoolRGStatus": "[steps('hostPool').rgNewExistingHP]",
+				"HostPoolName": "[if(equals(steps('hostPool').hostPool, 'Existing'), steps('hostPool').hostPoolSelection.name, steps('hostPool').HostPoolName)]",
+				"HostPoolAltToken": "[steps('hostPool').CrossTenantHPToken]",
+				"HostPoolWorkspaceName": "[steps('hostPool').WorkspaceName]",
+				"ResourceGroupVMs": "[if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Same'), steps('basics').resourceScope.resourceGroup.name, if(equals(steps('hostInfo').vmInformation.vmRGselection, 'Existing'), steps('hostInfo').vmInformation.vmRGexisting, steps('hostInfo').vmInformation.vmRGnew))]",
+				"RGVMsStatus": "[steps('hostInfo').vmInformation.vmRGselection]",
+				"HostPoolKind": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').hostPoolType, steps('hostPool').hostPoolApi.properties.hostPoolType)]",
+				"HostPoolLBType": "[if(equals(steps('hostPool').hostPool, 'New'), if(equals(steps('hostPool').hostPoolType, 'Pooled'), steps('hostPool').hostPoolPooled.HostPoolBalance, steps('hostPool').hostPoolPersonal.PersonalAssignment), if(equals(steps('hostPool').hostPoolApi.properties.hostPoolType, 'Personal'), steps('hostPool').hostPoolApi.properties.personalDesktopAssignmentType, steps('hostPool').hostPoolApi.properties.loadBalancerType))]",
+				"KeyVaultDomainOption": "[steps('hostInfo').identityDomainCredentials.optionDomainCredsKeyvault]",
+				"KeyVaultLocalOption": "[steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault]",
+				"KeyVaultDomResId": "[steps('hostInfo').identityDomainCredentials.kvDomain.id]",
+				"KeyVaultLocResId": "[steps('hostInfo').identityLocalCredentials.kvLocal.id]",
+				"KeyVaultDomName": "[steps('hostInfo').identityDomainCredentials.kvDomainSecretName]",
+				"KeyVaultLocName": "[steps('hostInfo').identityLocalCredentials.kvLocalSecretName]",
+				"LogAnalyticsRG": "[first(skip(split(steps('monitoring').alaWorkspaceExistingWorkspacesSelection.id, '/'),4))]",
+				"LogAnalyticsSubId": "[first(skip(split(steps('monitoring').alaWorkspaceExistingWorkspacesSelection.id, '/'),2))]",
+				"LogAnalyticsWorkspaceName": "[steps('monitoring').alaWorkspaceExistingWorkspacesSelection.name]",
+				"Location": "[steps('basics').resourceScope.location.name]",
+				"NumSessionHosts": "[steps('hostPool').NumSessionHosts]",
+				"NumUsersPerHost": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').hostPoolPooled.NumUsersPerHost, steps('hostPool').hostPoolApi.properties.maxSessionLimit)]",
+				"PostDeployOption": "[steps('imageInfo').PostDeploySection.optionPostDeploy]",
+				"PostDeployContainerId": "[steps('imageInfo').PostDeploySection.containerResourceId]",
+				"PostDeployScript": "[steps('imageInfo').PostDeploySection.postScriptName]",
+				"PostDeployOptVDOT": "[steps('imageInfo').PostDeploySection.VDOT]",
+				"ResGroupIdMonitor": "[if(or(equals(steps('monitoring').lawNewExisting, 'New'), equals(steps('monitoring').dcrNewExisting, 'New')), steps('monitoring').monitoringRGExisting, '')]",
+				"Restart": "[steps('imageInfo').PostDeploySection.restart]",
+				"Subnet": "[steps('networking').subnet]",
+				"Tags": "[steps('basics').TagsSection.Tags]",
+				"UpdateWindows": "[steps('imageInfo').PostDeploySection.UpdateWindows]",
+				"UseCustomImage": "[if(equals(steps('imageInfo').ImageSource, 'ComputeGallery'), true, false)]",
+				"StartVmOnConnect": "[if(equals(steps('hostPool').hostPool, 'New'), steps('hostPool').StartVmOnConnect, steps('hostPool').hostPoolApi.properties.startVMOnConnect)]",
+				"UserIdentityName": "[steps('imageInfo').PostDeploySection.UserIdentityName]",
+				"OUPath": "[steps('hostInfo').domainInformation.OUPath]",
+				"VODT": "[steps('imageInfo').PostDeploySection.VDOT]",
+				"VmIndexStart": "[steps('hostInfo').vmInformation.VmIndexStart]",
+				"VmPrefix": "[steps('hostInfo').vmInformation.VmPrefix]",
+				"ValidationEnvironment": "[steps('hostPool').ValidationEnvironment]",
+				"VirtualNetwork": "[steps('networking').virtualNetworkSelection.name]",
+				"VirtualNetworkResourceGroup": "[first(skip(split(steps('networking').virtualNetworkSelection.id, '/'),4))]",
+				"VmPassword": "[if(steps('hostInfo').identityLocalCredentials.optionLocalCredsKeyvault, 'abc123def456!notused', steps('hostInfo').identityLocalCredentials.VmPassword.password)]",
+				"VmSize": "[steps('hostInfo').vmInformation.VmSize]",
+				"VmUsername": "[steps('hostInfo').identityLocalCredentials.VmUsername]",
+				"WorkspaceName": "[if(steps('hostPool').WorkSpaceNew, steps('hostPool').WorkspaceName, steps('hostPool').workSpaceExisting)]"
+			},
+			"kind": "Subscription",
+			"location": "[steps('basics').resourceScope.location.name]",
+			"subscriptionId": "[steps('basics').resourceScope.subscription.id]"
+		}
+	}
+}
