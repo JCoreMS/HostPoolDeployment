@@ -1,13 +1,13 @@
 {
-	"$schema": "<relative path to dx.schema.json>",
+	"$schema": "https://schema.management.azure.com/schemas/2021-09-09/uiFormDefinition.schema.json",
 	"view": {
 		"kind": "Form",
 		"properties": {
-			"title": "Test Form View",
+			"title": "Deploy Zero Trust Storage for FSLogix (AD Joined)",
 			"steps": [
 				{
 					"name": "basics",
-					"label": "Basics",
+					"label": "Storage Basics",
 					"elements": [
 						{
 							"name": "resourceScope",
@@ -112,6 +112,16 @@
 										"value": "LRS"
 									}
 								]
+							}
+						},
+						{
+							"name": "StorageDeploymentLocationAndAvailability",
+							"type": "Microsoft.Common.InfoBox",
+							"visible": true,
+							"options": {
+								"text": "Storage resources will be deployed on the same location on the Session Hosts section.",
+								"uri": "https://learn.microsoft.com/azure/reliability/availability-zones-service-support#azure-regions-with-availability-zone-support",
+								"style": "Info"
 							}
 						},
 						{
@@ -512,58 +522,59 @@
 									"osPlatform": "Windows"
 								}
 							]
-						}
-					]
-				},
-				{
-					"name": "tags",
-					"label": "Tags",
-					"elements": [
+						},
 						{
-							"name": "tagsByResource",
-							"type": "Microsoft.Common.TagsByResource",
-							"resources": [
-								"Microsoft.Storage/storageAccounts",
-								"Microsoft.Compute/virtualMachines"
+							"name": "TagsSection",
+							"type": "Microsoft.Common.Section",
+							"label": "Tags",
+							"elements": [
+								{
+									"name": "Tags",
+									"type": "Microsoft.Common.TagsByResource",
+									"resources": [
+										"Microsoft.Storage/storageAccounts",
+										"Microsoft.Compute/virtualMachines",
+										"Microsoft.Network/networkInterfaces",
+										"Microsoft.Network/privateEndpoints"
+									],
+									"visible": true
+								}
 							]
 						}
 					]
 				}
-			],
-			"deployment": {
-				"kind": "ResourceGroup",
+			]
+		},
+		"outputs": {
+			"parameters": {
+				"domainJoinUserName": "[steps('domainJoinInfo').identityDomainCredentials.DomainUser]",
+				"domainJoinUserPassword": "[steps('domainJoinInfo').identityDomainCredentials.DomainPassword]",
+				"groupAdmins": "[steps('domainJoinInfo').ntfsSetup.groupAdminsName]",
+				"groupUsers": "[steps('domainJoinInfo').ntfsSetup.groupUsersName]",
+				"keyVaultName": "[steps('zeroTrustSetup').keyVaultName]",
 				"location": "[steps('basics').resourceScope.location.name]",
-				"resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]",
-				"parameters": {
-					"domainJoinUserName": "[steps('domainJoinInfo').identityDomainCredentials.DomainUser]",
-					"domainJoinUserPassword": "[steps('domainJoinInfo').identityDomainCredentials.DomainPassword]",
-					"groupAdmins": "[steps('domainJoinInfo').ntfsSetup.groupAdminsName]",
-					"groupUsers": "[steps('domainJoinInfo').ntfsSetup.groupUsersName]",
-					"keyVaultName": "[steps('zeroTrustSetup').keyVaultName]",
-					"location": "[steps('basics').resourceScope.location.name]",
-					"managedIdentityName": "[steps('zeroTrustSetup').identityName]",
-					"ouPathStorage": "[steps('domainJoinInfo').domainInformation.OUPathStorage]",
-					"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
-					"privateDNSZoneId": "[steps('zeroTrustSetup').pvtDNSZone]",
-					"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
-					"storageAcctName": "[steps('basics').storageName]",
-					"storageFileShareName": "[steps('basics').shareName]",
-					"storageResourceGroup": "[steps('basics').resourceGroupExisting]",
-					"storageResourceGroupMode": "[steps('basics').resourceScope.resourceGroup.mode]",
-					"storageRedundancy": "[steps('basics').storageRedundancy]",
-					"storageShareSize": "[steps('basics').shareSize]",
-					"storageTier": "[steps('basics').storageTier]",
-					"subnetId": "[steps('mgmtVMInfo').subnet]",
-					"subscriptionId": "[steps('basics').resourceScope.subscription.id]",
-					"tags": "[steps('tags').tagsByResource]",
-					"vmName": "[steps('mgmtVMInfo').vmName]",
-					"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
-					"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
-				},
-				"template": {
-					"file": "<ARM deployment template relative path>"
-				}
-			}
+				"managedIdentityName": "[steps('zeroTrustSetup').identityName]",
+				"ouPathStorage": "[steps('domainJoinInfo').domainInformation.OUPathStorage]",
+				"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
+				"privateDNSZoneId": "[steps('zeroTrustSetup').pvtDNSZone]",
+				"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
+				"storageAcctName": "[steps('basics').storageName]",
+				"storageFileShareName": "[steps('basics').shareName]",
+				"storageResourceGroup": "[steps('basics').resourceGroupExisting]",
+				"storageResourceGroupMode": "[steps('basics').resourceScope.resourceGroup.mode]",
+				"storageRedundancy": "[steps('basics').storageRedundancy]",
+				"storageShareSize": "[steps('basics').shareSize]",
+				"storageTier": "[steps('basics').storageTier]",
+				"subnetId": "[steps('mgmtVMInfo').subnet]",
+				"subscriptionId": "[steps('basics').resourceScope.subscription.id]",
+				"tags": "[steps('mgmtVMInfo').TagsSection.Tags]",
+				"vmName": "[steps('mgmtVMInfo').vmName]",
+				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
+				"vmAdminPassword": "[steps('mgmtVMInfo').identityLocalCredentials.VmPassword.password]"
+			},
+			"kind": "ResourceGroup",
+			"location": "[steps('basics').resourceScope.location.name]",
+			"resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]"
 		}
 	}
 }
