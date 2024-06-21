@@ -3,7 +3,7 @@
 	"view": {
 		"kind": "Form",
 		"properties": {
-			"title": "Deploy Zero Trust Storage for FSLogix (AVD)",
+			"title": "Deploy Zero Trust Storage for FSLogix (AD Joined)",
 			"steps": [
 				{
 					"name": "basics",

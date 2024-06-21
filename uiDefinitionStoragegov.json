@@ -3,7 +3,7 @@
 	"view": {
 		"kind": "Form",
 		"properties": {
-			"title": "Deploy Zero Trust Storage for FSLogix (AVD)",
+			"title": "Deploy Zero Trust Storage for FSLogix (AD Joined)",
 			"steps": [
 				{
 					"name": "basics",
@@ -564,6 +564,7 @@
 				"storageShareSize": "[steps('basics').shareSize]",
 				"storageTier": "[steps('basics').storageTier]",
 				"subnetId": "[steps('mgmtVMInfo').subnet]",
+				"subscriptionId": "[steps('basics').resourceScope.subscription.id]",
 				"tags": "[steps('mgmtVMInfo').TagsSection.Tags]",
 				"vmName": "[steps('mgmtVMInfo').vmName]",
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
