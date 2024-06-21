@@ -566,6 +566,7 @@
 				"storageShareSize": "[steps('basics').shareSize]",
 				"storageTier": "[steps('basics').storageTier]",
 				"subnetId": "[steps('mgmtVMInfo').subnet]",
+				"subscriptionId": "[steps('basics').resourceScope.subscription.id]",
 				"tags": "[steps('mgmtVMInfo').TagsSection.Tags]",
 				"vmName": "[steps('mgmtVMInfo').vmName]",
 				"vmAdminUsername": "[steps('mgmtVMInfo').identityLocalCredentials.VmUsername]",
