@@ -552,6 +552,7 @@
 				"groupAdmins": "[steps('domainJoinInfo').ntfsSetup.groupAdminsName]",
 				"groupUsers": "[steps('domainJoinInfo').ntfsSetup.groupUsersName]",
 				"keyVaultName": "[steps('zeroTrustSetup').keyVaultName]",
+				"location": "[steps('basics').resourceScope.location.name]",
 				"managedIdentityName": "[steps('zeroTrustSetup').identityName]",
 				"ouPathStorage": "[steps('domainJoinInfo').domainInformation.OUPathStorage]",
 				"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
