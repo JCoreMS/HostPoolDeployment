@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "16996297283435940146"
+      "templateHash": "1161435194669845890"
     }
   },
   "parameters": {
@@ -234,7 +234,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "15759934079317236092"
+              "templateHash": "8479621999298295778"
             }
           },
           "parameters": {
@@ -631,6 +631,7 @@
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
               "name": "linked_managementVm",
+              "resourceGroup": "[parameters('storageResourceGroup')]",
               "properties": {
                 "expressionEvaluationOptions": {
                   "scope": "inner"
@@ -1019,7 +1020,7 @@
                 "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2StorageRead'))]",
                 "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2StorageSMB'))]",
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'linked_managementVm')]",
+                "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageResourceGroup')), 'Microsoft.Resources/deployments', 'linked_managementVm')]",
                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[0], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[1], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[2])]"
               ]
             }

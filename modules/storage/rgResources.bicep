@@ -243,6 +243,7 @@ resource storageFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares
 
 module managementVm 'managementVm.bicep' = {
   name: 'linked_managementVm'
+  scope: resourceGroup(storageResourceGroup)
   params: {
     assignedIdentityId: identityStorageSetup.id
     domainJoinFQDN: domainJoinFQDN
