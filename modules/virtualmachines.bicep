@@ -207,7 +207,8 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
 
 
 resource extension_CustomScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2023-03-01' = [for i in range(0, NumSessionHosts): if(PostDeployOption) {
-  name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
+  //name: '${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}/CustomScriptExtension'
+  name: '${VmPrefix}-${i + VmIndexStart}/CustomScriptExtension'
   location: Location
   tags: contains(Tags, 'Microsoft.Compute/virtualMachines/extensions') ? Tags['Microsoft.Compute/virtualMachines/extensions'] : {}
   properties: {

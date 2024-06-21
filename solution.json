@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "6959771521616495309"
+      "templateHash": "10175860452797483770"
     }
   },
   "parameters": {
@@ -1455,7 +1455,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "15189724090534953642"
+              "templateHash": "6372630103240614101"
             }
           },
           "parameters": {
@@ -1733,7 +1733,7 @@
               "condition": "[parameters('PostDeployOption')]",
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
-              "name": "[format('{0}{1}/CustomScriptExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "name": "[format('{0}-{1}/CustomScriptExtension', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
