@@ -561,7 +561,6 @@
 				"storageAcctName": "[steps('basics').storageName]",
 				"storageFileShareName": "[steps('basics').shareName]",
 				"storageResourceGroup": "[steps('basics').resourceGroupExisting]",
-				"storageResourceGroupMode": "[steps('basics').resourceScope.resourceGroup.mode]",
 				"storageRedundancy": "[steps('basics').storageRedundancy]",
 				"storageShareSize": "[steps('basics').shareSize]",
 				"storageTier": "[steps('basics').storageTier]",
