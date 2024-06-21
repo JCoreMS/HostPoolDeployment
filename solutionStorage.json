@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "1161435194669845890"
+      "templateHash": "1803864957489083882"
     }
   },
   "parameters": {
@@ -57,14 +57,6 @@
     },
     "storageResourceGroup": {
       "type": "string"
-    },
-    "storageResourceGroupMode": {
-      "type": "string",
-      "defaultValue": "Existing",
-      "allowedValues": [
-        "New",
-        "Existing"
-      ]
     },
     "storageRedundancy": {
       "type": "string",
@@ -118,18 +110,10 @@
   },
   "resources": [
     {
-      "condition": "[equals(parameters('storageResourceGroupMode'), 'New')]",
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2021-04-01",
-      "name": "[parameters('storageResourceGroup')]",
-      "location": "[parameters('location')]",
-      "tags": "[parameters('tags')]"
-    },
-    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_ResourceGroup_Resources",
-      "location": "[deployment().location]",
+      "resourceGroup": "[parameters('storageResourceGroup')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1026,10 +1010,7 @@
             }
           ]
         }
-      },
-      "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('storageResourceGroup'))]"
-      ]
+      }
     }
   ]
 }

@@ -33,12 +33,6 @@ param storageFileShareName string
 param storageResourceGroup string
 
 @allowed([
-  'New'
-  'Existing'
-])
-param storageResourceGroupMode string = 'Existing'
-
-@allowed([
   'ZRS'
   'LRS'
 ])
@@ -85,20 +79,14 @@ var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'  //
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 var tenantId = subscription().tenantId
 
-resource resourceGroupNew 'Microsoft.Resources/resourceGroups@2021-04-01' = if (storageResourceGroupMode == 'New'){
-  name: storageResourceGroup
-  location: location
-  tags: tags
-}
 
-
-resource resourceGroupExisting 'Microsoft.Resources/resourceGroups@2021-04-01' existing = if (storageResourceGroupMode == 'Existing'){
+resource resourceGroupExisting 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
   name: storageResourceGroup
 }
 
 module rgResources 'modules/storage/rgResources.bicep' = {
   name: 'linked_ResourceGroup_Resources'
-  scope: storageResourceGroupMode == 'New' ? resourceGroupNew : resourceGroupExisting
+  scope: resourceGroupExisting
   params: {
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
@@ -131,7 +119,7 @@ module rgResources 'modules/storage/rgResources.bicep' = {
     vmAdminUsername: vmAdminUsername
     vmName: vmName
   }
-  dependsOn: storageResourceGroupMode == 'New' ?  [resourceGroupNew] : [resourceGroupExisting]
+  dependsOn: [resourceGroupExisting]
 }
 
 
