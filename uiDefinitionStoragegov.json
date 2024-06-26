@@ -239,7 +239,7 @@
 							"type": "Microsoft.Common.InfoBox",
 							"visible": "true",
 							"options": {
-								"text": "The Private DNS Zone must already be configured and you MUST select a 'FILE' based zone for Azure Files and 'VAULTCORE' for Key Vault.\nAdditionally, for On-Prem resources to resolve the storage please click this box for more details.",
+								"text": "The Private DNS Zone must already be configured and you MUST select a 'FILE' based zone for Azure Files and 'VAULTCORE' for Key Vault. Additionally, for On-Prem resources to resolve the storage please click this box for more details.",
 								"uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
 								"style": "Warning"
 							}
