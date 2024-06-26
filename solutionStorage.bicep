@@ -26,6 +26,8 @@ param privateDNSZoneId string
 
 param privateDNSZoneKvId string
 
+param privateEndPointPrefix string
+
 param storageAcctName string
 
 param storageFileShareName string
@@ -106,6 +108,7 @@ module rgResources 'modules/storage/rgResources.bicep' = {
     ouPathVm: ouPathVm
     privateDNSZoneId: privateDNSZoneId
     privateDNSZoneKvId: privateDNSZoneKvId
+    privateEndPointPrefix: privateEndPointPrefix
     domainJoinFQDN: domainJoinFQDN
     scriptLocation: scriptLocation
     smbSettings: smbSettings

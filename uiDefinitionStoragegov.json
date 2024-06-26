@@ -224,11 +224,22 @@
 							}
 						},
 						{
+							"name": "privateEndPointPrefix",
+							"type": "Microsoft.Common.TextBox",
+							"label": "Prefix for Private Endpoint Name",
+							"toolTip": "Type in a prefix to proceed the name of the storage and keyvault for the Private Endpoint Names.",
+							"defaultValue": "pep-",
+							"constraints": {
+								"required": true,
+								"validationMessage": "Must be between 3 and 5 characters long, alpha-numeric and can contain hyphens. (non-consecutive)"
+							}
+						},
+						{
 							"name": "basicsInfoWarn2",
 							"type": "Microsoft.Common.InfoBox",
 							"visible": "true",
 							"options": {
-								"text": "The Private DNS Zone must already be configured and you MUST select a 'FILE' based zone for Azure Files.\nAdditionally, for On-Prem resources to resolve the storage please click this box for more details.",
+								"text": "The Private DNS Zone must already be configured and you MUST select a 'FILE' based zone for Azure Files and 'VAULTCORE' for Key Vault.\nAdditionally, for On-Prem resources to resolve the storage please click this box for more details.",
 								"uri": "https://learn.microsoft.com/azure/virtual-desktop/azure-monitor?WT.mc_id=Portal-AppInsightsExtension",
 								"style": "Warning"
 							}
@@ -556,6 +567,7 @@
 				"ouPathVm": "[steps('mgmtVMInfo').OUPathVm]",
 				"privateDNSZoneId": "[steps('zeroTrustSetup').pvtDNSZone]",
 				"privateDNSZoneKvId": "[steps('zeroTrustSetup').pvtDNSZoneKV]",
+				"privateEndPointPrefix": "[steps('zeroTrustSetup').privateEndPointPrefix]",
 				"storageAcctName": "[steps('basics').storageName]",
 				"storageFileShareName": "[steps('basics').shareName]",
 				"storageResourceGroup": "[steps('basics').resourceGroupExisting]",

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.28.1.47646",
-      "templateHash": "11898056918549961242"
+      "templateHash": "15213456435749631507"
     }
   },
   "parameters": {
@@ -47,6 +47,9 @@
       "type": "string"
     },
     "privateDNSZoneKvId": {
+      "type": "string"
+    },
+    "privateEndPointPrefix": {
       "type": "string"
     },
     "storageAcctName": {
@@ -174,6 +177,9 @@
           "privateDNSZoneKvId": {
             "value": "[parameters('privateDNSZoneKvId')]"
           },
+          "privateEndPointPrefix": {
+            "value": "[parameters('privateEndPointPrefix')]"
+          },
           "domainJoinFQDN": {
             "value": "[variables('domainJoinFQDN')]"
           },
@@ -218,7 +224,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.28.1.47646",
-              "templateHash": "7945294976844462141"
+              "templateHash": "12285943484857592570"
             }
           },
           "parameters": {
@@ -259,6 +265,9 @@
               "type": "string"
             },
             "privateDNSZoneKvId": {
+              "type": "string"
+            },
+            "privateEndPointPrefix": {
               "type": "string"
             },
             "scriptLocation": {
@@ -390,7 +399,7 @@
             {
               "type": "Microsoft.Network/privateEndpoints",
               "apiVersion": "2020-07-01",
-              "name": "[format('pep-{0}', parameters('keyVaultName'))]",
+              "name": "[format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('keyVaultName'))]",
               "location": "[parameters('location')]",
               "properties": {
                 "privateLinkServiceConnections": [
@@ -428,7 +437,7 @@
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
-                "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('keyVaultName')))]"
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('keyVaultName')))]"
               ]
             },
             {
@@ -489,7 +498,7 @@
             {
               "type": "Microsoft.Network/privateEndpoints",
               "apiVersion": "2020-07-01",
-              "name": "[format('pep-{0}', parameters('storageAcctName'))]",
+              "name": "[format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName'))]",
               "location": "[parameters('location')]",
               "properties": {
                 "privateLinkServiceConnections": [
@@ -528,7 +537,7 @@
             {
               "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
               "apiVersion": "2020-06-01",
-              "name": "[format('{0}/{1}', format('pep-{0}', parameters('keyVaultName')), 'vaultPrivateDnsZoneGroup')]",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('keyVaultName')), 'vaultPrivateDnsZoneGroup')]",
               "properties": {
                 "privateDnsZoneConfigs": [
                   {
@@ -540,7 +549,7 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('keyVaultName')))]"
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('keyVaultName')))]"
               ]
             },
             {
@@ -558,13 +567,13 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
-                "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('storageAcctName')))]"
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')))]"
               ]
             },
             {
               "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
               "apiVersion": "2020-06-01",
-              "name": "[format('{0}/{1}', format('pep-{0}', parameters('storageAcctName')), 'filePrivateDnsZoneGroup')]",
+              "name": "[format('{0}/{1}', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')), 'filePrivateDnsZoneGroup')]",
               "properties": {
                 "privateDnsZoneConfigs": [
                   {
@@ -576,7 +585,7 @@
                 ]
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Network/privateEndpoints', format('pep-{0}', parameters('storageAcctName')))]"
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')))]"
               ]
             },
             {

@@ -16,6 +16,7 @@ param ouPathStorage string
 param ouPathVm string
 param privateDNSZoneId string
 param privateDNSZoneKvId string
+param privateEndPointPrefix string
 param scriptLocation string
 param smbSettings object
 param storageAcctName string
@@ -109,7 +110,7 @@ resource keyVaultKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
 
 // Private Endpoint for Storage Account
 resource keyvaultPvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: 'pep-${keyVaultName}'
+  name: '${privateEndPointPrefix}-${keyVaultName}'
   location: location
   properties: {
     privateLinkServiceConnections: [
@@ -207,7 +208,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
 
 // Private Endpoint for Storage Account
 resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: 'pep-${storageAcctName}'
+  name: '${privateEndPointPrefix}-${storageAcctName}'
   location: location
   properties: {
     privateLinkServiceConnections: [
