@@ -55,7 +55,7 @@ var vmTagDH = !empty(DedicatedHostTagName) ? { DedicatedHostTagName : DedicatedH
 var vmTags = !empty(DedicatedHostTagName) ? union(vmTagDH, Tags) : Tags
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
-  name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
+  name: 'nic-${VmPrefix}-${padLeft((i + VmIndexStart), 0, '0')}'
   location: Location
   tags: contains(Tags, 'Microsoft.Network/networkInterfaces') ? Tags['Microsoft.Network/networkInterfaces'] : {}
   properties: {
