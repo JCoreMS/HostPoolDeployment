@@ -1619,7 +1619,7 @@
               },
               "type": "Microsoft.Compute/virtualMachines",
               "apiVersion": "2022-11-01",
-              "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+              "name": "[format('{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(variables('vmTags'), 'Microsoft.Compute/virtualMachines'), variables('vmTags')['Microsoft.Compute/virtualMachines'], createObject())]",
               "identity": "[if(parameters('PostDeployOption'), createObject('type', 'SystemAssigned, UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserIdentityResId')), createObject())), createObject('type', 'SystemAssigned'))]",
