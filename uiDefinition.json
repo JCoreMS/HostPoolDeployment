@@ -42,6 +42,17 @@
 							}
 						},
 						{
+							"name": "desApi",
+							"type": "Microsoft.Solutions.ArmApiControl",
+							"request": {
+								"method": "GET",
+								"path": "[concat(steps('basics').resourceScope.subscription.id, '/providers/Microsoft.Compute/diskEncryptionSets?api-version=2024-03-02')]",
+								"transforms": {
+									"list": "value|[*].{label:name, value:id, description:properties.encryptionType}"
+								}
+							}
+						},
+						{
 							"name": "TagsSection",
 							"type": "Microsoft.Common.Section",
 							"label": "Tags",
@@ -675,6 +686,25 @@
 										]
 									},
 									"visible": true
+								},
+								{
+									"name": "diskEncryptionSet",
+									"type": "Microsoft.Common.DropDown",
+									"label": "Existing Disk Encyrption Set",
+									"placeholder": "",
+									"defaultValue": "",
+									"toolTip": "Select the existing Disk Encryption Set for the VM's Disk Encryption.",
+									"multiselect": false,
+									"selectAll": false,
+									"filter": true,
+									"filterPlaceholder": "Filter items ...",
+									"multiLine": true,
+									"defaultDescription": "A value for selection",
+									"constraints": {
+										"allowedValues": "[steps('basics').desApi.transformed.list]",
+										"required": true
+									},
+									"visible": true
 								}
 							]
 						},
@@ -883,7 +913,7 @@
 									"type": "Microsoft.Common.DropDown",
 									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
 									"filter": true,
-									"label": "Select the Dedicated Host",
+									"label": "Dedicated Host Group",
 									"defaultValue": "",
 									"toolTip": "",
 									"constraints": {
@@ -904,7 +934,7 @@
 									"type": "Microsoft.Common.DropDown",
 									"visible": "[steps('dedicatedHostInfo').vmDedicatedHostOpt]",
 									"filter": true,
-									"label": "Select the Dedicated Host",
+									"label": "Dedicated Host",
 									"defaultValue": "",
 									"toolTip": "",
 									"constraints": {
@@ -1226,6 +1256,7 @@
 				"DCRExisting": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), steps('monitoring').dcrExisting, '')]",
 				"dedicatedHostId": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHost]",
 				"dedicatedHostTagName": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHostTagName]",
+				"diskEncryptionSet": "[steps('hostInfo').vmInformation.diskEncryptionSet]",
 				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
 				"DomainName": "[steps('hostInfo').domainInformation.DomainName]",
 				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
