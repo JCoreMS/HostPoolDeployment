@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "14528542145192538141"
+      "templateHash": "4237005148965747684"
     }
   },
   "parameters": {
@@ -848,7 +848,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "16991366356808140615"
+              "templateHash": "18290354203679214215"
             }
           },
           "parameters": {
@@ -989,7 +989,7 @@
           "outputs": {
             "HostPoolRegistrationToken": {
               "type": "string",
-              "value": "[if(equals(parameters('HostPoolStatus'), 'Existing'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token, reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token)]"
+              "value": "[if(equals(parameters('HostPoolStatus'), 'Existing'), listRegistrationTokens(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2021-07-12')[0].token, listRegistrationTokens(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2021-07-12')[0].token)]"
             }
           }
         }
