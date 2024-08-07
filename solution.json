@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "9986893763620749921"
+      "templateHash": "14528542145192538141"
     }
   },
   "parameters": {
@@ -813,6 +813,9 @@
           "NumUsersPerHost": {
             "value": "[parameters('NumUsersPerHost')]"
           },
+          "ResourceGroupHP": {
+            "value": "[parameters('ResourceGroupHP')]"
+          },
           "StartVmOnConnect": {
             "value": "[parameters('StartVmOnConnect')]"
           },
@@ -845,7 +848,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "13791144295816409140"
+              "templateHash": "16991366356808140615"
             }
           },
           "parameters": {
@@ -884,6 +887,9 @@
             },
             "NumUsersPerHost": {
               "type": "int"
+            },
+            "ResourceGroupHP": {
+              "type": "string"
             },
             "Tags": {
               "type": "object"
@@ -983,7 +989,7 @@
           "outputs": {
             "HostPoolRegistrationToken": {
               "type": "string",
-              "value": "[if(equals(parameters('HostPoolStatus'), 'Existing'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, resourceGroup().name), 'Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token, reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token)]"
+              "value": "[if(equals(parameters('HostPoolStatus'), 'Existing'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token, reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token)]"
             }
           }
         }
