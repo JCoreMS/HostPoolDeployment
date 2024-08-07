@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "11663357255790671723"
+      "templateHash": "10519816789155497470"
     }
   },
   "parameters": {
@@ -842,7 +842,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "17552629771832758641"
+              "templateHash": "5928631112998955503"
             }
           },
           "parameters": {
@@ -924,7 +924,7 @@
             {
               "condition": "[and(not(equals(parameters('HostPoolStatus'), 'Existing')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/hostPools",
-              "apiVersion": "2022-10-14-preview",
+              "apiVersion": "2023-09-05",
               "name": "[parameters('HostPoolName')]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/hostPools'), parameters('Tags')['Microsoft.DesktopVirtualization/hostPools'], createObject())]",
@@ -947,7 +947,7 @@
             {
               "condition": "[and(not(equals(parameters('HostPoolStatus'), 'Existing')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/applicationGroups",
-              "apiVersion": "2022-10-14-preview",
+              "apiVersion": "2023-09-05",
               "name": "[parameters('AppGroupName')]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/applicationGroups'), parameters('Tags')['Microsoft.DesktopVirtualization/applicationGroups'], createObject())]",
@@ -962,7 +962,7 @@
             {
               "condition": "[and(not(equals(parameters('HostPoolWorkspaceName'), 'none')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/workspaces",
-              "apiVersion": "2022-10-14-preview",
+              "apiVersion": "2023-09-05",
               "name": "[parameters('HostPoolWorkspaceName')]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/workspaces'), parameters('Tags')['Microsoft.DesktopVirtualization/workspaces'], createObject())]",
