@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "10519816789155497470"
+      "templateHash": "2320368610030330248"
     }
   },
   "parameters": {
@@ -842,7 +842,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "5928631112998955503"
+              "templateHash": "17077743901430878344"
             }
           },
           "parameters": {
@@ -981,10 +981,6 @@
             "HostPoolRegistrationToken": {
               "type": "string",
               "value": "[if(equals(parameters('HostPoolStatus'), 'Existing'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, resourceGroup().name), 'Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token, reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token)]"
-            },
-            "ComputeImageGalleryID": {
-              "type": "string",
-              "value": "[parameters('ComputeGalleryImageId')]"
             }
           }
         }
