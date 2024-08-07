@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.28.1.47646",
-      "templateHash": "10175860452797483770"
+      "version": "0.29.47.4906",
+      "templateHash": "14975040389798461810"
     }
   },
   "parameters": {
@@ -446,8 +446,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "11089756203503382254"
+              "version": "0.29.47.4906",
+              "templateHash": "509034971017235348"
             }
           },
           "parameters": {
@@ -511,8 +511,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "11089756203503382254"
+              "version": "0.29.47.4906",
+              "templateHash": "509034971017235348"
             }
           },
           "parameters": {
@@ -588,8 +588,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "9514493763928148324"
+              "version": "0.29.47.4906",
+              "templateHash": "12359102126182649036"
             }
           },
           "parameters": {
@@ -655,8 +655,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.28.1.47646",
-                      "templateHash": "4351793688923126866"
+                      "version": "0.29.47.4906",
+                      "templateHash": "10531604064036903521"
                     }
                   },
                   "parameters": {
@@ -736,8 +736,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "56991581899384414"
+              "version": "0.29.47.4906",
+              "templateHash": "15061869666497315581"
             }
           },
           "parameters": {
@@ -756,7 +756,6 @@
       }
     },
     {
-      "condition": "[not(equals(parameters('HostPoolOption'), 'AltTenant'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_HostPoolDeployment",
@@ -790,6 +789,9 @@
           },
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
+          },
+          "HostPoolOption": {
+            "value": "[parameters('HostPoolOption')]"
           },
           "HostPoolType": {
             "value": "[variables('HostPoolType')]"
@@ -831,8 +833,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "16077112639809955508"
+              "version": "0.29.47.4906",
+              "templateHash": "2701028422303329781"
             }
           },
           "parameters": {
@@ -855,6 +857,9 @@
               "type": "string"
             },
             "HostPoolName": {
+              "type": "string"
+            },
+            "HostPoolOption": {
               "type": "string"
             },
             "HostPoolType": {
@@ -909,8 +914,9 @@
           },
           "resources": [
             {
+              "condition": "[and(not(equals(parameters('HostPoolStatus'), 'Existing')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/hostPools",
-              "apiVersion": "2022-10-14-preview",
+              "apiVersion": "2023-09-05",
               "name": "[parameters('HostPoolName')]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/hostPools'), parameters('Tags')['Microsoft.DesktopVirtualization/hostPools'], createObject())]",
@@ -931,7 +937,7 @@
               }
             },
             {
-              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
+              "condition": "[and(not(equals(parameters('HostPoolStatus'), 'Existing')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/applicationGroups",
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('AppGroupName')]",
@@ -946,7 +952,7 @@
               ]
             },
             {
-              "condition": "[not(equals(parameters('HostPoolWorkspaceName'), 'none'))]",
+              "condition": "[and(not(equals(parameters('HostPoolWorkspaceName'), 'none')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/workspaces",
               "apiVersion": "2022-10-14-preview",
               "name": "[parameters('HostPoolWorkspaceName')]",
@@ -966,7 +972,7 @@
           "outputs": {
             "HostPoolRegistrationToken": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token]"
+              "value": "[if(equals(parameters('HostPoolStatus'), 'Existing'), reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token, reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token)]"
             },
             "ComputeImageGalleryID": {
               "type": "string",
@@ -980,7 +986,6 @@
       ]
     },
     {
-      "condition": "[not(equals(parameters('HostPoolOption'), 'AltTenant'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "linked_Diagnostics_Setup",
@@ -1006,6 +1011,9 @@
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
+          "HostPoolOption": {
+            "value": "[parameters('HostPoolOption')]"
+          },
           "Location": {
             "value": "[parameters('Location')]"
           },
@@ -1028,8 +1036,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "4519746122556212830"
+              "version": "0.29.47.4906",
+              "templateHash": "18304332295865615926"
             }
           },
           "parameters": {
@@ -1046,6 +1054,9 @@
               "type": "string"
             },
             "HostPoolName": {
+              "type": "string"
+            },
+            "HostPoolOption": {
               "type": "string"
             },
             "HostPoolWorkspaceName": {
@@ -1065,6 +1076,7 @@
             }
           },
           "variables": {
+            "Deploy": "[if(and(not(equals(parameters('HostPoolStatus'), 'Existing')), not(equals(parameters('HostPoolOption'), 'AltTenant'))), true(), false())]",
             "PerfCounters": [
               {
                 "streams": [
@@ -1124,7 +1136,7 @@
           },
           "resources": [
             {
-              "condition": "[not(equals(parameters('HostPoolStatus'), 'Existing'))]",
+              "condition": "[variables('Deploy')]",
               "type": "Microsoft.Insights/diagnosticSettings",
               "apiVersion": "2021-05-01-preview",
               "scope": "[format('Microsoft.DesktopVirtualization/hostPools/{0}', parameters('HostPoolName'))]",
@@ -1179,8 +1191,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "2268410409713947420"
+              "version": "0.29.47.4906",
+              "templateHash": "15628121041006489164"
             }
           },
           "parameters": {
@@ -1324,8 +1336,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "16451974991653985077"
+              "version": "0.29.47.4906",
+              "templateHash": "2134802168048666240"
             }
           },
           "parameters": {
@@ -1454,8 +1466,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "6372630103240614101"
+              "version": "0.29.47.4906",
+              "templateHash": "16526603391534998594"
             }
           },
           "parameters": {
@@ -1619,7 +1631,7 @@
               },
               "type": "Microsoft.Compute/virtualMachines",
               "apiVersion": "2022-11-01",
-              "name": "[format('{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+              "name": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(variables('vmTags'), 'Microsoft.Compute/virtualMachines'), variables('vmTags')['Microsoft.Compute/virtualMachines'], createObject())]",
               "identity": "[if(parameters('PostDeployOption'), createObject('type', 'SystemAssigned, UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserIdentityResId')), createObject())), createObject('type', 'SystemAssigned'))]",
@@ -1630,7 +1642,7 @@
                 "storageProfile": {
                   "imageReference": "[variables('imageToUse')]",
                   "osDisk": {
-                    "name": "[format('osDisk-{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+                    "name": "[format('osDisk-{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
                     "osType": "Windows",
                     "createOption": "FromImage",
                     "caching": "ReadOnly",
@@ -1639,7 +1651,7 @@
                   "dataDisks": []
                 },
                 "osProfile": {
-                  "computerName": "[format('{0}{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 3, '0'))]",
+                  "computerName": "[format('{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
                   "adminUsername": "[parameters('VmUsername')]",
                   "adminPassword": "[parameters('VmPassword')]",
                   "windowsConfiguration": {
