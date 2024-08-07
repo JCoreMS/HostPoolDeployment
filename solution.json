@@ -5,18 +5,10 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "5048572533661055203"
+      "templateHash": "15981647198646559635"
     }
   },
   "parameters": {
-    "_artifactsLocation": {
-      "type": "string",
-      "defaultValue": ""
-    },
-    "_artifactsLocationSasToken": {
-      "type": "string",
-      "defaultValue": ""
-    },
     "AppGroupName": {
       "type": "string",
       "defaultValue": "none"
@@ -842,7 +834,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "4176484875683824030"
+              "templateHash": "10738125051048640360"
             }
           },
           "parameters": {
@@ -924,7 +916,7 @@
             {
               "condition": "[and(not(equals(parameters('HostPoolStatus'), 'Existing')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/hostPools",
-              "apiVersion": "2024-01-16-preview",
+              "apiVersion": "2022-10-14-preview",
               "name": "[parameters('HostPoolName')]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.DesktopVirtualization/hostPools'), parameters('Tags')['Microsoft.DesktopVirtualization/hostPools'], createObject())]",
