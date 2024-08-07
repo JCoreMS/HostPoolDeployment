@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "5344979888040583065"
+      "templateHash": "9986893763620749921"
     }
   },
   "parameters": {
@@ -96,6 +96,9 @@
       "metadata": {
         "description": "The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS."
       }
+    },
+    "diskEncryptionSetResId": {
+      "type": "string"
     },
     "DomainName": {
       "type": "string"
@@ -1396,6 +1399,9 @@
           "ComputeGalleryProperties": "[if(parameters('UseCustomImage'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('ComputeGallerySubId'), parameters('ComputeGalleryRG')), 'Microsoft.Compute/galleries/images', split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[0], split(format('{0}/{1}', parameters('ComputeGalleryName'), parameters('ComputeGalleryImage')), '/')[1]), '2022-03-03')), createObject('value', createObject()))]",
           "DedicatedHostResId": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', parameters('dedicatedHostId')), createObject('value', ''))]",
           "DedicatedHostTagName": "[if(not(empty(parameters('dedicatedHostTagName'))), createObject('value', parameters('dedicatedHostTagName')), createObject('value', ''))]",
+          "diskEncryptionSetResId": {
+            "value": "[parameters('diskEncryptionSetResId')]"
+          },
           "DomainUser": {
             "value": "[parameters('DomainUser')]"
           },
@@ -1471,7 +1477,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "12353079278429511548"
+              "templateHash": "6996954048858515554"
             }
           },
           "parameters": {
@@ -1488,6 +1494,9 @@
               "type": "string"
             },
             "DedicatedHostTagName": {
+              "type": "string"
+            },
+            "diskEncryptionSetResId": {
               "type": "string"
             },
             "DomainName": {
@@ -1650,9 +1659,14 @@
                     "osType": "Windows",
                     "createOption": "FromImage",
                     "caching": "ReadOnly",
-                    "deleteOption": "Delete"
-                  },
-                  "dataDisks": []
+                    "deleteOption": "Delete",
+                    "managedDisk": {
+                      "diskEncryptionSet": {
+                        "id": "[parameters('diskEncryptionSetResId')]"
+                      }
+                    },
+                    "dataDisks": []
+                  }
                 },
                 "osProfile": {
                   "computerName": "[format('{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
