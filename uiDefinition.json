@@ -1215,7 +1215,7 @@
 									"name": "VDOT",
 									"type": "Microsoft.Common.CheckBox",
 									"label": "Configure Optimizations (VDOT)",
-									"defaultValue": true,
+									"defaultValue": false,
 									"toolTip": "Deploys All Standard Optimizations per https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool",
 									"constraints": {
 										"required": false,
@@ -1227,7 +1227,7 @@
 									"name": "restart",
 									"type": "Microsoft.Common.CheckBox",
 									"label": "Restart VMs after Post Config",
-									"defaultValue": true,
+									"defaultValue": false,
 									"toolTip": "It's recommended to restart after post deployment configurations, especially after Windows Updates.",
 									"constraints": {
 										"required": false,
