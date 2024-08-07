@@ -1256,7 +1256,7 @@
 				"DCRExisting": "[if(equals(steps('monitoring').dcrNewExisting, 'Existing'), steps('monitoring').dcrExisting, '')]",
 				"dedicatedHostId": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHost]",
 				"dedicatedHostTagName": "[steps('dedicatedHostInfo').dedicatedHostConfig.dedicatedHostTagName]",
-				"diskEncryptionSet": "[steps('hostInfo').vmInformation.diskEncryptionSet]",
+				"diskEncryptionSetResId": "[steps('hostInfo').vmInformation.diskEncryptionSet]",
 				"DiskSku": "[steps('hostInfo').vmInformation.DiskSku]",
 				"DomainName": "[steps('hostInfo').domainInformation.DomainName]",
 				"DomainUser": "[steps('hostInfo').identityDomainCredentials.DomainUser]",
