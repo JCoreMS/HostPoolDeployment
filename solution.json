@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "1885650221505977671"
+      "templateHash": "11146443622195458830"
     }
   },
   "parameters": {
@@ -1476,7 +1476,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "4827098020858539495"
+              "templateHash": "7958101616493090537"
             }
           },
           "parameters": {
@@ -1615,7 +1615,7 @@
               },
               "type": "Microsoft.Network/networkInterfaces",
               "apiVersion": "2022-11-01",
-              "name": "[format('nic-{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+              "name": "[format('nic-{0}-{1}', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Network/networkInterfaces'), parameters('Tags')['Microsoft.Network/networkInterfaces'], createObject())]",
               "properties": {
@@ -1643,7 +1643,7 @@
               },
               "type": "Microsoft.Compute/virtualMachines",
               "apiVersion": "2022-11-01",
-              "name": "[format('{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+              "name": "[format('{0}-{1}', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(variables('vmTags'), 'Microsoft.Compute/virtualMachines'), variables('vmTags')['Microsoft.Compute/virtualMachines'], createObject())]",
               "identity": "[if(parameters('PostDeployOption'), createObject('type', 'SystemAssigned, UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserIdentityResId')), createObject())), createObject('type', 'SystemAssigned'))]",
@@ -1654,7 +1654,7 @@
                 "storageProfile": {
                   "imageReference": "[variables('imageToUse')]",
                   "osDisk": {
-                    "name": "[format('osDisk-{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+                    "name": "[format('osDisk-{0}-{1}', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
                     "osType": "Windows",
                     "createOption": "FromImage",
                     "caching": "ReadOnly",
@@ -1709,7 +1709,7 @@
               },
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
-              "name": "[format('{0}{1}/AzureMonitorWindowsAgent', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+              "name": "[format('{0}-{1}/AzureMonitorWindowsAgent', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
@@ -1730,7 +1730,7 @@
               },
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
-              "name": "[format('{0}{1}/JsonADDomainExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+              "name": "[format('{0}-{1}/JsonADDomainExtension', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
@@ -1762,7 +1762,7 @@
               "condition": "[parameters('PostDeployOption')]",
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
-              "name": "[format('{0}-{1}/CustomScriptExtension', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+              "name": "[format('{0}-{1}/CustomScriptExtension', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
@@ -1794,7 +1794,7 @@
               },
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-03-01",
-              "name": "[format('{0}-{1}/HostPoolRegistration', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+              "name": "[format('{0}-{1}/HostPoolRegistration', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
               "location": "[parameters('Location')]",
               "tags": "[if(contains(parameters('Tags'), 'Microsoft.Compute/virtualMachines/extensions'), parameters('Tags')['Microsoft.Compute/virtualMachines/extensions'], createObject())]",
               "properties": {
