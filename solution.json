@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "11146443622195458830"
+      "templateHash": "16654053354275403798"
     }
   },
   "parameters": {
@@ -1476,7 +1476,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "7958101616493090537"
+              "templateHash": "4758607065500577758"
             }
           },
           "parameters": {
@@ -1668,7 +1668,7 @@
                   }
                 },
                 "osProfile": {
-                  "computerName": "[format('{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
+                  "computerName": "[format('{0}-{1}', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
                   "adminUsername": "[parameters('VmUsername')]",
                   "adminPassword": "[parameters('VmPassword')]",
                   "windowsConfiguration": {
@@ -1682,7 +1682,7 @@
                 "networkProfile": {
                   "networkInterfaces": [
                     {
-                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0')))]",
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}-{1}', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart'))))]",
                       "properties": {
                         "deleteOption": "Delete"
                       }
