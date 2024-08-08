@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "10451034209073265352"
+      "templateHash": "18207063867115436382"
     }
   },
   "parameters": {
@@ -813,9 +813,6 @@
           "NumUsersPerHost": {
             "value": "[parameters('NumUsersPerHost')]"
           },
-          "ResourceGroupHP": {
-            "value": "[parameters('ResourceGroupHP')]"
-          },
           "StartVmOnConnect": {
             "value": "[parameters('StartVmOnConnect')]"
           },
@@ -848,7 +845,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "16278629261271961259"
+              "templateHash": "2296731571249223545"
             }
           },
           "parameters": {
@@ -887,9 +884,6 @@
             },
             "NumUsersPerHost": {
               "type": "int"
-            },
-            "ResourceGroupHP": {
-              "type": "string"
             },
             "Tags": {
               "type": "object"
@@ -931,7 +925,6 @@
           },
           "resources": [
             {
-              "condition": "[and(not(equals(parameters('HostPoolStatus'), 'Existing')), not(equals(parameters('HostPoolOption'), 'AltTenant')))]",
               "type": "Microsoft.DesktopVirtualization/hostPools",
               "apiVersion": "2023-09-05",
               "name": "[parameters('HostPoolName')]",
@@ -989,7 +982,7 @@
           "outputs": {
             "HostPoolRegistrationToken": {
               "type": "string",
-              "value": "[if(equals(parameters('HostPoolStatus'), 'Existing'), listRegistrationTokens(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2023-09-05')[0].token, listRegistrationTokens(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName')), '2023-09-05')[0].token)]"
+              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('HostPoolName'))).registrationInfo.token]"
             }
           }
         }
