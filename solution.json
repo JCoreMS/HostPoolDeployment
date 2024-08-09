@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "18363952071829196465"
+      "templateHash": "117670818417663630"
     }
   },
   "parameters": {
@@ -432,7 +432,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_ResourceGroupHP",
+      "name": "[format('linked_ResourceGroupHP_{0}', parameters('Location'))]",
       "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -497,7 +497,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_ResourceGroupVMs",
+      "name": "[format('linked_ResourceGroupVMs_{0}', parameters('Location'))]",
       "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -563,7 +563,7 @@
       "condition": "[parameters('PostDeployOption')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_UserIdentityCreateAssign",
+      "name": "[format('linked_UserIdentityCreateAssign_{0}', parameters('Location'))]",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -722,13 +722,13 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_ResourceGroupHP')]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('linked_ResourceGroupHP_{0}', parameters('Location')))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_logAnalyticsWorkspace",
+      "name": "[format('linked_logAnalyticsWorkspace_{0}', parameters('Location'))]",
       "subscriptionId": "[parameters('LogAnalyticsSubId')]",
       "resourceGroup": "[parameters('LogAnalyticsRG')]",
       "properties": {
@@ -769,7 +769,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_HostPoolDeployment",
+      "name": "[format('linked_HostPoolDeployment_{0}', parameters('Location'))]",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -988,13 +988,13 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_ResourceGroupHP')]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('linked_ResourceGroupHP_{0}', parameters('Location')))]"
       ]
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_Diagnostics_Setup",
+      "name": "[format('linked_Diagnostics_Setup_{0}', parameters('Location'))]",
       "resourceGroup": "[parameters('ResourceGroupHP')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1024,7 +1024,7 @@
             "value": "[parameters('Location')]"
           },
           "LogAnalyticsWorkspaceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', format('linked_logAnalyticsWorkspace_{0}', parameters('Location'))), '2022-09-01').outputs.logAnalyticsId.value]"
           },
           "HostPoolWorkspaceName": {
             "value": "[parameters('HostPoolWorkspaceName')]"
@@ -1161,16 +1161,16 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]",
-        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_ResourceGroupHP')]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_HostPoolDeployment_{0}', parameters('Location')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', format('linked_logAnalyticsWorkspace_{0}', parameters('Location')))]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('linked_ResourceGroupHP_{0}', parameters('Location')))]"
       ]
     },
     {
       "condition": "[equals(parameters('DCRStatus'), 'New')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_DataCollectionRule",
+      "name": "[format('linked_DataCollectionRule_{0}', parameters('Location'))]",
       "resourceGroup": "[parameters('ResGroupIdMonitor')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1185,7 +1185,7 @@
             "value": "[parameters('Location')]"
           },
           "LogAnalyticsWorkspaceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace'), '2022-09-01').outputs.logAnalyticsId.value]"
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', format('linked_logAnalyticsWorkspace_{0}', parameters('Location'))), '2022-09-01').outputs.logAnalyticsId.value]"
           },
           "Tags": {
             "value": "[parameters('Tags')]"
@@ -1317,14 +1317,14 @@
         }
       },
       "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', 'linked_logAnalyticsWorkspace')]"
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', parameters('LogAnalyticsSubId'), parameters('LogAnalyticsRG')), 'Microsoft.Resources/deployments', format('linked_logAnalyticsWorkspace_{0}', parameters('Location')))]"
       ]
     },
     {
       "condition": "[not(equals(parameters('dedicatedHostId'), ''))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_dedicatedHostInfo",
+      "name": "[format('linked_dedicatedHostInfo_{0}', parameters('Location'))]",
       "location": "[deployment().location]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -1411,7 +1411,7 @@
           "HostPoolName": {
             "value": "[parameters('HostPoolName')]"
           },
-          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPoolOption'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment'), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
+          "HostPoolRegistrationToken": "[if(not(equals(parameters('HostPoolOption'), 'AltTenant')), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_HostPoolDeployment_{0}', parameters('Location'))), '2022-09-01').outputs.HostPoolRegistrationToken.value), createObject('value', parameters('HostPoolAltToken')))]",
           "Location": {
             "value": "[parameters('Location')]"
           },
@@ -1446,8 +1446,8 @@
           "UseCustomImage": {
             "value": "[parameters('UseCustomImage')]"
           },
-          "UserIdentityResId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityResId.value), createObject('value', ''))]",
-          "UserIdentityObjId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign'), '2022-09-01').outputs.userIdentityObjId.value), createObject('value', ''))]",
+          "UserIdentityResId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_UserIdentityCreateAssign_{0}', parameters('Location'))), '2022-09-01').outputs.userIdentityResId.value), createObject('value', ''))]",
+          "UserIdentityObjId": "[if(parameters('PostDeployOption'), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_UserIdentityCreateAssign_{0}', parameters('Location'))), '2022-09-01').outputs.userIdentityObjId.value), createObject('value', ''))]",
           "VirtualNetwork": {
             "value": "[parameters('VirtualNetwork')]"
           },
@@ -1467,7 +1467,7 @@
           "VmPrefix": {
             "value": "[parameters('VmPrefix')]"
           },
-          "Zones": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', 'linked_dedicatedHostInfo'), '2022-09-01').outputs.Zones.value), createObject('value', createArray()))]"
+          "Zones": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', format('linked_dedicatedHostInfo_{0}', parameters('Location'))), '2022-09-01').outputs.Zones.value), createObject('value', createArray()))]"
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -1821,10 +1821,10 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/deployments', 'linked_dedicatedHostInfo')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_Diagnostics_Setup')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_HostPoolDeployment')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', 'linked_UserIdentityCreateAssign')]"
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('linked_dedicatedHostInfo_{0}', parameters('Location')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_Diagnostics_Setup_{0}', parameters('Location')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_HostPoolDeployment_{0}', parameters('Location')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_UserIdentityCreateAssign_{0}', parameters('Location')))]"
       ]
     }
   ]
