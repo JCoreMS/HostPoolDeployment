@@ -85,6 +85,10 @@ try {
 
     Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'PRE-REQ'
 
+    Write-Log -Message "Installing WinGet" -Type 'PRE-REQ'
+    Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile winget.msixbundle
+    Add-AppxPackage winget.msixbundle
+
     write-Log -Message "Installing PowerShell 7 via WinGet" -Type 'Pre-REQ'
     & winget install --id Microsoft.Powershell --source winget
 
