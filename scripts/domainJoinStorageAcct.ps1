@@ -85,12 +85,10 @@ try {
 
     Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'PRE-REQ'
 
-    Write-Log -Message "Installing WinGet" -Type 'PRE-REQ'
-    Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile winget.msixbundle
-    Add-AppxPackage winget.msixbundle
-
     write-Log -Message "Installing PowerShell 7 via WinGet" -Type 'Pre-REQ'
-    & winget install --id Microsoft.Powershell --source winget
+    Invoke-WebRequest -Uri https://github.com/PowerShell/PowerShell/releases/download/v7.4.4/PowerShell-7.4.4-win-x64.msi -OutFile C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi -UseBasicParsing
+    msiexec.exe /package C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1
+    Remove-Item -Path C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi -Force
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Write-Log -Message "Getting PowerShell Providers List" -Type 'PRE-REQ'
