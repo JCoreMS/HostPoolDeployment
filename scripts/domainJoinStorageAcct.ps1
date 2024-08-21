@@ -23,6 +23,9 @@ param
     [Parameter(Mandatory)]
     [String]$StorageAccountResourceGroupName,
 
+    [Parameter(Mandatory = $false)]
+    [String]$AltStorageAcct = $null,
+
     [Parameter(Mandatory)]
     [String]$StorageAccountName,
 
@@ -47,8 +50,7 @@ try {
     ##############################################################
     #  Logging Function
     ##############################################################
-    function Write-Log
-    {
+    function Write-Log {
         param(
             [parameter(Mandatory)]
             [string]$Message,
@@ -56,10 +58,9 @@ try {
             [parameter(Mandatory)]
             [string]$Type
         )
-        $Path = 'C:\cse_FileShareSetup.txt'
-        if(!(Test-Path -Path $Path))
-        {
-            New-Item -Path C:\ -Name cse_FileShareSetup.txt| Out-Null
+        $Path = 'C:\Windows\Temp\cse_FileShareSetup.txt'
+        if (!(Test-Path -Path $Path)) {
+            New-Item -Path C:\ -Name cse_FileShareSetup.txt | Out-Null
         }
         $Timestamp = Get-Date -Format 'MM/dd/yyyy HH:mm:ss.ff'
         $Entry = '[' + $Timestamp + '] [' + $Type + '] ' + $Message
@@ -75,25 +76,21 @@ try {
     Write-Log -Message " ==================================================================" -Type 'INFO'
 
     # Check if Domain Joined VM
-    $DomainJoined = if($ENV:COMPUTERNAME -eq $ENV:USERDNSDOMAIN) {
+    $DomainJoined = if ($ENV:COMPUTERNAME -eq $ENV:USERDNSDOMAIN) {
         $false
         Write-Log -Message "Not Domain Joined" -Type 'ERROR'
         throw "VM is not Domain Joined! Unable to proceed with domain join storage account."
-        }
-        else { $true }
+    }
+    else { $true }
 
     Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'PRE-REQ'
 
-    Write-Log -Message "Verifying PowerShell Modules Needed" -Type 'PRE-REQ'
+    write-Log -Message "Installing PowerShell 7 via WinGet" -Type 'Pre-REQ'
+    & winget install --id Microsoft.Powershell --source winget
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
-    Write-Log -Message "...Checking and loading NuGet provider" -Type 'PRE-REQ'
+    Write-Log -Message "Getting PowerShell Providers List" -Type 'PRE-REQ'
     $providers = get-packageprovider -ListAvailable
-    If ($providers.Name -notcontains "NuGet") {
-        Install-packageprovider -Name "NuGet" -Force | Out-Null
-    }
-    else { Write-Log -Message "---NuGet provider already installed" -Type 'PRE-REQ' }
 
     Write-Log -Message "...Checking and installing RSAT for Active Directory" -Type 'PRE-REQ'
     $RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where-Object DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State
@@ -102,19 +99,56 @@ try {
     }
     else { Write-Log -Message "---RSAT for Active Directory already installed" -Type 'PRE-REQ' }
 
-    $modules = get-module -ListAvailable
+    If ($AltStorageAcct -eq $null) {
 
-    Write-Log -Message "...Checking and loading ActiveDirectory Module" -Type 'PRE-REQ'
-    If ($modules.name -notcontains "ActiveDirectory") {
-        Install-Module -Name "ActiveDirectory" -Force | Out-Null
-    }
-    else { Write-Log -Message "---ActiveDirectory Module already installed" -Type 'PRE-REQ' }
+        Write-Log -Message "...Checking and loading NuGet provider" -Type 'PRE-REQ'
+        If ($providers.Name -notcontains "PackageManagement") {
+            Install-packageprovider -Name "PackageManagement" -Force | Out-Null
+        }
+        else { Write-Log -Message "---Package Management (NuGet) provider already installed" -Type 'PRE-REQ' }
 
-    Write-Log -Message "...Checking and loading Az.Storage Module" -Type 'PRE-REQ'
-    If ($modules.name -notcontains "Az.Storage") {
-        Install-Module -Name "Az.Storage" -Force | Out-Null
+        Write-Log -Message "...Checking and installing RSAT for Active Directory" -Type 'PRE-REQ'
+        $RSATAD = Get-WindowsCapability -Name RSAT* -Online | Where-Object DisplayName -Match "Active Directory Domain Services" | Select-Object -Property DisplayName, State
+        If ($RSATAD.State -eq "NotPresent") {
+            Get-WindowsCapability -Name RSAT* -Online | Where-Object DisplayName -Match "Active Directory Domain Services" | Add-WindowsCapability -Online
+        }
+        else { Write-Log -Message "---RSAT for Active Directory already installed" -Type 'PRE-REQ' }
+
+        $modules = get-module -ListAvailable
+
+        Write-Log -Message "...Checking and loading ActiveDirectory Module" -Type 'PRE-REQ'
+        If ($modules.name -notcontains "ActiveDirectory") {
+            Install-Module -Name "ActiveDirectory" -Force | Out-Null
+        }
+        else { Write-Log -Message "---ActiveDirectory Module already installed" -Type 'PRE-REQ' }
+        Write-Log -Message "...Checking and loading Az.Storage Module" -Type 'PRE-REQ'
+        If ($modules.name -notcontains "Az.Storage") {
+            Install-Module -Name "Az.Storage" -Force | Out-Null
+        }
+        else { Write-Log -Message "---Az.Storage Module already installed" -Type 'PRE-REQ' }
+
     }
-    else { Write-Log -Message "---Az.Storage Module already installed" -Type 'PRE-REQ' }
+    else {
+        # Copy modules from storage
+        Write-Log -Message "Alternate Storage Location Specified: $AltStorageAcct" -Type 'WARN'
+
+        Write-Log -Message "Copying PS Modules" -Type 'PRE-REQ'
+        Invoke-WebRequest -Uri "$AltStorageAcct/PSModules.zip" -OutFile "C:\Windows\Temp\PSModules.zip" -UseBasicParsing
+
+        Write-Log -Message "Extracting PS Modules" -Type 'PRE-REQ'
+        Expand-Archive -Path "C:\Temp\PSModules.zip" -Destination "C:\Program Files\PowerShell\7\Modules" -Force
+
+        # Import Modules
+        Write-Log -Message "Importing Module: Windows Compatibility" -Type 'PRE-REQ'
+        Import-module -Name WindowsCompatibility
+        Write-Log -Message "Importing Module: Active Directory" -Type 'PRE-REQ'
+        Import-Module -Name ActiveDirectory
+        Write-Log -Message "Importing Module: Azure Accounts" -Type 'PRE-REQ'
+        Import-Module -Name Az.Accounts
+        Write-Log -Message "Importing Module: Azure Storage" -Type 'PRE-REQ'
+        import-module -Name Az.Storage
+
+    }
 
     # Disable Edge First Run
     Write-Log -Message "Disable Edge First Run Experience via Registry" -Type 'PRE-REQ'
@@ -133,8 +167,7 @@ try {
     #  Variables
     ##############################################################
     # Get Domain information
-    $Domain = Get-ADDomain `
-        -Current 'LocalComputer'
+    $Domain = Get-WMIObject Win32_ComputerSystem| Select-Object -ExpandProperty Domain
 
     Write-Log -Message "Collected domain information" -Type 'INFO'
 
@@ -176,21 +209,19 @@ try {
     [pscredential]$StorageKeyCredential = New-Object System.Management.Automation.PSCredential ($StorageUsername, $StoragePassword)
 
     # Get / create kerberos key for Azure Storage Account
-    $KerberosKey = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -ListKerbKey | Where-Object {$_.Keyname -contains 'kerb1'}).Value
-    if(!$KerberosKey)
-    {
+    $KerberosKey = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -ListKerbKey | Where-Object { $_.Keyname -contains 'kerb1' }).Value
+    if (!$KerberosKey) {
         New-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -KeyName kerb1 | Out-Null
-        $Key = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -ListKerbKey | Where-Object {$_.Keyname -contains 'kerb1'}).Value
+        $Key = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -ListKerbKey | Where-Object { $_.Keyname -contains 'kerb1' }).Value
         Write-Log -Message "Kerberos Key creation on Storage Account, $StorageAccountName, succeeded." -Type 'INFO'
     }
-    else
-    {
+    else {
         $Key = $KerberosKey
         Write-Log -Message "Acquired Kerberos Key from Storage Account, $StorageAccountName." -Type 'INFO'
     }
 
     # Creates a password for the Azure Storage Account in AD using the Kerberos key
-    $ComputerPassword = ConvertTo-SecureString -String $Key.Replace("'","") -AsPlainText -Force
+    $ComputerPassword = ConvertTo-SecureString -String $Key.Replace("'", "") -AsPlainText -Force
     Write-Log -Message "Secure string conversion succeeded" -Type 'INFO'
 
     # Create the SPN value for the Azure Storage Account; attribute for computer object in AD
@@ -200,9 +231,8 @@ try {
     $Description = "Computer account object for Azure storage account $($StorageAccountName)."
 
     # Create the AD computer object for the Azure Storage Account
-    $Computer = Get-ADComputer -Credential $DomainCredential -Filter {Name -eq $StorageAccountName}
-    if($Computer)
-    {
+    $Computer = Get-ADComputer -Credential $DomainCredential -Filter { Name -eq $StorageAccountName }
+    if ($Computer) {
         Remove-ADComputer -Credential $DomainCredential -Identity $StorageAccountName -Confirm:$false
     }
     $ComputerObject = New-ADComputer -Credential $DomainCredential -Name $StorageAccountName -Path $OUPath -ServicePrincipalNames $SPN -AccountPassword $ComputerPassword -Description $Description -PassThru
@@ -229,7 +259,7 @@ try {
 
     # Reset the Kerberos key on the Storage Account
     New-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -KeyName kerb1 | Out-Null
-    $Key = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -ListKerbKey | Where-Object {$_.Keyname -contains 'kerb1'}).Value
+    $Key = (Get-AzStorageAccountKey -ResourceGroupName $StorageAccountResourceGroupName -Name $StorageAccountName -ListKerbKey | Where-Object { $_.Keyname -contains 'kerb1' }).Value
     Write-Log -Message "Resetting the Kerberos key on the Storage Account succeeded" -Type 'INFO'
 
     # Update the password on the computer object with the new Kerberos key on the Storage Account
@@ -240,12 +270,12 @@ try {
 
     # Check File Share Security for NTLMv2 or mapping will fail
     $FileShareSec = Get-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -StorageAccountName $StorageAccountName
-    If($FileShareSec.ProtocolSettings.Smb.AuthenticationMethods -notcontains 'NTLMv2'){
+    If ($FileShareSec.ProtocolSettings.Smb.AuthenticationMethods -notcontains 'NTLMv2') {
         Write-Log -Message "Missing NTLMv2 property to allow mapping, setting temporarily..." -Type 'WARN'
         Update-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -AccountName $StorageAccountName `
-            -SMBAuthenticationMethod Kerberos,NTLMv2 | Out-Null
+            -SMBAuthenticationMethod Kerberos, NTLMv2 | Out-Null
         $RemoveNTLMv2 = $true
-        }
+    }
 
     # Mount file share
     $FileShare = "\\" + $FileServer + "\" + $StorageFileShareName
@@ -262,11 +292,11 @@ try {
     $ACL.PurgeAccessRules($AuthenticatedUsers)
     $Users = New-Object System.Security.Principal.Ntaccount ("Users")
     $ACL.PurgeAccessRules($Users)
-    $DomainUsers = New-Object System.Security.AccessControl.FileSystemAccessRule("$UsersGroup","Modify","None","None","Allow")
+    $DomainUsers = New-Object System.Security.AccessControl.FileSystemAccessRule("$UsersGroup", "Modify", "None", "None", "Allow")
     $ACL.SetAccessRule($DomainUsers)
-    $AdminUsers = New-Object System.Security.AccessControl.FileSystemAccessRule("$AdminGroup","Full","None","None","Allow")
+    $AdminUsers = New-Object System.Security.AccessControl.FileSystemAccessRule("$AdminGroup", "Full", "None", "None", "Allow")
     $ACL.SetAccessRule($AdminUsers)
-    $CreatorOwner = New-Object System.Security.AccessControl.FileSystemAccessRule("Creator Owner","Modify","ContainerInherit,ObjectInherit","InheritOnly","Allow")
+    $CreatorOwner = New-Object System.Security.AccessControl.FileSystemAccessRule("Creator Owner", "Modify", "ContainerInherit,ObjectInherit", "InheritOnly", "Allow")
     $ACL.AddAccessRule($CreatorOwner)
     $ACL | Set-Acl -Path 'Z:' | Out-Null
     Write-Log -Message "Setting the NTFS permissions on the Azure file share succeeded" -Type 'INFO'
@@ -277,11 +307,11 @@ try {
     Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'CLEANUP'
 
     # Remove NTLMv2 if not pre-existing
-    If($RemoveNTLMv2){
+    If ($RemoveNTLMv2) {
         Write-Log -Message "Removing NTLMv2 property as it wasn't pre-existing..." -Type 'WARN'
         Update-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -AccountName $StorageAccountName `
             -SMBAuthenticationMethod Kerberos | Out-Null
-        }
+    }
 
     Disconnect-AzAccount | Out-Null
     Write-Log -Message "Disconnection from Azure succeeded" -Type 'INFO'

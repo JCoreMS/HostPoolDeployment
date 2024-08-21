@@ -4,22 +4,55 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.28.1.47646",
-      "templateHash": "15213456435749631507"
+      "version": "0.29.47.4906",
+      "templateHash": "13098414700197233838"
     }
   },
   "parameters": {
+    "_artifactsLocation": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "_artifactsLocationSasToken": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "domainGUID": {
+      "type": "string",
+      "defaultValue": "00000000-0000-0000-0000-000000000000"
+    },
     "domainJoinUserName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "domainJoinUserPassword": {
-      "type": "securestring"
+      "type": "securestring",
+      "defaultValue": ""
     },
-    "groupAdmins": {
+    "domainFQDN": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "groupAdminsName": {
       "type": "string"
     },
-    "groupUsers": {
+    "groupAdminsGuid": {
       "type": "string"
+    },
+    "groupUsersName": {
+      "type": "string"
+    },
+    "groupUsersGuid": {
+      "type": "string"
+    },
+    "identityOption": {
+      "type": "string",
+      "allowedValues": [
+        "AD",
+        "AADKERB",
+        "AADDS",
+        "None"
+      ]
     },
     "keyExpiration": {
       "type": "int",
@@ -38,10 +71,12 @@
       "type": "string"
     },
     "ouPathStorage": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "ouPathVm": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "privateDNSZoneId": {
       "type": "string"
@@ -78,7 +113,11 @@
         "Premium"
       ]
     },
-    "subnetId": {
+    "vmsubnetId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "storsubnetId": {
       "type": "string"
     },
     "subscriptionId": {
@@ -93,17 +132,19 @@
       "defaultValue": "[utcNow()]"
     },
     "vmName": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "vmAdminUsername": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": ""
     },
     "vmAdminPassword": {
-      "type": "securestring"
+      "type": "securestring",
+      "defaultValue": ""
     }
   },
   "variables": {
-    "domainJoinFQDN": "[split(parameters('domainJoinUserName'), '@')[1]]",
     "storageSKU": "[format('{0}_{1}', parameters('storageTier'), parameters('storageRedundancy'))]",
     "scriptLocation": "https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts",
     "storageKind": "[if(or(equals(variables('storageSKU'), 'Premium_LRS'), equals(variables('storageSKU'), 'Premium_ZRS')), 'FileStorage', 'StorageV2')]",
@@ -115,7 +156,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "linked_ResourceGroup_Resources",
+      "name": "[format('linked_ResourceGroup_Resources-{0}', parameters('storageAcctName'))]",
       "resourceGroup": "[parameters('storageResourceGroup')]",
       "properties": {
         "expressionEvaluationOptions": {
@@ -123,11 +164,20 @@
         },
         "mode": "Incremental",
         "parameters": {
+          "domainFQDN": {
+            "value": "[parameters('domainFQDN')]"
+          },
+          "domainGUID": {
+            "value": "[parameters('domainGUID')]"
+          },
           "domainJoinUserName": {
             "value": "[parameters('domainJoinUserName')]"
           },
           "domainJoinUserPassword": {
             "value": "[parameters('domainJoinUserPassword')]"
+          },
+          "identityOption": {
+            "value": "[parameters('identityOption')]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -150,8 +200,8 @@
           "storageSKU": {
             "value": "[variables('storageSKU')]"
           },
-          "subnetId": {
-            "value": "[parameters('subnetId')]"
+          "vmsubnetId": {
+            "value": "[parameters('vmsubnetId')]"
           },
           "tenantId": {
             "value": "[variables('tenantId')]"
@@ -159,11 +209,17 @@
           "timestamp": {
             "value": "[parameters('timestamp')]"
           },
-          "groupAdmins": {
-            "value": "[parameters('groupAdmins')]"
+          "groupAdminsName": {
+            "value": "[parameters('groupAdminsName')]"
           },
-          "groupUsers": {
-            "value": "[parameters('groupUsers')]"
+          "groupUsersName": {
+            "value": "[parameters('groupUsersName')]"
+          },
+          "groupAdminsGuid": {
+            "value": "[parameters('groupAdminsGuid')]"
+          },
+          "groupUsersGuid": {
+            "value": "[parameters('groupUsersGuid')]"
           },
           "ouPathStorage": {
             "value": "[parameters('ouPathStorage')]"
@@ -179,9 +235,6 @@
           },
           "privateEndPointPrefix": {
             "value": "[parameters('privateEndPointPrefix')]"
-          },
-          "domainJoinFQDN": {
-            "value": "[variables('domainJoinFQDN')]"
           },
           "scriptLocation": {
             "value": "[variables('scriptLocation')]"
@@ -204,6 +257,9 @@
           "storageShareSize": {
             "value": "[parameters('storageShareSize')]"
           },
+          "storsubnetId": {
+            "value": "[parameters('storsubnetId')]"
+          },
           "subscriptionId": {
             "value": "[parameters('subscriptionId')]"
           },
@@ -223,8 +279,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.28.1.47646",
-              "templateHash": "12285943484857592570"
+              "version": "0.29.47.4906",
+              "templateHash": "9891237765494404734"
             }
           },
           "parameters": {
@@ -234,13 +290,25 @@
             "domainJoinUserPassword": {
               "type": "securestring"
             },
-            "domainJoinFQDN": {
+            "domainFQDN": {
               "type": "string"
             },
-            "groupAdmins": {
+            "domainGUID": {
               "type": "string"
             },
-            "groupUsers": {
+            "groupAdminsName": {
+              "type": "string"
+            },
+            "groupAdminsGuid": {
+              "type": "string"
+            },
+            "groupUsersName": {
+              "type": "string"
+            },
+            "groupUsersGuid": {
+              "type": "string"
+            },
+            "identityOption": {
               "type": "string"
             },
             "keyExpiration": {
@@ -297,7 +365,7 @@
             "storageSKU": {
               "type": "string"
             },
-            "subnetId": {
+            "storsubnetId": {
               "type": "string"
             },
             "subscriptionId": {
@@ -320,7 +388,13 @@
             },
             "vmName": {
               "type": "string"
+            },
+            "vmsubnetId": {
+              "type": "string"
             }
+          },
+          "variables": {
+            "activeDirectoryProperties": "[if(equals(parameters('identityOption'), 'AADKERB'), createObject('domainName', parameters('domainFQDN'), 'netBiosDomainName', ' ', 'forestName', ' ', 'domainGuid', parameters('domainGUID'), 'domainSid', ' ', 'azureStorageSid', ' '), null())]"
           },
           "resources": [
             {
@@ -397,36 +471,10 @@
               ]
             },
             {
-              "type": "Microsoft.Network/privateEndpoints",
-              "apiVersion": "2020-07-01",
-              "name": "[format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('keyVaultName'))]",
-              "location": "[parameters('location')]",
-              "properties": {
-                "privateLinkServiceConnections": [
-                  {
-                    "name": "[format('pep-{0}', parameters('keyVaultName'))]",
-                    "properties": {
-                      "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-                      "groupIds": [
-                        "vault"
-                      ]
-                    }
-                  }
-                ],
-                "subnet": {
-                  "id": "[parameters('subnetId')]"
-                }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]"
-              ]
-            },
-            {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
               "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
-              "name": "[guid(subscription().subscriptionId, 'assignIdentity2Vault')]",
+              "name": "[guid(subscription().subscriptionId, 'assignIdentity2Vault', parameters('timestamp'))]",
               "properties": {
                 "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
                 "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
@@ -435,9 +483,7 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
-                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('keyVaultName')))]"
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
               ]
             },
             {
@@ -457,6 +503,7 @@
                 }
               },
               "properties": {
+                "azureFilesIdentityBasedAuthentication": "[if(not(equals(variables('activeDirectoryProperties'), null())), createObject('directoryServiceOptions', parameters('identityOption'), 'activeDirectoryProperties', variables('activeDirectoryProperties')), null())]",
                 "minimumTlsVersion": "TLS1_2",
                 "supportsHttpsTrafficOnly": true,
                 "allowBlobPublicAccess": false,
@@ -489,35 +536,25 @@
                 }
               },
               "dependsOn": [
-                "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2Vault'))]",
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]"
               ]
             },
             {
-              "type": "Microsoft.Network/privateEndpoints",
-              "apiVersion": "2020-07-01",
-              "name": "[format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName'))]",
-              "location": "[parameters('location')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAcctName'))]",
+              "name": "[guid(subscription().subscriptionId, '17d1049b-9a84-46fb-8f53-869881c3d3ab')]",
               "properties": {
-                "privateLinkServiceConnections": [
-                  {
-                    "name": "[format('pep-{0}', parameters('storageAcctName'))]",
-                    "properties": {
-                      "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
-                      "groupIds": [
-                        "file"
-                      ]
-                    }
-                  }
-                ],
-                "subnet": {
-                  "id": "[parameters('subnetId')]"
-                }
+                "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
+                "principalType": "ServicePrincipal",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab')]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
               ]
             },
@@ -530,8 +567,84 @@
                 "enabledProtocols": "SMB"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAcctName'), 'default')]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/fileServices",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}', parameters('storageAcctName'), 'default')]",
+              "properties": {
+                "protocolSettings": {
+                  "smb": "[parameters('smbSettings')]"
+                },
+                "shareDeleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": 7
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAcctName'))]",
+              "name": "[guid(subscription().subscriptionId, 'a7264617-510b-434b-a828-9731dc254ea7')]",
+              "properties": {
+                "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
+                "principalId": "[parameters('groupAdminsGuid')]",
+                "principalType": "Group",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a7264617-510b-434b-a828-9731dc254ea7')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAcctName'))]",
+              "name": "[guid(subscription().subscriptionId, '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb')]",
+              "properties": {
+                "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
+                "principalId": "[parameters('groupUsersGuid')]",
+                "principalType": "Group",
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2020-07-01",
+              "name": "[format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('keyVaultName'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[format('pep-{0}', parameters('keyVaultName'))]",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                      "groupIds": [
+                        "vault"
+                      ]
+                    }
+                  }
+                ],
+                "subnet": {
+                  "id": "[parameters('storsubnetId')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
               ]
             },
             {
@@ -553,21 +666,28 @@
               ]
             },
             {
-              "type": "Microsoft.Storage/storageAccounts/fileServices",
-              "apiVersion": "2022-09-01",
-              "name": "[format('{0}/{1}', parameters('storageAcctName'), 'default')]",
+              "type": "Microsoft.Network/privateEndpoints",
+              "apiVersion": "2020-07-01",
+              "name": "[format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName'))]",
+              "location": "[parameters('location')]",
               "properties": {
-                "protocolSettings": {
-                  "smb": "[parameters('smbSettings')]"
-                },
-                "shareDeleteRetentionPolicy": {
-                  "enabled": true,
-                  "days": 7
+                "privateLinkServiceConnections": [
+                  {
+                    "name": "[format('pep-{0}', parameters('storageAcctName'))]",
+                    "properties": {
+                      "privateLinkServiceId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
+                      "groupIds": [
+                        "file"
+                      ]
+                    }
+                  }
+                ],
+                "subnet": {
+                  "id": "[parameters('storsubnetId')]"
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
-                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
               ]
             },
             {
@@ -589,43 +709,10 @@
               ]
             },
             {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAcctName'))]",
-              "name": "[guid(subscription().subscriptionId, 'assignIdentity2StorageSMB')]",
-              "properties": {
-                "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
-                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
-                "principalType": "ServicePrincipal",
-                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a7264617-510b-434b-a828-9731dc254ea7')]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', parameters('storageAcctName'))]",
-              "name": "[guid(subscription().subscriptionId, 'assignIdentity2StorageRead')]",
-              "properties": {
-                "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
-                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",
-                "principalType": "ServicePrincipal",
-                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '17d1049b-9a84-46fb-8f53-869881c3d3ab')]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
-              ]
-            },
-            {
+              "condition": "[equals(parameters('identityOption'), 'AD')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
-              "name": "linked_managementVm",
+              "name": "[format('linked_managementVm-{0}', parameters('storageAcctName'))]",
               "resourceGroup": "[parameters('storageResourceGroup')]",
               "properties": {
                 "expressionEvaluationOptions": {
@@ -637,7 +724,7 @@
                     "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
                   },
                   "domainJoinFQDN": {
-                    "value": "[parameters('domainJoinFQDN')]"
+                    "value": "[parameters('domainFQDN')]"
                   },
                   "domainJoinOUPath": {
                     "value": "[parameters('ouPathStorage')]"
@@ -652,7 +739,7 @@
                     "value": "[parameters('location')]"
                   },
                   "subnetId": {
-                    "value": "[parameters('subnetId')]"
+                    "value": "[parameters('vmsubnetId')]"
                   },
                   "vmName": {
                     "value": "[parameters('vmName')]"
@@ -673,8 +760,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.28.1.47646",
-                      "templateHash": "17952793939531168441"
+                      "version": "0.29.47.4906",
+                      "templateHash": "2036838474113733927"
                     }
                   },
                   "parameters": {
@@ -848,15 +935,14 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[0], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[1], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[2])]"
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
               ]
             },
             {
+              "condition": "[equals(parameters('identityOption'), 'AD')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2022-09-01",
-              "name": "linked_managementVMscript",
+              "name": "[format('linked_managementVMscript-{0}', parameters('storageAcctName'))]",
               "properties": {
                 "expressionEvaluationOptions": {
                   "scope": "inner"
@@ -911,10 +997,10 @@
                     "value": "[parameters('vmName')]"
                   },
                   "groupAdmins": {
-                    "value": "[parameters('groupAdmins')]"
+                    "value": "[parameters('groupAdminsName')]"
                   },
                   "groupUsers": {
-                    "value": "[parameters('groupUsers')]"
+                    "value": "[parameters('groupUsersName')]"
                   }
                 },
                 "template": {
@@ -923,8 +1009,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.28.1.47646",
-                      "templateHash": "1505055709102177552"
+                      "version": "0.29.47.4906",
+                      "templateHash": "543013264962772197"
                     }
                   },
                   "parameters": {
@@ -1012,11 +1098,8 @@
                 }
               },
               "dependsOn": [
-                "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2StorageRead'))]",
-                "[extensionResourceId(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'assignIdentity2StorageSMB'))]",
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageResourceGroup')), 'Microsoft.Resources/deployments', 'linked_managementVm')]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[0], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[1], split(format('{0}/default/{1}', parameters('storageAcctName'), parameters('storageFileShareName')), '/')[2])]"
+                "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageResourceGroup')), 'Microsoft.Resources/deployments', format('linked_managementVm-{0}', parameters('storageAcctName')))]"
               ]
             }
           ]

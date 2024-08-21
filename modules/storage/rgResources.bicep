@@ -5,9 +5,13 @@ param domainJoinUserName string
 @secure()
 param domainJoinUserPassword string
 
-param domainJoinFQDN string
-param groupAdmins string
-param groupUsers string
+param domainFQDN string
+param domainGUID string
+param groupAdminsName string
+param groupAdminsGuid string
+param groupUsersName string
+param groupUsersGuid string
+param identityOption string
 param keyExpiration int
 param keyVaultName string
 param location string
@@ -26,7 +30,7 @@ param storageResourceGroup string
 param storageShareSize int
 param storageSetupScript string
 param storageSKU string
-param subnetId string
+param storsubnetId string
 param subscriptionId string
 param tags object
 param tenantId string
@@ -37,7 +41,16 @@ param vmAdminPassword string
 
 param vmAdminUsername string
 param vmName string
+param vmsubnetId string
 
+var activeDirectoryProperties = identityOption == 'AADKERB' ? {
+    domainName: domainFQDN
+    netBiosDomainName: ' '
+    forestName: ' '
+    domainGuid: domainGUID
+    domainSid: ' '
+    azureStorageSid: ' '
+    } : null
 
 
 // Create User Assigned Managed Identity
@@ -108,34 +121,10 @@ resource keyVaultKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
 }
 
 
-// Private Endpoint for Storage Account
-resource keyvaultPvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: '${privateEndPointPrefix}-${keyVaultName}'
-  location: location
-  properties: {
-    privateLinkServiceConnections: [
-      {
-        name: 'pep-${keyVaultName}'
-        properties: {
-          privateLinkServiceId: keyVault.id
-          groupIds: [
-            'vault'
-          ]
-        }
-      }
-    ]
-    subnet: {
-      id: subnetId
-    }
-  }
-  dependsOn:[
-    keyVaultKey
-  ]
-}
 
 // Assign Managed Identity to Key Vault
 resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, 'assignIdentity2Vault')
+  name: guid(subscription().subscriptionId, 'assignIdentity2Vault', timestamp)
   scope: keyVault
   properties: {
     description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
@@ -146,11 +135,8 @@ resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-0
       'e147488a-f6f5-4113-8e2d-b22465e65bf6'
     ) // Key Vault Crypto Service Encryption User
   }
-  dependsOn: [
-    keyVaultKey
-    keyvaultPvtEndpoint
-  ]
 }
+
 
 // Create Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
@@ -168,6 +154,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     }
   }
   properties: {
+    azureFilesIdentityBasedAuthentication: activeDirectoryProperties != null ? {
+      directoryServiceOptions: identityOption
+      activeDirectoryProperties: activeDirectoryProperties
+    } : null
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: false
@@ -201,35 +191,23 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
       requireInfrastructureEncryption: false
     }
   }
-  dependsOn: [
-    assignIdentity2Vault
-  ]
 }
 
-// Private Endpoint for Storage Account
-resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
-  name: '${privateEndPointPrefix}-${storageAcctName}'
-  location: location
+// Assign Managed Identity to Storage Account
+resource assignIdentity2StorageContrib 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, '17d1049b-9a84-46fb-8f53-869881c3d3ab')
+  scope: storageAccount
   properties: {
-    privateLinkServiceConnections: [
-      {
-        name: 'pep-${storageAcctName}'
-        properties: {
-          privateLinkServiceId: storageAccount.id
-          groupIds: [
-            'file'
-          ]
-        }
-      }
-    ]
-    subnet: {
-      id: subnetId
-    }
+    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
+    principalId: identityStorageSetup.properties.principalId
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '17d1049b-9a84-46fb-8f53-869881c3d3ab'
+    ) // Storage Account Contributor Role
   }
-  dependsOn:[
-    keyVaultKey
-  ]
 }
+
 
 
 resource storageFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
@@ -238,33 +216,125 @@ resource storageFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares
     shareQuota: storageShareSize
     enabledProtocols: 'SMB'
   }
-  dependsOn: [
-    storageFileService
-  ]
 }
 
 // Create Management Virtual Machine and domain join storage
 //     System Managed Identity to access storage
 
-module managementVm 'managementVm.bicep' = {
-  name: 'linked_managementVm'
+module managementVm 'managementVm.bicep' =  if(identityOption == 'AD') {
+  name: 'linked_managementVm-${storageAcctName}'
   scope: resourceGroup(storageResourceGroup)
   params: {
     assignedIdentityId: identityStorageSetup.id
-    domainJoinFQDN: domainJoinFQDN
+    domainJoinFQDN: domainFQDN
     domainJoinOUPath: ouPathStorage
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
     location: location
-    subnetId: subnetId
+    subnetId: vmsubnetId
     vmName: vmName
     tags: tags
     vmAdminPassword: vmAdminPassword
     vmAdminUsername: vmAdminUsername
   }
+}
+
+
+
+resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
+  parent: storageAccount
+  name: 'default'
+  properties: {
+    protocolSettings: {
+      smb: smbSettings
+    }
+    shareDeleteRetentionPolicy: {
+      enabled: true
+      days: 7
+    }
+  }
+}
+
+// Assign SMB Share Elevated Contributor Role
+resource assignGroupAdmins2StorageSMB 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, 'a7264617-510b-434b-a828-9731dc254ea7')
+  scope: storageAccount
+  properties: {
+    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
+    principalId: groupAdminsGuid
+    principalType: 'Group'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'a7264617-510b-434b-a828-9731dc254ea7'
+    ) // Storage File Data SMB Share Elevated Contributor
+  }
+}
+
+// Assign SMB Share Elevated Contributor Role
+resource assignGroupUsers2StorageSMB 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb')
+  scope: storageAccount
+  properties: {
+    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
+    principalId: groupUsersGuid
+    principalType: 'Group'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb'
+    ) // Storage File Data SMB Share Contributor
+  }
+}
+
+
+
+module managementVmScript 'managementVmScript.bicep' = if(identityOption == 'AD') {
+  name: 'linked_managementVMscript-${storageAcctName}'
+  params: {
+    domainJoinOUPath: ouPathVm
+    domainJoinUserName: domainJoinUserName
+    domainJoinUserPassword: domainJoinUserPassword
+    location: location
+    storageSetupScriptUri: ['${scriptLocation}/${storageSetupScript}']
+    storageSetupScriptName: storageSetupScript
+    storageSetupId: identityStorageSetup.properties.clientId
+    storageAccountName: storageAcctName
+    storageFileShareName: storageFileShareName
+    storageResourceGroup: storageResourceGroup
+    subscriptionId: subscriptionId
+    tags: tags
+    tenantId: tenantId
+    timestamp: timestamp
+    vmName: vmName
+    groupAdmins: groupAdminsName
+    groupUsers: groupUsersName
+  }
+  dependsOn: [
+    managementVm
+  ]
+}
+
+// Private Endpoint for Key Vault
+resource keyvaultPvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
+  name: '${privateEndPointPrefix}-${keyVaultName}'
+  location: location
+  properties: {
+    privateLinkServiceConnections: [
+      {
+        name: 'pep-${keyVaultName}'
+        properties: {
+          privateLinkServiceId: keyVault.id
+          groupIds: [
+            'vault'
+          ]
+        }
+      }
+    ]
+    subnet: {
+      id: storsubnetId
+    }
+  }
   dependsOn: [
     storageAccount
-    storageFileShare
   ]
 }
 
@@ -282,26 +352,27 @@ resource vaultPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDns
     ]
   }
 }
-
-resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
-  parent: storageAccount
-  name: 'default'
+// Private Endpoint for Storage Account
+resource storagePvtEndpoint 'Microsoft.Network/privateEndpoints@2020-07-01' = {
+  name: '${privateEndPointPrefix}-${storageAcctName}'
+  location: location
   properties: {
-    protocolSettings: {
-      smb: smbSettings
-    }
-    shareDeleteRetentionPolicy: {
-      enabled: true
-      days: 7
+    privateLinkServiceConnections: [
+      {
+        name: 'pep-${storageAcctName}'
+        properties: {
+          privateLinkServiceId: storageAccount.id
+          groupIds: [
+            'file'
+          ]
+        }
+      }
+    ]
+    subnet: {
+      id: storsubnetId
     }
   }
-  dependsOn: [
-    storagePvtEndpoint
-  ]
 }
-
-
-
 resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2020-06-01' = {
   name: 'filePrivateDnsZoneGroup'
   parent: storagePvtEndpoint
@@ -315,64 +386,4 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
       }
     ]
   }
-}
-
-// Assign Managed Identity to Storage Account
-resource assignIdentity2StorageSMB 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, 'assignIdentity2StorageSMB')
-  scope: storageAccount
-  properties: {
-    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
-    principalId: identityStorageSetup.properties.principalId
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      'a7264617-510b-434b-a828-9731dc254ea7'
-    ) // Storage File Data SMB Share Elevated Contributor
-  }
-}
-
-// Assign Managed Identity to Storage Account
-resource assignIdentity2StorageContrib 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, 'assignIdentity2StorageRead')
-  scope: storageAccount
-  properties: {
-    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
-    principalId: identityStorageSetup.properties.principalId
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      '17d1049b-9a84-46fb-8f53-869881c3d3ab'
-    ) // Storage Account Contributor Role
-  }
-}
-
-
-module managementVmScript 'managementVmScript.bicep' = {
-  name: 'linked_managementVMscript'
-  params: {
-    domainJoinOUPath: ouPathVm
-    domainJoinUserName: domainJoinUserName
-    domainJoinUserPassword: domainJoinUserPassword
-    location: location
-    storageSetupScriptUri: ['${scriptLocation}/${storageSetupScript}']
-    storageSetupScriptName: storageSetupScript
-    storageSetupId: identityStorageSetup.properties.clientId
-    storageAccountName: storageAcctName
-    storageFileShareName: storageFileShareName
-    storageResourceGroup: storageResourceGroup
-    subscriptionId: subscriptionId
-    tags: tags
-    tenantId: tenantId
-    timestamp: timestamp
-    vmName: vmName
-    groupAdmins: groupAdmins
-    groupUsers: groupUsers
-  }
-  dependsOn: [
-    managementVm
-    assignIdentity2StorageSMB
-    assignIdentity2StorageContrib
-    storageFileShare
-  ]
 }

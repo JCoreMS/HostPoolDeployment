@@ -8,7 +8,9 @@ param DiskSku string
 param DomainName string
 param HostPoolStatus string
 param HostPoolName string
+param HostPoolOption string
 param HostPoolType string
+@secure()
 param HostPoolWorkspaceName string
 param Location string
 param NumUsersPerHost int
@@ -30,10 +32,12 @@ var vmTemplateMS = '{"domain":"${DomainName}","galleryImageOffer":"${vmOffer}","
 var vmTemplateCompGal = '{"domain":"${DomainName}","galleryImageOffer":null,"galleryImagePublisher":null,"galleryImageSKU":null,"imageType":"CustomImage","imageUri":null,"customImageId":"${ComputeGalleryImageId}","namePrefix":"${VmPrefix}","osDiskType":"${DiskSku}","useManagedDisks":true,"vmSize":{"id":"${VmSize}","cores":null,"ram":null},"galleryItemId":null}' 
 var vmTemplate = UseCustomImage ? vmTemplateCompGal : vmTemplateMS
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' = {
-  name: HostPoolName
+
+// resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' = if((HostPoolStatus != 'Existing') && (HostPoolOption != 'AltTenant')) {
+  resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' = {
+name: HostPoolName
   location: Location
-  tags: contains(Tags, 'Microsoft.DesktopVirtualization/hostPools') ? Tags['Microsoft.DesktopVirtualization/hostPools'] : {}
+  tags: Tags[?'Microsoft.DesktopVirtualization/hostPools'] ?? {}
   properties: {
     hostPoolType: split(HostPoolType, ' ')[0]
     maxSessionLimit: NumUsersPerHost
@@ -50,21 +54,27 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview'
     vmTemplate: vmTemplate
   }
 }
+/*
+resource hostPoolExisting 'Microsoft.DesktopVirtualization/hostPools@2023-09-05' existing = if(HostPoolStatus == 'Existing') {
+  name: HostPoolName
+  scope: resourceGroup(subscription().subscriptionId, ResourceGroupHP)
+}
+*/
 
-resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2022-10-14-preview' = if(HostPoolStatus != 'Existing') {
+resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2023-09-05' = if((HostPoolStatus != 'Existing') && (HostPoolOption != 'AltTenant')) {
   name: AppGroupName
   location: Location
-  tags: contains(Tags, 'Microsoft.DesktopVirtualization/applicationGroups') ? Tags['Microsoft.DesktopVirtualization/applicationGroups'] : {}
+  tags: Tags[?'Microsoft.DesktopVirtualization/applicationGroups'] ?? {}
   properties: {
     hostPoolArmPath: hostPool.id
     applicationGroupType: 'Desktop'
   }
 }
 
-resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-10-14-preview' = if(HostPoolWorkspaceName != 'none') {
+resource workspace 'Microsoft.DesktopVirtualization/workspaces@2023-09-05' = if((HostPoolWorkspaceName != 'none') && (HostPoolOption != 'AltTenant')) {
   name: HostPoolWorkspaceName
   location: Location
-  tags: contains(Tags, 'Microsoft.DesktopVirtualization/workspaces') ? Tags['Microsoft.DesktopVirtualization/workspaces'] : {}
+  tags: Tags[?'Microsoft.DesktopVirtualization/workspaces'] ?? {}
   properties: {
     applicationGroupReferences: [
       appGroup.id
@@ -75,5 +85,5 @@ resource workspace 'Microsoft.DesktopVirtualization/workspaces@2022-10-14-previe
   ]
 }
 
+// output HostPoolRegistrationToken string = HostPoolStatus == 'Existing' ? hostPoolExisting.listRegistrationTokens()[0].token : hostPool.listRegistrationTokens()[0].token
 output HostPoolRegistrationToken string = reference(hostPool.id).registrationInfo.token
-output ComputeImageGalleryID string = ComputeGalleryImageId

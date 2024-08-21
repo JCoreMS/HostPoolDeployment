@@ -5,12 +5,14 @@ param DCRNewName string
 param DCRExisting string
 param HostPoolStatus string
 param HostPoolName string
+param HostPoolOption string
 param HostPoolWorkspaceName string
 param LogAnalyticsWorkspaceId string
 param ResGroupIdMonitor string
 param Location string
 param Tags object
 
+var Deploy = ((HostPoolStatus != 'Existing') && (HostPoolOption != 'AltTenant')) ? true : false
 
 var PerfCounters = [
   {
@@ -89,11 +91,11 @@ resource workspaceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
   }
 } */
 
-resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = if(HostPoolStatus != 'Existing') {
+resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2022-10-14-preview' existing = if(Deploy) {
   name: HostPoolName
 }
 
-resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if(HostPoolStatus != 'Existing') {
+resource hostPoolDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if(Deploy) {
   name: 'WVDInsights'
   scope: hostPool
   properties: {

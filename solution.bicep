@@ -1,5 +1,7 @@
 targetScope = 'subscription'
 
+param _artifactsLocation string = ''
+param _artifactsLocationSasToken string = ''
 param AppGroupName string = 'none'
 
 @allowed([
@@ -42,7 +44,7 @@ param dedicatedHostTagName string = ''
 ])
 @description('The storage SKU for the AVD session host disks.  Production deployments should use Premium_LRS.')
 param DiskSku string = 'Standard_LRS'
-
+param diskEncryptionSetResId string
 param DomainName string
 param DomainUser string
 
@@ -257,7 +259,7 @@ var varMarketPlaceGalleryWindows = {
 }
 
 module resourceGroupHP 'modules/resourceGroup.bicep' = {
-  name: 'linked_ResourceGroupHP'
+  name: 'linked_ResourceGroupHP_${Location}'
   params: {
     Location: Location
     RGName: ResourceGroupHP
@@ -279,7 +281,7 @@ resource kvLocal 'Microsoft.KeyVault/vaults@2022-11-01' existing =
   }
 
 module resourceGroupVMs 'modules/resourceGroup.bicep' = {
-    name: 'linked_ResourceGroupVMs'
+    name: 'linked_ResourceGroupVMs_${Location}'
     params: {
         Location: Location
         RGName: ResourceGroupVMs
@@ -297,7 +299,7 @@ resource computeGalleryImage 'Microsoft.Compute/galleries/images@2022-03-03' exi
 module userIdentity 'modules/userIdentity.bicep' =
   if (PostDeployOption) {
     scope: resourceGroup(ResourceGroupHP)
-    name: 'linked_UserIdentityCreateAssign'
+    name: 'linked_UserIdentityCreateAssign_${Location}'
     params: {
       Location: Location
       PostDeployOption: PostDeployOption
@@ -314,15 +316,14 @@ module userIdentity 'modules/userIdentity.bicep' =
 
 module logAnalyticsWorkspace 'modules/logAnalytics.bicep' = {
   scope: resourceGroup(LogAnalyticsSubId, LogAnalyticsRG)
-  name: 'linked_logAnalyticsWorkspace'
+  name: 'linked_logAnalyticsWorkspace_${Location}'
   params: {
     LogAnalyticsWorkspaceName: LogAnalyticsWorkspaceName
   }
 }
 
-module hostPool 'modules/hostpool.bicep' =
-  if (HostPoolOption != 'AltTenant') {
-    name: 'linked_HostPoolDeployment'
+module hostPool 'modules/hostpool.bicep' = {
+    name: 'linked_HostPoolDeployment_${Location}'
     scope: resourceGroup(ResourceGroupHP)
     params: {
       AppGroupName: AppGroupName
@@ -333,6 +334,7 @@ module hostPool 'modules/hostpool.bicep' =
       DomainName: DomainName
       HostPoolStatus: HostPoolOption
       HostPoolName: HostPoolName
+      HostPoolOption: HostPoolOption
       HostPoolType: HostPoolType
       Location: Location
       NumUsersPerHost: NumUsersPerHost
@@ -352,9 +354,8 @@ module hostPool 'modules/hostpool.bicep' =
 
 // Monitoring Resources for AVD Insights
 // This module configures Log Analytics Workspace with Windows Events & Windows Performance Counters plus diagnostic settings on the required resources 
-module diagnostics 'modules/diagnostics.bicep' =
-  if (HostPoolOption != 'AltTenant') {
-    name: 'linked_Diagnostics_Setup'
+module diagnostics 'modules/diagnostics.bicep' = {
+    name: 'linked_Diagnostics_Setup_${Location}'
     scope: resourceGroup(ResourceGroupHP) // Management Resource Group
     params: {
       DCRStatus: DCRStatus
@@ -362,6 +363,7 @@ module diagnostics 'modules/diagnostics.bicep' =
       DCRExisting: DCRExisting
       HostPoolStatus: HostPoolOption
       HostPoolName: HostPoolName
+      HostPoolOption: HostPoolOption
       Location: Location
       LogAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.logAnalyticsId
       HostPoolWorkspaceName: HostPoolWorkspaceName
@@ -382,7 +384,7 @@ resource dataCollectionRuleExisting 'Microsoft.Insights/dataCollectionRules@2022
   }
 
 module dataCollectionRule 'modules/dataCollectionRule.bicep' = if (DCRStatus == 'New') {
-    name: 'linked_DataCollectionRule'
+    name: 'linked_DataCollectionRule_${Location}'
     scope: resourceGroup(ResGroupIdMonitor)
     params: {
       DCRNewName: DCRNewName
@@ -393,7 +395,7 @@ module dataCollectionRule 'modules/dataCollectionRule.bicep' = if (DCRStatus == 
   }
 
 module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId != '') {
-    name: 'linked_dedicatedHostInfo'
+    name: 'linked_dedicatedHostInfo_${Location}'
     scope: DedicatedHostRG != '' ? resourceGroup(DedicatedHostRG) : resourceGroup(ResourceGroupHP)
     params: {
       dedicatedHostId: dedicatedHostId
@@ -402,7 +404,7 @@ module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId
 
 @batchSize(1)
 module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, SessionHostBatchCount): {
-    name: 'linked_VirtualMachines_batch_${i - 1}'
+    name: 'linked_VMs_batch_${i - 1}-${guid(Timestamp)}'
     scope: resourceGroup(ResourceGroupVMs)
     params: {
       AgentPackageLocation: varAvdAgentPackageLocation
@@ -410,6 +412,8 @@ module virtualMachines 'modules/virtualmachines.bicep' = [for i in range(1, Sess
       ComputeGalleryProperties: UseCustomImage ? computeGalleryImage.properties : {}
       DedicatedHostResId: !empty(dedicatedHostId) ? dedicatedHostId : ''
       DedicatedHostTagName: !empty(dedicatedHostTagName) ? dedicatedHostTagName : ''
+      diskEncryptionSetResId: diskEncryptionSetResId
+      DiskSku: DiskSku
       DomainUser: DomainUser
       DomainPassword: KeyVaultDomainOption ? kvDomain.getSecret(KeyVaultDomName) : DomainPassword
       DomainName: DomainName
