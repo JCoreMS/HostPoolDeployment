@@ -58,7 +58,7 @@ try {
             [parameter(Mandatory)]
             [string]$Type
         )
-        $Path = 'C:\Windows\Temp\cse_FileShareSetup.txt'
+        $Path = 'C:\cse_FileShareSetup.txt'
         if (!(Test-Path -Path $Path)) {
             New-Item -Path C:\ -Name cse_FileShareSetup.txt | Out-Null
         }
