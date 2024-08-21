@@ -85,10 +85,15 @@ try {
 
     Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'PRE-REQ'
 
-    write-Log -Message "Installing PowerShell 7" -Type 'PRE-REQ'
-    Invoke-WebRequest -Uri https://github.com/PowerShell/PowerShell/releases/download/v7.4.4/PowerShell-7.4.4-win-x64.msi -OutFile C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi -UseBasicParsing
-    msiexec.exe /package C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1
-    Remove-Item -Path C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi -Force
+    Write-Log -Message "Checking for PowerShell 7" -Type 'PRE-REQ'
+    $PSVersion = $PSVersionTable.PSVersion.Major
+    If($PSVersion.Major -lt 7) {
+        write-Log -Message "Installing PowerShell 7" -Type 'PRE-REQ'
+        Invoke-WebRequest -Uri https://github.com/PowerShell/PowerShell/releases/download/v7.4.4/PowerShell-7.4.4-win-x64.msi -OutFile C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi -UseBasicParsing
+        msiexec.exe /package C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi /quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1
+        Remove-Item -Path C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi -Force
+    }
+    else { Write-Log -Message "PowerShell 7 already installed" -Type 'PRE-REQ' }
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Write-Log -Message "Getting PowerShell Providers List" -Type 'PRE-REQ'
