@@ -260,7 +260,7 @@ resource assignGroupAdmins2StorageSMB 'Microsoft.Authorization/roleAssignments@2
   name: guid(subscription().subscriptionId, 'a7264617-510b-434b-a828-9731dc254ea7')
   scope: storageAccount
   properties: {
-    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
+    description: 'Provides AVD Admins access to ${storageAccount.name}'
     principalId: groupAdminsGuid
     principalType: 'Group'
     roleDefinitionId: subscriptionResourceId(
@@ -275,13 +275,28 @@ resource assignGroupUsers2StorageSMB 'Microsoft.Authorization/roleAssignments@20
   name: guid(subscription().subscriptionId, '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb')
   scope: storageAccount
   properties: {
-    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
+    description: 'Provides AVD Users access to ${storageAccount.name} for FSlogix'
     principalId: groupUsersGuid
     principalType: 'Group'
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb'
     ) // Storage File Data SMB Share Contributor
+  }
+}
+
+// Assign User Identity from Management VM to Storage Account
+resource assignVMMI2Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb')
+  scope: storageAccount
+  properties: {
+    description: 'Provides User Identity ${vmName} access to StorageAccount for Domain Join Setup. (${storageAccount.name})'
+    principalId: identityStorageSetup.id
+    principalType: 'ServicePrincipal'
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '17d1049b-9a84-46fb-8f53-869881c3d3ab'
+    ) // Storage Account Contributor
   }
 }
 

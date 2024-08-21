@@ -70,12 +70,12 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [fo
             id: resourceId(subscription().subscriptionId, VirtualNetworkResourceGroup, 'Microsoft.Network/virtualNetworks/subnets', VirtualNetwork, Subnet)
           }
         }
+      }
       ]
       enableAcceleratedNetworking: true
       enableIPForwarding: false
     }
-  }
-]
+  }]
 
 // No OS Profile for Dedicated Host
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2022-11-01' = [

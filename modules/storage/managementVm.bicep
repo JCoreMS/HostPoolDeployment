@@ -137,3 +137,4 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
     }
   }
 }
+

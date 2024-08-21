@@ -85,7 +85,7 @@ try {
 
     Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'PRE-REQ'
 
-    Write-Log -Message "Checking for PowerShell 7" -Type 'PRE-REQ'
+<#  Write-Log -Message "Checking for PowerShell 7" -Type 'PRE-REQ'
     $PSVersion = $PSVersionTable.PSVersion.Major
     If($PSVersion -lt 7) {
         write-Log -Message "Installing PowerShell 7" -Type 'PRE-REQ'
@@ -94,6 +94,7 @@ try {
         Remove-Item -Path C:\Windows\Temp\PowerShell-7.4.4-win-x64.msi -Force
     }
     else { Write-Log -Message "PowerShell 7 already installed" -Type 'PRE-REQ' }
+ #>
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Write-Log -Message "Getting PowerShell Providers List" -Type 'PRE-REQ'
