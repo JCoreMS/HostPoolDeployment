@@ -56,29 +56,18 @@ var DedicatedHostName = !empty(DedicatedHostResId) ? split(DedicatedHostResId, '
 var vmTagDH = !empty(DedicatedHostTagName) ? { DedicatedHostTagName: DedicatedHostName } : {}
 var vmTags = !empty(DedicatedHostTagName) ? union(vmTagDH, Tags) : Tags
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [
-  for i in range(0, NumSessionHosts): {
-//    name: 'nic-${VmPrefix}${padLeft((i + VmIndexStart), 3, '0')}'
-    name: 'nic-${VmPrefix}-${(i + VmIndexStart)}'
-    location: Location
-    tags: Tags[?'Microsoft.Network/networkInterfaces'] ?? {}
-    properties: {
-      ipConfigurations: [
-        {
-          name: 'ipconfig'
-          properties: {
-            privateIPAllocationMethod: 'Dynamic'
-            subnet: {
-              id: resourceId(
-                subscription().subscriptionId,
-                VirtualNetworkResourceGroup,
-                'Microsoft.Network/virtualNetworks/subnets',
-                VirtualNetwork,
-                Subnet
-              )
-            }
-            primary: true
-            privateIPAddressVersion: 'IPv4'
+resource networkInterface 'Microsoft.Network/networkInterfaces@2022-11-01' = [for i in range(0, NumSessionHosts): {
+  name: 'nic-${VmPrefix}-${padLeft((i + VmIndexStart), 0, '0')}'
+  location: Location
+  tags: contains(Tags, 'Microsoft.Network/networkInterfaces') ? Tags['Microsoft.Network/networkInterfaces'] : {}
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: resourceId(subscription().subscriptionId, VirtualNetworkResourceGroup, 'Microsoft.Network/virtualNetworks/subnets', VirtualNetwork, Subnet)
           }
         }
       ]
