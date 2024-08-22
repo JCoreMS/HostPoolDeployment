@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "18061366869503930966"
+      "templateHash": "14561849922911559523"
     }
   },
   "parameters": {
@@ -276,7 +276,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "3126363317700724144"
+              "templateHash": "9631512158347308753"
             }
           },
           "parameters": {
@@ -510,28 +510,10 @@
                   "defaultAction": "Deny"
                 },
                 "dnsEndpointType": "Standard",
-                "largeFileSharesState": "Enabled",
-                "encryption": {
-                  "identity": {
-                    "userAssignedIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
-                  },
-                  "keySource": "Microsoft.Keyvault",
-                  "keyvaultproperties": {
-                    "keyname": "[format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp'))]",
-                    "keyvaulturi": "[if(endsWith(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, '/'), substring(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, 0, sub(length(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri), 1)), reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri)]"
-                  },
-                  "services": {
-                    "file": {
-                      "enabled": true
-                    }
-                  },
-                  "requireInfrastructureEncryption": false
-                }
+                "largeFileSharesState": "Enabled"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]"
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
               ]
             },
             {
@@ -1094,6 +1076,160 @@
               "dependsOn": [
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
                 "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageResourceGroup')), 'Microsoft.Resources/deployments', format('linked_managementVm-{0}', parameters('storageAcctName')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('linked_storageCMKSetup-{0}', parameters('storageAcctName'))]",
+              "resourceGroup": "[parameters('storageResourceGroup')]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "domainFQDN": {
+                    "value": "[parameters('domainFQDN')]"
+                  },
+                  "domainGUID": {
+                    "value": "[parameters('domainGUID')]"
+                  },
+                  "identityOption": {
+                    "value": "[parameters('identityOption')]"
+                  },
+                  "identityStorageSetupId": {
+                    "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
+                  },
+                  "keyVaultKeyName": {
+                    "value": "[format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp'))]"
+                  },
+                  "keyVaultUri": "[if(endsWith(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, '/'), createObject('value', substring(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, 0, sub(length(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri), 1))), createObject('value', reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri))]",
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "storageAcctName": {
+                    "value": "[parameters('storageAcctName')]"
+                  },
+                  "storageKind": {
+                    "value": "[parameters('storageKind')]"
+                  },
+                  "storageSKU": {
+                    "value": "[parameters('storageSKU')]"
+                  },
+                  "tags": {
+                    "value": "[parameters('tags')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.29.47.4906",
+                      "templateHash": "4987098316445937559"
+                    }
+                  },
+                  "parameters": {
+                    "domainFQDN": {
+                      "type": "string"
+                    },
+                    "domainGUID": {
+                      "type": "string"
+                    },
+                    "identityOption": {
+                      "type": "string"
+                    },
+                    "identityStorageSetupId": {
+                      "type": "string"
+                    },
+                    "keyVaultKeyName": {
+                      "type": "string"
+                    },
+                    "keyVaultUri": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "storageAcctName": {
+                      "type": "string"
+                    },
+                    "storageKind": {
+                      "type": "string"
+                    },
+                    "storageSKU": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "object"
+                    }
+                  },
+                  "variables": {
+                    "activeDirectoryProperties": "[if(equals(parameters('identityOption'), 'AADKERB'), createObject('domainName', parameters('domainFQDN'), 'netBiosDomainName', ' ', 'forestName', ' ', 'domainGuid', parameters('domainGUID'), 'domainSid', ' ', 'azureStorageSid', ' '), null())]"
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Storage/storageAccounts",
+                      "apiVersion": "2022-09-01",
+                      "name": "[parameters('storageAcctName')]",
+                      "location": "[parameters('location')]",
+                      "tags": "[parameters('tags')]",
+                      "sku": {
+                        "name": "[parameters('storageSKU')]"
+                      },
+                      "kind": "[parameters('storageKind')]",
+                      "identity": {
+                        "type": "UserAssigned",
+                        "userAssignedIdentities": {
+                          "[format('{0}', parameters('identityStorageSetupId'))]": {}
+                        }
+                      },
+                      "properties": {
+                        "azureFilesIdentityBasedAuthentication": "[if(not(equals(variables('activeDirectoryProperties'), null())), createObject('directoryServiceOptions', parameters('identityOption'), 'activeDirectoryProperties', variables('activeDirectoryProperties')), null())]",
+                        "minimumTlsVersion": "TLS1_2",
+                        "supportsHttpsTrafficOnly": true,
+                        "allowBlobPublicAccess": false,
+                        "allowSharedKeyAccess": true,
+                        "defaultToOAuthAuthentication": false,
+                        "accessTier": "Hot",
+                        "publicNetworkAccess": "Disabled",
+                        "allowCrossTenantReplication": false,
+                        "networkAcls": {
+                          "bypass": "AzureServices",
+                          "defaultAction": "Deny"
+                        },
+                        "dnsEndpointType": "Standard",
+                        "largeFileSharesState": "Enabled",
+                        "encryption": {
+                          "identity": {
+                            "userAssignedIdentity": "[parameters('identityStorageSetupId')]"
+                          },
+                          "keySource": "Microsoft.Keyvault",
+                          "keyvaultproperties": {
+                            "keyname": "[parameters('keyVaultKeyName')]",
+                            "keyvaulturi": "[parameters('keyVaultUri')]"
+                          },
+                          "services": {
+                            "file": {
+                              "enabled": true
+                            }
+                          },
+                          "requireInfrastructureEncryption": false
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
+                "[resourceId('Microsoft.Resources/deployments', format('linked_managementVMscript-{0}', parameters('storageAcctName')))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')))]"
               ]
             }
           ]
