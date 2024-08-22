@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "14475158591914312021"
+      "templateHash": "8215902823162458705"
     }
   },
   "parameters": {
@@ -280,7 +280,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "15135111766647507193"
+              "templateHash": "16384282787460677788"
             }
           },
           "parameters": {
@@ -474,7 +474,7 @@
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
               "scope": "[format('Microsoft.KeyVault/vaults/{0}', parameters('keyVaultName'))]",
-              "name": "[guid(subscription().subscriptionId, 'assignIdentity2Vault', parameters('timestamp'))]",
+              "name": "[guid(subscription().subscriptionId, 'e147488a-f6f5-4113-8e2d-b22465e65bf6')]",
               "properties": {
                 "description": "[format('Provides User Identity {0} access to Key Vault {1}', parameters('managedIdentityName'), parameters('keyVaultName'))]",
                 "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31').principalId]",

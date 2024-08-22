@@ -124,7 +124,7 @@ resource keyVaultKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
 
 // Assign Managed Identity to Key Vault
 resource assignIdentity2Vault 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, 'assignIdentity2Vault', timestamp)
+  name: guid(subscription().subscriptionId, 'e147488a-f6f5-4113-8e2d-b22465e65bf6')
   scope: keyVault
   properties: {
     description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
