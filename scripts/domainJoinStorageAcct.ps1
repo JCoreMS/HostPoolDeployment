@@ -85,6 +85,18 @@ try {
 
     Write-Log -Message "VM is Domain Joined: $DomainJoined" -Type 'PRE-REQ'
 
+    # Disable Edge First Run
+    Write-Log -Message "Disable Edge First Run Experience via Registry" -Type 'PRE-REQ'
+    reg add HKLM\Software\Policies\Microsoft\Edge /v HideFirstRunExperience /t REG_DWORD /d 1 /f
+
+    # Disable Windows Welcome Screen
+    Write-Log -Message "Disable Windows Welcome Screen via Registry" -Type 'PRE-REQ'
+    reg add HKEY_USERS\.DEFAULT\Software\Policies\Microsoft\Windows\CloudContent /v disablewindowsSpotlightwindowswelcomeExperience /t REG_DWORD /d 1 /f
+    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement /v ScoobeSystemSettingEnabled /t REG_DWORD /d 0 /f
+    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager /v SubscribedContent-310093Enabled /t REG_DWORD /d 0 /f
+    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager /v SubscribedContent-338389Enabled /t REG_DWORD /d 0 /f
+    reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE /v DisablePrivacyExperience /t REG_DWORD /d 1 /f
+
 <#  Write-Log -Message "Checking for PowerShell 7" -Type 'PRE-REQ'
     $PSVersion = $PSVersionTable.PSVersion.Major
     If($PSVersion -lt 7) {
@@ -158,17 +170,7 @@ try {
 
     }
 
-    # Disable Edge First Run
-    Write-Log -Message "Disable Edge First Run Experience via Registry" -Type 'PRE-REQ'
-    reg add HKLM\Software\Policies\Microsoft\Edge /v HideFirstRunExperience /t REG_DWORD /d 1 /f
 
-    # Disable Windows Welcome Screen
-    Write-Log -Message "Disable Windows Welcome Screen via Registry" -Type 'PRE-REQ'
-    reg add HKEY_USERS\.DEFAULT\Software\Policies\Microsoft\Windows\CloudContent /v disablewindowsSpotlightwindowswelcomeExperience /t REG_DWORD /d 1 /f
-    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement /v ScoobeSystemSettingEnabled /t REG_DWORD /d 0 /f
-    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager /v SubscribedContent-310093Enabled /t REG_DWORD /d 0 /f
-    reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager /v SubscribedContent-338389Enabled /t REG_DWORD /d 0 /f
-    reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE /v DisablePrivacyExperience /t REG_DWORD /d 1 /f
 
 
     ##############################################################
