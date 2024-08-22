@@ -24,7 +24,7 @@ param
     [String]$StorageAccountResourceGroupName,
 
     [Parameter(Mandatory = $false)]
-    [String]$AltStorageAcct = $null,
+    [String]$AltStorageAcct = 'none',
 
     [Parameter(Mandatory)]
     [String]$StorageAccountName,
@@ -119,7 +119,7 @@ try {
     }
     else { Write-Log -Message "---RSAT for Active Directory already installed" -Type 'PRE-REQ' }
 
-    If ($AltStorageAcct -eq $null) {
+    If ($AltStorageAcct -eq 'none') {
 
         Write-Log -Message "...Checking and loading NuGet provider" -Type 'PRE-REQ'
         If ($providers.Name -notcontains "NuGet") {
