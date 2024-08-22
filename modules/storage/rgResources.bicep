@@ -171,7 +171,28 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     }
     dnsEndpointType: 'Standard'
     largeFileSharesState: 'Enabled'
+    encryption: {
+      identity: {
+        userAssignedIdentity: identityStorageSetup.id
+      }
+      keySource: 'Microsoft.Keyvault'
+      keyvaultproperties: {
+        keyname: keyVaultKey.name
+        keyvaulturi: endsWith(keyVault.properties.vaultUri, '/')
+        ? substring(keyVault.properties.vaultUri, 0, length(keyVault.properties.vaultUri) - 1)
+        : keyVault.properties.vaultUri
+      }
+      services: {
+        file: {
+          enabled: true
+        }
+      }
+      requireInfrastructureEncryption: false
+    }
   }
+  dependsOn: [
+    assignIdentity2Vault
+  ]
 }
 
 // Assign User Identity from Management VM to Storage Account
@@ -207,7 +228,7 @@ module managementVm 'managementVm.bicep' =  if(identityOption == 'AD') {
   params: {
     assignedIdentityId: identityStorageSetup.id
     domainJoinFQDN: domainFQDN
-    domainJoinOUPath: ouPathStorage
+    domainJoinOUPath: ouPathVm
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
     location: location
@@ -276,7 +297,7 @@ resource assignGroupUsers2StorageSMB 'Microsoft.Authorization/roleAssignments@20
 module managementVmScript 'managementVmScript.bicep' = if(identityOption == 'AD') {
   name: 'linked_managementVMscript-${storageAcctName}'
   params: {
-    domainJoinOUPath: ouPathVm
+    domainJoinOUPath: ouPathStorage
     domainJoinUserName: domainJoinUserName
     domainJoinUserPassword: domainJoinUserPassword
     location: location
@@ -372,30 +393,4 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
       }
     ]
   }
-}
-
-
-module storageCMKSetup '../../modules/storage/storageCMK.bicep' = {
-  name: 'linked_storageCMKSetup-${storageAcctName}'
-  scope: resourceGroup(storageResourceGroup)
-  params: {
-    domainFQDN: domainFQDN
-    domainGUID: domainGUID
-    identityOption: identityOption
-    identityStorageSetupId: identityStorageSetup.id
-    keyVaultKeyName: keyVaultKey.name
-    keyVaultUri: endsWith(keyVault.properties.vaultUri, '/')
-    ? substring(keyVault.properties.vaultUri, 0, length(keyVault.properties.vaultUri) - 1)
-    : keyVault.properties.vaultUri
-    location: location
-    storageAcctName: storageAcctName
-    storageKind: storageKind
-    storageSKU: storageSKU
-    tags: tags
-  }
-  dependsOn: [
-    storageAccount
-    storagePvtEndpoint
-    managementVmScript
-  ]
 }

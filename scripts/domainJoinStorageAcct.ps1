@@ -216,7 +216,7 @@ try {
     Write-Log -Message "The GET operation for the Storage Account key on $StorageAccountName succeeded" -Type 'INFO'
 
     # Create credential for accessing the storage account
-    $StorageUsername = 'Azure\' + $StorageAccountName
+    $StorageUsername = '.\' + $StorageAccountName
     $StoragePassword = ConvertTo-SecureString -String "$($StorageKey)" -AsPlainText -Force
     [pscredential]$StorageKeyCredential = New-Object System.Management.Automation.PSCredential ($StorageUsername, $StoragePassword)
 
