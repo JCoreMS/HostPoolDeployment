@@ -179,14 +179,16 @@ try {
     # Get Domain information
     $Domain = Get-WMIObject Win32_ComputerSystem| Select-Object -ExpandProperty Domain
 
-    Write-Log -Message "Collected domain information" -Type 'INFO'
+    Write-Log -Message "Collected domain information: $Domain" -Type 'INFO'
 
     # Create Domain credential
+    Write-Log -Message "--- Creating Domiain Credentials" -Type 'INFO'
     $DomainUsername = $DomainJoinUserPrincipalName
     $DomainPassword = ConvertTo-SecureString -String $DomainJoinPassword -AsPlainText -Force
     [pscredential]$DomainCredential = New-Object System.Management.Automation.PSCredential ($DomainUsername, $DomainPassword)
 
     # Get Domain information
+    Write-Log -Message "--- Getting Domain Information" -Type 'INFO'
     $Domain = Get-ADDomain -Credential $DomainCredential -Current 'LocalComputer'
     $Netbios = $Domain.NetBIOSName
 
@@ -289,8 +291,9 @@ try {
 
     # Mount file share
     $FileShare = "\\" + $FileServer + "\" + $StorageFileShareName
-    Write-Log -Message "FileShare: $FileShare  | StorageKey: $Key" -Type 'DEBUG'
+    Write-Log -Message "FileShare: $FileShare  | StorageKey: $StorageKey" -Type 'DEBUG'
     New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $StorageKeyCredential | Out-Null
+    # New-PSDrive -Name 'Z' -PSProvider 'FileSystem' -Root $FileShare -Credential $DomainCredential | Out-Null
     Write-Log -Message "Mounting the Azure file share, $FileShare, succeeded" -Type 'INFO'
 
 

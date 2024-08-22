@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "4303426754300036647"
+      "templateHash": "7517499518527161887"
     }
   },
   "parameters": {
@@ -280,7 +280,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "12989109008985456300"
+              "templateHash": "3950364238126902667"
             }
           },
           "parameters": {
@@ -575,7 +575,12 @@
               "name": "[format('{0}/{1}', parameters('storageAcctName'), 'default')]",
               "properties": {
                 "protocolSettings": {
-                  "smb": "[parameters('smbSettings')]"
+                  "smb": {
+                    "authenticationMethods": "NTLMv2;Kerberos",
+                    "channelEncryption": "AES-128-CCM;AES-128-GCM;AES-256-GCM",
+                    "kerberosTicketEncryption": "RC4-HMAC;AES-256",
+                    "versions": "SMB3.0;SMB3.1.1"
+                  }
                 },
                 "shareDeleteRetentionPolicy": {
                   "enabled": true,
@@ -702,6 +707,20 @@
               "dependsOn": [
                 "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')))]"
               ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/fileServices",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}', parameters('storageAcctName'), 'default')]",
+              "properties": {
+                "protocolSettings": {
+                  "smb": "[parameters('smbSettings')]"
+                },
+                "shareDeleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": 7
+                }
+              }
             },
             {
               "condition": "[equals(parameters('identityOption'), 'AD')]",

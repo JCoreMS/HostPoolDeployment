@@ -248,7 +248,12 @@ resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022
   name: 'default'
   properties: {
     protocolSettings: {
-      smb: smbSettings
+      smb: {
+        authenticationMethods: 'NTLMv2;Kerberos'
+        channelEncryption: 'AES-128-CCM;AES-128-GCM;AES-256-GCM'
+        kerberosTicketEncryption: 'RC4-HMAC;AES-256'
+        versions: 'SMB3.0;SMB3.1.1'
+      }
     }
     shareDeleteRetentionPolicy: {
       enabled: true
@@ -385,5 +390,23 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
         }
       }
     ]
+  }
+}
+
+resource storageAccountExisting 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
+  name: storageAcctName
+}
+
+resource storageFileServiceSecure 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
+  parent: storageAccountExisting
+  name: 'default'
+  properties: {
+    protocolSettings: {
+      smb: smbSettings
+    }
+    shareDeleteRetentionPolicy: {
+      enabled: true
+      days: 7
+    }
   }
 }
