@@ -193,21 +193,20 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
   }
 }
 
-// Assign Managed Identity to Storage Account
-resource assignIdentity2StorageContrib 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+// Assign User Identity from Management VM to Storage Account
+resource assignVMMI2Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, '17d1049b-9a84-46fb-8f53-869881c3d3ab')
   scope: storageAccount
   properties: {
-    description: 'Provides User Identity ${identityStorageSetup.name} access to Key Vault ${keyVault.name}'
-    principalId: identityStorageSetup.properties.principalId
+    description: 'Provides User Identity ${vmName} access to StorageAccount for Domain Join Setup. (${storageAccount.name})'
+    principalId: identityStorageSetup.id
     principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       '17d1049b-9a84-46fb-8f53-869881c3d3ab'
-    ) // Storage Account Contributor Role
+    ) // Storage Account Contributor
   }
 }
-
 
 
 resource storageFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = {
@@ -284,23 +283,6 @@ resource assignGroupUsers2StorageSMB 'Microsoft.Authorization/roleAssignments@20
     ) // Storage File Data SMB Share Contributor
   }
 }
-
-// Assign User Identity from Management VM to Storage Account
-resource assignVMMI2Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, '17d1049b-9a84-46fb-8f53-869881c3d3ab')
-  scope: storageAccount
-  properties: {
-    description: 'Provides User Identity ${vmName} access to StorageAccount for Domain Join Setup. (${storageAccount.name})'
-    principalId: identityStorageSetup.id
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      '17d1049b-9a84-46fb-8f53-869881c3d3ab'
-    ) // Storage Account Contributor
-  }
-}
-
-
 
 module managementVmScript 'managementVmScript.bicep' = if(identityOption == 'AD') {
   name: 'linked_managementVMscript-${storageAcctName}'
