@@ -287,7 +287,7 @@ resource assignGroupUsers2StorageSMB 'Microsoft.Authorization/roleAssignments@20
 
 // Assign User Identity from Management VM to Storage Account
 resource assignVMMI2Storage 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb')
+  name: guid(subscription().subscriptionId, '17d1049b-9a84-46fb-8f53-869881c3d3ab')
   scope: storageAccount
   properties: {
     description: 'Provides User Identity ${vmName} access to StorageAccount for Domain Join Setup. (${storageAccount.name})'
