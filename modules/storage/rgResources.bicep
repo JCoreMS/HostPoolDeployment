@@ -199,7 +199,7 @@ resource assignVMMI2Storage 'Microsoft.Authorization/roleAssignments@2022-04-01'
   scope: storageAccount
   properties: {
     description: 'Provides User Identity ${vmName} access to StorageAccount for Domain Join Setup. (${storageAccount.name})'
-    principalId: identityStorageSetup.id
+    principalId: identityStorageSetup.properties.principalId
     principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
@@ -236,6 +236,9 @@ module managementVm 'managementVm.bicep' =  if(identityOption == 'AD') {
     vmAdminPassword: vmAdminPassword
     vmAdminUsername: vmAdminUsername
   }
+  dependsOn: [
+    storageAccount
+  ]
 }
 
 
