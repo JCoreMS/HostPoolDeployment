@@ -97,7 +97,7 @@ try {
     reg add HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager /v SubscribedContent-338389Enabled /t REG_DWORD /d 0 /f
     reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\OOBE /v DisablePrivacyExperience /t REG_DWORD /d 1 /f
 
-<#  Write-Log -Message "Checking for PowerShell 7" -Type 'PRE-REQ'
+    <#  Write-Log -Message "Checking for PowerShell 7" -Type 'PRE-REQ'
     $PSVersion = $PSVersionTable.PSVersion.Major
     If($PSVersion -lt 7) {
         write-Log -Message "Installing PowerShell 7" -Type 'PRE-REQ'
@@ -177,7 +177,7 @@ try {
     #  Variables
     ##############################################################
     # Get Domain information
-    $Domain = Get-WMIObject Win32_ComputerSystem| Select-Object -ExpandProperty Domain
+    $Domain = Get-WMIObject Win32_ComputerSystem | Select-Object -ExpandProperty Domain
 
     Write-Log -Message "Collected domain information: $Domain" -Type 'INFO'
 
@@ -280,15 +280,6 @@ try {
     Write-Log -Message "Setting the new Kerberos key on the Computer Object succeeded" -Type 'INFO'
 
 
-    # Check File Share Security for NTLMv2 or mapping will fail
-    $FileShareSec = Get-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -StorageAccountName $StorageAccountName
-    If ($FileShareSec.ProtocolSettings.Smb.AuthenticationMethods -notcontains 'NTLMv2') {
-        Write-Log -Message "Missing NTLMv2 property to allow mapping, setting temporarily..." -Type 'WARN'
-        Update-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -AccountName $StorageAccountName `
-            -SMBAuthenticationMethod Kerberos, NTLMv2 | Out-Null
-        $RemoveNTLMv2 = $true
-    }
-
     # Mount file share
     $FileShare = "\\" + $FileServer + "\" + $StorageFileShareName
     Write-Log -Message "FileShare: $FileShare  | StorageKey: $StorageKey" -Type 'DEBUG'
@@ -319,12 +310,13 @@ try {
     Start-Sleep -Seconds 5 | Out-Null
     Write-Log -Message "Unmounting the Azure file share, $FileShare, succeeded" -Type 'CLEANUP'
 
-    # Remove NTLMv2 if not pre-existing
-    If ($RemoveNTLMv2) {
-        Write-Log -Message "Removing NTLMv2 property as it wasn't pre-existing..." -Type 'WARN'
-        Update-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -AccountName $StorageAccountName `
-            -SMBAuthenticationMethod Kerberos | Out-Null
-    }
+    # Lockdown Storage Account to Kerberos Only and 256-bit Encryption
+    Update-AzStorageFileServiceProperty -ResourceGroupName $StorageAccountResourceGroupName -AccountName $StorageAccountName `
+    -SMBProtocolVersion SMB3.0,SMB3.1.1  `
+    -SMBAuthenticationMethod Kerberos `
+    -SMBKerberosTicketEncryption AES-256 `
+    -SMBChannelEncryption AES-256-GCM | Out-Null
+    Write-Log -Message "Storage Account locked down to Kerberos Only and 256-bit Encryption" -Type 'INFO'
 
     Disconnect-AzAccount | Out-Null
     Write-Log -Message "Disconnection from Azure succeeded" -Type 'INFO'

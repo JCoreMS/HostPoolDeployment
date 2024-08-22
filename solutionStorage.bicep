@@ -83,6 +83,8 @@ var storageSKU = '${storageTier}_${storageRedundancy}'
 var scriptLocation = 'https://raw.githubusercontent.com/JCoreMS/HostPoolDeployment/master/scripts' // URL with NO trailing slash
 
 var storageKind = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS' ? 'FileStorage' : 'StorageV2'
+
+/*  Initially setup open to allow mapping but script will then lock down.
 var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'  // SMB Multichannel is only supported on Premium storage
   ? {
       authenticationMethods: 'Kerberos'
@@ -96,7 +98,7 @@ var smbSettings = storageSKU == 'Premium_LRS' || storageSKU == 'Premium_ZRS'  //
       channelEncryption: 'AES-256-GCM'
       kerberosTicketEncryption: 'AES-256'
       versions: 'SMB3.0;SMB3.1.1'
-    }
+    } */
 var storageSetupScript = 'domainJoinStorageAcct.ps1'
 var tenantId = subscription().tenantId
 
@@ -134,7 +136,6 @@ module rgResources 'modules/storage/rgResources.bicep' = {
     privateDNSZoneKvId: privateDNSZoneKvId
     privateEndPointPrefix: privateEndPointPrefix
     scriptLocation: scriptLocation
-    smbSettings: smbSettings
     storageFileShareName: storageFileShareName
     storageKind: storageKind
     storageResourceGroup: storageResourceGroup

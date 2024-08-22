@@ -22,7 +22,6 @@ param privateDNSZoneId string
 param privateDNSZoneKvId string
 param privateEndPointPrefix string
 param scriptLocation string
-param smbSettings object
 param storageAcctName string
 param storageFileShareName string
 param storageKind string
@@ -393,20 +392,4 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
   }
 }
 
-resource storageAccountExisting 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
-  name: storageAcctName
-}
 
-resource storageFileServiceSecure 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = {
-  parent: storageAccountExisting
-  name: 'default'
-  properties: {
-    protocolSettings: {
-      smb: smbSettings
-    }
-    shareDeleteRetentionPolicy: {
-      enabled: true
-      days: 7
-    }
-  }
-}
