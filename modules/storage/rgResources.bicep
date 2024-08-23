@@ -381,17 +381,20 @@ module storCMKsetup './storCMKsetup.bicep' = {
   name: 'linked_storCMKsetup-${storageAcctName}'
   scope: resourceGroup(storageResourceGroup)
   params: {
-    keyVault: keyVault
+    keyVaultUri: endsWith(keyVault.properties.vaultUri, '/')
+    ? substring(keyVault.properties.vaultUri, 0, length(keyVault.properties.vaultUri) - 1)
+    : keyVault.properties.vaultUri
     keyVaultKeyName: keyVaultKey.name
     storageAcctName: storageAcctName
     location: location
     storageSKU: storageSKU
     storageKind: storageKind
-    identityStorageSetup: identityStorageSetup
+    identityStorageSetupId: identityStorageSetup.id
   }
   dependsOn: [
     storageAccount
     storagePvtEndpoint
     filePrivateDnsZoneGroup
+    managementVmScript
   ]
 }

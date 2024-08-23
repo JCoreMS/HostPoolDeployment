@@ -2,8 +2,8 @@ param storageAcctName string
 param location string
 param storageSKU string
 param storageKind string
-param identityStorageSetup object
-param keyVault object
+param identityStorageSetupId string
+param keyVaultUri string
 param keyVaultKeyName string
 
 // Create Storage Account
@@ -31,14 +31,12 @@ resource storageAccountCMKSetup 'Microsoft.Storage/storageAccounts@2022-09-01' =
     largeFileSharesState: 'Enabled'
     encryption: {
       identity: {
-        userAssignedIdentity: identityStorageSetup.id
+        userAssignedIdentity: identityStorageSetupId
       }
       keySource: 'Microsoft.Keyvault'
       keyvaultproperties: {
         keyname: keyVaultKeyName
-        keyvaulturi: endsWith(keyVault.properties.vaultUri, '/')
-        ? substring(keyVault.properties.vaultUri, 0, length(keyVault.properties.vaultUri) - 1)
-        : keyVault.properties.vaultUri
+        keyvaulturi: keyVaultUri
       }
       services: {
         file: {

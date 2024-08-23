@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "11912000422422597319"
+      "templateHash": "12149573165667339117"
     }
   },
   "parameters": {
@@ -276,7 +276,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "1324442056103618561"
+              "templateHash": "8854990294873447298"
             }
           },
           "parameters": {
@@ -1090,9 +1090,7 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                  "keyVault": {
-                    "value": "[reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01', 'full')]"
-                  },
+                  "keyVaultUri": "[if(endsWith(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, '/'), createObject('value', substring(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, 0, sub(length(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri), 1))), createObject('value', reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri))]",
                   "keyVaultKeyName": {
                     "value": "[format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp'))]"
                   },
@@ -1108,8 +1106,8 @@
                   "storageKind": {
                     "value": "[parameters('storageKind')]"
                   },
-                  "identityStorageSetup": {
-                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31', 'full')]"
+                  "identityStorageSetupId": {
+                    "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
                   }
                 },
                 "template": {
@@ -1119,7 +1117,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.29.47.4906",
-                      "templateHash": "16569748128600727200"
+                      "templateHash": "3549841555949263082"
                     }
                   },
                   "parameters": {
@@ -1135,11 +1133,11 @@
                     "storageKind": {
                       "type": "string"
                     },
-                    "identityStorageSetup": {
-                      "type": "object"
+                    "identityStorageSetupId": {
+                      "type": "string"
                     },
-                    "keyVault": {
-                      "type": "object"
+                    "keyVaultUri": {
+                      "type": "string"
                     },
                     "keyVaultKeyName": {
                       "type": "string"
@@ -1172,12 +1170,12 @@
                         "largeFileSharesState": "Enabled",
                         "encryption": {
                           "identity": {
-                            "userAssignedIdentity": "[parameters('identityStorageSetup').id]"
+                            "userAssignedIdentity": "[parameters('identityStorageSetupId')]"
                           },
                           "keySource": "Microsoft.Keyvault",
                           "keyvaultproperties": {
                             "keyname": "[parameters('keyVaultKeyName')]",
-                            "keyvaulturi": "[if(endsWith(parameters('keyVault').properties.vaultUri, '/'), substring(parameters('keyVault').properties.vaultUri, 0, sub(length(parameters('keyVault').properties.vaultUri), 1)), parameters('keyVault').properties.vaultUri)]"
+                            "keyvaulturi": "[parameters('keyVaultUri')]"
                           },
                           "services": {
                             "file": {
@@ -1196,6 +1194,7 @@
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
+                "[resourceId('Microsoft.Resources/deployments', format('linked_managementVMscript-{0}', parameters('storageAcctName')))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
                 "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')))]"
               ]
