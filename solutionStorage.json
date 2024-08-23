@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "15898222031619247867"
+      "templateHash": "14298036213303210994"
     }
   },
   "parameters": {
@@ -276,7 +276,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "7772115629272377436"
+              "templateHash": "2532750611000604121"
             }
           },
           "parameters": {
@@ -510,29 +510,11 @@
                   "defaultAction": "Deny"
                 },
                 "dnsEndpointType": "Standard",
-                "largeFileSharesState": "Enabled",
-                "encryption": {
-                  "identity": {
-                    "userAssignedIdentity": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
-                  },
-                  "keySource": "Microsoft.Keyvault",
-                  "keyvaultproperties": {
-                    "keyname": "[format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp'))]",
-                    "keyvaulturi": "[if(endsWith(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, '/'), substring(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri, 0, sub(length(reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri), 1)), reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01').vaultUri)]"
-                  },
-                  "services": {
-                    "file": {
-                      "enabled": true
-                    }
-                  },
-                  "requireInfrastructureEncryption": false
-                }
+                "largeFileSharesState": "Enabled"
               },
               "dependsOn": [
                 "[extensionResourceId(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), 'Microsoft.Authorization/roleAssignments', guid(subscription().subscriptionId, 'e147488a-f6f5-4113-8e2d-b22465e65bf6'))]",
-                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
-                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]"
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]"
               ]
             },
             {
@@ -1095,6 +1077,125 @@
               "dependsOn": [
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
                 "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('storageResourceGroup')), 'Microsoft.Resources/deployments', format('linked_managementVm-{0}', parameters('storageAcctName')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('linked_storCMKsetup-{0}', parameters('storageAcctName'))]",
+              "resourceGroup": "[parameters('storageResourceGroup')]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "keyVault": {
+                    "value": "[reference(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), '2023-07-01', 'full')]"
+                  },
+                  "keyVaultKeyName": {
+                    "value": "[format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp'))]"
+                  },
+                  "storageAcctName": {
+                    "value": "[parameters('storageAcctName')]"
+                  },
+                  "location": {
+                    "value": "[parameters('location')]"
+                  },
+                  "storageSKU": {
+                    "value": "[parameters('storageSKU')]"
+                  },
+                  "storageKind": {
+                    "value": "[parameters('storageKind')]"
+                  },
+                  "identityStorageSetup": {
+                    "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')), '2023-01-31', 'full')]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.29.47.4906",
+                      "templateHash": "16569748128600727200"
+                    }
+                  },
+                  "parameters": {
+                    "storageAcctName": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "storageSKU": {
+                      "type": "string"
+                    },
+                    "storageKind": {
+                      "type": "string"
+                    },
+                    "identityStorageSetup": {
+                      "type": "object"
+                    },
+                    "keyVault": {
+                      "type": "object"
+                    },
+                    "keyVaultKeyName": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Storage/storageAccounts",
+                      "apiVersion": "2022-09-01",
+                      "name": "[parameters('storageAcctName')]",
+                      "location": "[parameters('location')]",
+                      "sku": {
+                        "name": "[parameters('storageSKU')]"
+                      },
+                      "kind": "[parameters('storageKind')]",
+                      "properties": {
+                        "minimumTlsVersion": "TLS1_2",
+                        "supportsHttpsTrafficOnly": true,
+                        "allowBlobPublicAccess": false,
+                        "allowSharedKeyAccess": true,
+                        "defaultToOAuthAuthentication": false,
+                        "accessTier": "Hot",
+                        "publicNetworkAccess": "Disabled",
+                        "allowCrossTenantReplication": false,
+                        "networkAcls": {
+                          "bypass": "AzureServices",
+                          "defaultAction": "Deny"
+                        },
+                        "dnsEndpointType": "Standard",
+                        "largeFileSharesState": "Enabled",
+                        "encryption": {
+                          "identity": {
+                            "userAssignedIdentity": "[parameters('identityStorageSetup').id]"
+                          },
+                          "keySource": "Microsoft.Keyvault",
+                          "keyvaultproperties": {
+                            "keyname": "[parameters('keyVaultKeyName')]",
+                            "keyvaulturi": "[if(endsWith(parameters('keyVault').properties.vaultUri, '/'), substring(parameters('keyVault').properties.vaultUri, 0, sub(length(parameters('keyVault').properties.vaultUri), 1)), parameters('keyVault').properties.vaultUri)]"
+                          },
+                          "services": {
+                            "file": {
+                              "enabled": true
+                            }
+                          },
+                          "requireInfrastructureEncryption": false
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+                "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
               ]
             }
           ]

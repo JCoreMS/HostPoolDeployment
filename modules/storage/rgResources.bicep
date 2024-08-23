@@ -171,24 +171,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
     }
     dnsEndpointType: 'Standard'
     largeFileSharesState: 'Enabled'
-    encryption: {
-      identity: {
-        userAssignedIdentity: identityStorageSetup.id
-      }
-      keySource: 'Microsoft.Keyvault'
-      keyvaultproperties: {
-        keyname: keyVaultKey.name
-        keyvaulturi: endsWith(keyVault.properties.vaultUri, '/')
-        ? substring(keyVault.properties.vaultUri, 0, length(keyVault.properties.vaultUri) - 1)
-        : keyVault.properties.vaultUri
-      }
-      services: {
-        file: {
-          enabled: true
-        }
-      }
-      requireInfrastructureEncryption: false
-    }
   }
   dependsOn: [
     assignIdentity2Vault
@@ -393,4 +375,21 @@ resource filePrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZ
       }
     ]
   }
+}
+
+module storCMKsetup './storCMKsetup.bicep' = {
+  name: 'linked_storCMKsetup-${storageAcctName}'
+  scope: resourceGroup(storageResourceGroup)
+  params: {
+    keyVault: keyVault
+    keyVaultKeyName: keyVaultKey.name
+    storageAcctName: storageAcctName
+    location: location
+    storageSKU: storageSKU
+    storageKind: storageKind
+    identityStorageSetup: identityStorageSetup
+  }
+  dependsOn: [
+    storageAccount
+  ]
 }
