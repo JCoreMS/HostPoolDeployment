@@ -391,5 +391,7 @@ module storCMKsetup './storCMKsetup.bicep' = {
   }
   dependsOn: [
     storageAccount
+    storagePvtEndpoint
+    filePrivateDnsZoneGroup
   ]
 }

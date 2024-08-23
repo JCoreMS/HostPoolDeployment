@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "14298036213303210994"
+      "templateHash": "11912000422422597319"
     }
   },
   "parameters": {
@@ -276,7 +276,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "2532750611000604121"
+              "templateHash": "1324442056103618561"
             }
           },
           "parameters": {
@@ -1192,10 +1192,12 @@
                 }
               },
               "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints/privateDnsZoneGroups', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')), 'filePrivateDnsZoneGroup')]",
                 "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
                 "[resourceId('Microsoft.KeyVault/vaults/keys', parameters('keyVaultName'), format('{0}-{1}', parameters('storageAcctName'), parameters('timestamp')))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAcctName'))]",
+                "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-{1}', parameters('privateEndPointPrefix'), parameters('storageAcctName')))]"
               ]
             }
           ]
