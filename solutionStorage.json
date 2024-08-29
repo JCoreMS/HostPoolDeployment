@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "8518499589339140017"
+      "templateHash": "5851650539899241783"
     }
   },
   "parameters": {
@@ -276,7 +276,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "16767325039516417433"
+              "templateHash": "11697031008291484135"
             }
           },
           "parameters": {
@@ -387,7 +387,8 @@
             }
           },
           "variables": {
-            "activeDirectoryProperties": "[if(equals(parameters('identityOption'), 'AADKERB'), createObject('domainName', parameters('domainFQDN'), 'netBiosDomainName', ' ', 'forestName', ' ', 'domainGuid', parameters('domainGUID'), 'domainSid', ' ', 'azureStorageSid', ' '), null())]"
+            "activeDirectoryProperties": "[if(equals(parameters('identityOption'), 'AADKERB'), createObject('domainName', parameters('domainFQDN'), 'netBiosDomainName', ' ', 'forestName', ' ', 'domainGuid', parameters('domainGUID'), 'domainSid', ' ', 'azureStorageSid', ' '), null())]",
+            "smbSettings": "[if(equals(parameters('identityOption'), 'AD'), createObject('authenticationMethods', 'NTLMv2;Kerberos', 'channelEncryption', 'AES-128-CCM;AES-128-GCM;AES-256-GCM', 'kerberosTicketEncryption', 'RC4-HMAC;AES-256', 'multichannel', if(equals(parameters('storageKind'), 'FileStorage'), createObject('enabled', true()), createObject('enabled', false())), 'versions', 'SMB3.0;SMB3.1.1'), if(equals(parameters('identityOption'), 'AADKERB'), createObject('authenticationMethods', 'Kerberos', 'channelEncryption', 'AES-256-GCM', 'kerberosTicketEncryption', 'AES-256', 'multichannel', if(equals(parameters('storageKind'), 'FileStorage'), createObject('enabled', true()), createObject('enabled', false())), 'versions', 'SMB3.0;SMB3.1.1'), createObject()))]"
           },
           "resources": [
             {
@@ -551,12 +552,7 @@
               "name": "[format('{0}/{1}', parameters('storageAcctName'), 'default')]",
               "properties": {
                 "protocolSettings": {
-                  "smb": {
-                    "authenticationMethods": "NTLMv2;Kerberos",
-                    "channelEncryption": "AES-128-CCM;AES-128-GCM;AES-256-GCM",
-                    "kerberosTicketEncryption": "RC4-HMAC;AES-256",
-                    "versions": "SMB3.0;SMB3.1.1"
-                  }
+                  "smb": "[variables('smbSettings')]"
                 },
                 "shareDeleteRetentionPolicy": {
                   "enabled": true,

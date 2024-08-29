@@ -51,6 +51,21 @@ var activeDirectoryProperties = identityOption == 'AADKERB' ? {
     azureStorageSid: ' '
     } : null
 
+// Relaxed for AD as script will need them to map with storage key then will set to Zero Trust
+// also account for Premium storage by adding SMB MultiChannel
+var smbSettings = identityOption == 'AD' ? {
+  authenticationMethods: 'NTLMv2;Kerberos'
+  channelEncryption: 'AES-128-CCM;AES-128-GCM;AES-256-GCM'
+  kerberosTicketEncryption: 'RC4-HMAC;AES-256'
+  multichannel: storageKind == 'FileStorage' ? {enabled: true} : {enabled: false}
+  versions: 'SMB3.0;SMB3.1.1'
+} : identityOption == 'AADKERB' ? {
+  authenticationMethods: 'Kerberos'
+  channelEncryption: 'AES-256-GCM'
+  kerberosTicketEncryption: 'AES-256'
+  multichannel: storageKind == 'FileStorage' ? {enabled: true} : {enabled: false}
+  versions: 'SMB3.0;SMB3.1.1'
+} : {}
 
 // Create User Assigned Managed Identity
 resource identityStorageSetup 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -232,12 +247,7 @@ resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022
   name: 'default'
   properties: {
     protocolSettings: {
-      smb: {
-        authenticationMethods: 'NTLMv2;Kerberos'
-        channelEncryption: 'AES-128-CCM;AES-128-GCM;AES-256-GCM'
-        kerberosTicketEncryption: 'RC4-HMAC;AES-256'
-        versions: 'SMB3.0;SMB3.1.1'
-      }
+      smb: smbSettings
     }
     shareDeleteRetentionPolicy: {
       enabled: true
