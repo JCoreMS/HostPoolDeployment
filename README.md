@@ -1,9 +1,6 @@
 
 # AVD Host Pool Deployment
 
-## **NOTE: Beginning May 2023 to Aug 15, 2023 4pm EST this solution broke the ability to add Session Hosts via the AVD Portal!**  
-Please see this [article and instructions](./fixhostpool.md) to see details and resolve the issue.
-
 This solution was designed to provide a quick start for using Infrastructure as Code for AVD. It's a simple solution that combines a Custom UI Definition and ARM template to deploy a Host Pool, Add Session Hosts, and executes a Post Deployment Script.
 
 Additionally the solution was written in BICEP to provide an ease of use and mechanism for customizations. To get started you will need the following:
@@ -35,6 +32,7 @@ This was created to expand on what is in the Azure Portal natively due to some s
 4. Deploy Session Hosts to a Dedicated Host (Per IL5 requirements)
 
 **Deploy Host Pool or Session Hosts**  
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2Fsolution.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinition.json) [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2Fsolution.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinition.json)
 
 ## Deploy Zero Trust Storage - AD Domain Joined Only
@@ -62,6 +60,7 @@ This option does NOT use or create the management VM and requires additional AVD
 https://learn.microsoft.com/en-us/azure/virtual-desktop/create-profile-container-azure-ad#configure-the-session-hosts
 
 **Deploy Zero Trust Storage**  
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FsolutionStorage.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinitionStorage.json) [![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#blade/Microsoft_Azure_CreateUIDef/CustomDeploymentBlade/uri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FsolutionStorage.json/uiFormDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FJCoreMS%2FHostPoolDeployment%2Fmaster%2FuiDefinitionStoragegov.json)
 
 ## IaaC Info
