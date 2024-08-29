@@ -43,7 +43,6 @@ resource storageAccountCMKSetup 'Microsoft.Storage/storageAccounts@2022-09-01' =
           enabled: true
         }
       }
-      requireInfrastructureEncryption: false
     }
   }
 }
