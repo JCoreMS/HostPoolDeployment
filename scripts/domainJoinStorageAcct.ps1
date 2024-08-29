@@ -322,6 +322,8 @@ try {
     Write-Log -Message "Disconnection from Azure succeeded" -Type 'INFO'
     Write-Log -Message "Storage Account Domain Joined, NTFS Permissions configured!" -Type 'COMPLETED'
 
+    Write-Log -Message "FINISHED - Shutting down the VM" -Type 'INFO'
+    Get-AzVM -Name $ENV:COMPUTERNAME | Stop-AzVM -Force | Out-Null
 }
 catch {
     Write-Log -Message $_ -Type 'ERROR'

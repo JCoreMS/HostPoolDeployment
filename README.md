@@ -53,9 +53,8 @@ Note: Upon completion of the deployment, there will be a running VM that you'll 
 
 Eventually there will be an update to provide an option for the following:  
 
-A. Shutdown Management VM  
-B. Remove/ Delete Management VM  
-C. Additional Storage Scenarios (i.e. Entra ID Joined and Hybrid Joined)  
+A. Remove/ Delete Management VM  
+B. Support for Entra ID Domain Services
 
 **Deploy Zero Trust Storage**
 
