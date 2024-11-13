@@ -171,6 +171,7 @@ var PostDeployEndpoint = PostDeployOption
   : ''
 
 var DedicatedHostRG = !empty(dedicatedHostId) ? split(dedicatedHostId, '/')[4] : ''
+var DedicatedHostScope = DedicatedHostRG  != '' ? DedicatedHostRG : ResourceGroupHP
 var DCRExistingName = !empty(DCRExisting) ? split(DCRExisting, '/')[8] : ''
 var RoleAssignments = {
   BlobDataRead: {
@@ -396,7 +397,7 @@ module dataCollectionRule 'modules/dataCollectionRule.bicep' = if (DCRStatus == 
 
 module dedicatedHostInfo 'modules/dedicatedHostInfo.bicep' = if (dedicatedHostId != '') {
     name: 'linked_dedicatedHostInfo_${Location}'
-    scope: DedicatedHostRG != '' ? resourceGroup(DedicatedHostRG) : resourceGroup(ResourceGroupHP)
+    scope: resourceGroup(DedicatedHostScope)
     params: {
       dedicatedHostId: dedicatedHostId
     }

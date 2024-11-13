@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "10560936693189608038"
+      "version": "0.31.34.60546",
+      "templateHash": "7483757731028980790"
     }
   },
   "parameters": {
@@ -342,6 +342,7 @@
     "PostDeployStorRG": "[if(parameters('PostDeployOption'), split(parameters('PostDeployContainerId'), '/')[4], '')]",
     "PostDeployEndpoint": "[if(parameters('PostDeployOption'), format('https://{0}.blob.{1}/{2}', variables('PostDeployStorName'), environment().suffixes.storage, variables('PostDeployContainerName')), '')]",
     "DedicatedHostRG": "[if(not(empty(parameters('dedicatedHostId'))), split(parameters('dedicatedHostId'), '/')[4], '')]",
+    "DedicatedHostScope": "[if(not(equals(variables('DedicatedHostRG'), '')), variables('DedicatedHostRG'), parameters('ResourceGroupHP'))]",
     "DCRExistingName": "[if(not(empty(parameters('DCRExisting'))), split(parameters('DCRExisting'), '/')[8], '')]",
     "RoleAssignments": {
       "BlobDataRead": {
@@ -457,8 +458,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "509034971017235348"
+              "version": "0.31.34.60546",
+              "templateHash": "5845498649436457322"
             }
           },
           "parameters": {
@@ -522,8 +523,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "509034971017235348"
+              "version": "0.31.34.60546",
+              "templateHash": "5845498649436457322"
             }
           },
           "parameters": {
@@ -599,8 +600,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "12359102126182649036"
+              "version": "0.31.34.60546",
+              "templateHash": "14248318979169936213"
             }
           },
           "parameters": {
@@ -666,8 +667,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.29.47.4906",
-                      "templateHash": "10531604064036903521"
+                      "version": "0.31.34.60546",
+                      "templateHash": "3732729872315506116"
                     }
                   },
                   "parameters": {
@@ -747,8 +748,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "15061869666497315581"
+              "version": "0.31.34.60546",
+              "templateHash": "14356018691608137391"
             }
           },
           "parameters": {
@@ -844,8 +845,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "2737541410298864410"
+              "version": "0.31.34.60546",
+              "templateHash": "458595016469472669"
             }
           },
           "parameters": {
@@ -1042,8 +1043,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "18304332295865615926"
+              "version": "0.31.34.60546",
+              "templateHash": "15550773705449872663"
             }
           },
           "parameters": {
@@ -1197,8 +1198,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "15628121041006489164"
+              "version": "0.31.34.60546",
+              "templateHash": "11629910416154153272"
             }
           },
           "parameters": {
@@ -1325,7 +1326,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
       "name": "[format('linked_dedicatedHostInfo_{0}', parameters('Location'))]",
-      "location": "[deployment().location]",
+      "resourceGroup": "[variables('DedicatedHostScope')]",
       "properties": {
         "expressionEvaluationOptions": {
           "scope": "inner"
@@ -1342,8 +1343,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "2134802168048666240"
+              "version": "0.31.34.60546",
+              "templateHash": "3180259960236855576"
             }
           },
           "parameters": {
@@ -1470,7 +1471,7 @@
           "VmPrefix": {
             "value": "[parameters('VmPrefix')]"
           },
-          "Zones": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', reference(subscriptionResourceId('Microsoft.Resources/deployments', format('linked_dedicatedHostInfo_{0}', parameters('Location'))), '2022-09-01').outputs.Zones.value), createObject('value', createArray()))]"
+          "Zones": "[if(not(empty(parameters('dedicatedHostId'))), createObject('value', reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostScope')), 'Microsoft.Resources/deployments', format('linked_dedicatedHostInfo_{0}', parameters('Location'))), '2022-09-01').outputs.Zones.value), createObject('value', createArray()))]"
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -1478,8 +1479,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "12057538845380819734"
+              "version": "0.31.34.60546",
+              "templateHash": "8025310880287468356"
             }
           },
           "parameters": {
@@ -1621,9 +1622,9 @@
               },
               "type": "Microsoft.Network/networkInterfaces",
               "apiVersion": "2022-11-01",
-              "name": "[format('nic-{0}-{1}', parameters('VmPrefix'), add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')))]",
+              "name": "[format('nic-{0}-{1}', parameters('VmPrefix'), padLeft(add(range(0, parameters('NumSessionHosts'))[copyIndex()], parameters('VmIndexStart')), 0, '0'))]",
               "location": "[parameters('Location')]",
-              "tags": "[coalesce(tryGet(parameters('Tags'), 'Microsoft.Network/networkInterfaces'), createObject())]",
+              "tags": "[if(contains(parameters('Tags'), 'Microsoft.Network/networkInterfaces'), parameters('Tags')['Microsoft.Network/networkInterfaces'], createObject())]",
               "properties": {
                 "ipConfigurations": [
                   {
@@ -1632,9 +1633,7 @@
                       "privateIPAllocationMethod": "Dynamic",
                       "subnet": {
                         "id": "[resourceId(subscription().subscriptionId, parameters('VirtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('VirtualNetwork'), parameters('Subnet'))]"
-                      },
-                      "primary": true,
-                      "privateIPAddressVersion": "IPv4"
+                      }
                     }
                   }
                 ],
@@ -1828,7 +1827,7 @@
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/deployments', format('linked_dedicatedHostInfo_{0}', parameters('Location')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('DedicatedHostScope')), 'Microsoft.Resources/deployments', format('linked_dedicatedHostInfo_{0}', parameters('Location')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_Diagnostics_Setup_{0}', parameters('Location')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_HostPoolDeployment_{0}', parameters('Location')))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('ResourceGroupHP')), 'Microsoft.Resources/deployments', format('linked_UserIdentityCreateAssign_{0}', parameters('Location')))]"
