@@ -67,7 +67,7 @@ resource appGroup 'Microsoft.DesktopVirtualization/applicationGroups@2023-09-05'
   tags: Tags[?'Microsoft.DesktopVirtualization/applicationGroups'] ?? {}
   properties: {
     hostPoolArmPath: hostPool.id
-    applicationGroupType: 'Desktop'
+    applicationGroupType: AppGroupType
   }
 }
 

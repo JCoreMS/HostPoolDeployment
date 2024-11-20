@@ -33,7 +33,6 @@ param KeyVaultDomResId = ''
 param KeyVaultLocalOption = false
 param KeyVaultLocName = ''
 param KeyVaultLocResId = ''
-param Location = deployment().location
 param LogAnalyticsRG = ''
 param LogAnalyticsSubId = ''
 param LogAnalyticsWorkspaceName = ''

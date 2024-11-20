@@ -6,7 +6,7 @@ param AppGroupName string = 'none'
 
 @allowed([
   'Desktop'
-  'RailApplications'
+  'RemoteApp'
 ])
 param AppGroupType string = 'Desktop'
 

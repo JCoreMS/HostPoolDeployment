@@ -1,0 +1,198 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "_artifactsLocation": {
+        "value": null
+      },
+      "_artifactsLocationSasToken": {
+        "value": null
+      },
+      "AppGroupName": {
+        "value": "hp-remoteapptest"
+      },
+      "AppGroupType": {
+        "value": "RemoteApp"
+      },
+      "avdOsImage": {
+        "value": null
+      },
+      "ComputeGalleryName": {
+        "value": "ageus2avd"
+      },
+      "ComputeGallerySubId": {
+        "value": "<subscription-id>"
+      },
+      "ComputeGalleryRG": {
+        "value": "rg-eus2-AVDLab-Images"
+      },
+      "ComputeGalleryImage": {
+        "value": "imgdef-win11-23h2-office"
+      },
+      "CustomRdpProperty": {
+        "value": "audiocapturemode:i:1;audiomode:i:0;drivestoredirect:s:;redirectclipboard:i:1;redirectcomports:i:1;redirectprinters:i:1;redirectsmartcards:i:1;screen mode id:i:2;"
+      },
+      "DCRStatus": {
+        "value": "Existing"
+      },
+      "DCRNewName": {
+        "value": null
+      },
+      "DCRExisting": {
+        "value": "/subscriptions/<subscription-id>/resourceGroups/rg-eus2-AVDLab-Accel-Monitoring/providers/Microsoft.Insights/dataCollectionRules/microsoft-avdi-eastus2"
+      },
+      "dedicatedHostId": {
+        "value": null
+      },
+      "dedicatedHostTagName": {
+        "value": null
+      },
+      "DiskSku": {
+        "value": "StandardSSD_LRS"
+      },
+      "diskEncryptionSetResId": {
+        "value": "/subscriptions/<subscription-id>/resourceGroups/RG-EUS2-AVDLAB-ACCEL-RESOURCES/providers/Microsoft.Compute/diskEncryptionSets/des-accl-dev-use2-001"
+      },
+      "DomainName": {
+        "value": "contoso.com"
+      },
+      "DomainUser": {
+        "value": "admin@contoso.com"
+      },
+      "DomainPassword": {
+        "value": "<password>"
+      },
+      "HostPoolAltToken": {
+        "value": null
+      },
+      "HostPoolKind": {
+        "value": "Pooled"
+      },
+      "HostPoolLBType": {
+        "value": "DepthFirst"
+      },
+      "HostPoolName": {
+        "value": "hp-eus2-RemoteAppTest"
+      },
+      "HostPoolOption": {
+        "value": "New"
+      },
+      "HostPoolRGStatus": {
+        "value": "Existing"
+      },
+      "HostPoolWorkspaceName": {
+        "value": "ws-eus2-remoteapptest"
+      },
+      "KeyVaultDomainOption": {
+        "value": false
+      },
+      "KeyVaultDomName": {
+        "value": null
+      },
+      "KeyVaultDomResId": {
+        "value": null
+      },
+      "KeyVaultLocalOption": {
+        "value": false
+      },
+      "KeyVaultLocName": {
+        "value": null
+      },
+      "KeyVaultLocResId": {
+        "value": null
+      },
+      "Location": {
+        "value": "eastus2"
+      },
+      "LogAnalyticsRG": {
+        "value": "rg-eastus2-AVDLab-Manage"
+      },
+      "LogAnalyticsSubId": {
+        "value": "<subscription-id>"
+      },
+      "LogAnalyticsWorkspaceName": {
+        "value": "law-eastus2-AVDLab"
+      },
+      "NumSessionHosts": {
+        "value": 1
+      },
+      "NumUsersPerHost": {
+        "value": 3
+      },
+      "PostDeployContainerId": {
+        "value": null
+      },
+      "PostDeployOption": {
+        "value": null
+      },
+      "PostDeployOptVDOT": {
+        "value": null
+      },
+      "PostDeployScript": {
+        "value": null
+      },
+      "ResGroupIdMonitor": {
+        "value": null
+      },
+      "ResourceGroupHP": {
+        "value": "rg-eus2-AVDLab-Resources"
+      },
+      "ResourceGroupVMs": {
+        "value": "rg-eus2-AVDLab-RemoteAppTest"
+      },
+      "Restart": {
+        "value": null
+      },
+      "RGVMsStatus": {
+        "value": "Existing"
+      },
+      "StartVmOnConnect": {
+        "value": true
+      },
+      "Subnet": {
+        "value": "subnet-eastus2-AVDLab-HostPoolVMs"
+      },
+      "Tags": {
+        "value": {}
+      },
+      "Timestamp": {
+        "value": null
+      },
+      "UpdateWindows": {
+        "value": null
+      },
+      "UserIdentityName": {
+        "value": null
+      },
+      "OUPath": {
+        "value": "OU=AVDGenUsers,OU=Workstations,DC=contoso,DC=com"
+      },
+      "UseCustomImage": {
+        "value": true
+      },
+      "VmIndexStart": {
+        "value": 1
+      },
+      "VmPrefix": {
+        "value": "vmremapptst"
+      },
+      "ValidationEnvironment": {
+        "value": null
+      },
+      "VirtualNetwork": {
+        "value": "vnet-EastUS2-AVDLab"
+      },
+      "VirtualNetworkResourceGroup": {
+        "value": "rg-eastus2-LandingZone"
+      },
+      "VmPassword": {
+        "value": "<password>"
+      },
+      "VmSize": {
+        "value": "Standard_D2as_v5"
+      },
+      "VmUsername": {
+        "value": "vmAdmin"
+      }
+    }
+  }
