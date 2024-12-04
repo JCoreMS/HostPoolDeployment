@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.31.92.45157",
-      "templateHash": "18210387929060966418"
+      "templateHash": "15380564575569598204"
     }
   },
   "parameters": {
@@ -846,7 +846,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.31.92.45157",
-              "templateHash": "11173203408611523555"
+              "templateHash": "1633837276757384809"
             }
           },
           "parameters": {
@@ -940,7 +940,7 @@
                   "expirationTime": "[dateTimeAdd(parameters('Timestamp'), 'PT2H')]",
                   "registrationTokenOperation": "Update"
                 },
-                "preferredAppGroupType": "[parameters('AppGroupType')]",
+                "preferredAppGroupType": "[if(equals(parameters('AppGroupType'), 'RemoteApp'), 'RailApplications', parameters('AppGroupType'))]",
                 "customRdpProperty": "[parameters('CustomRdpProperty')]",
                 "personalDesktopAssignmentType": "[if(contains(parameters('HostPoolType'), 'Personal'), split(parameters('HostPoolType'), ' ')[1], null())]",
                 "startVMOnConnect": "[parameters('StartVmOnConnect')]",

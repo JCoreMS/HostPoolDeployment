@@ -47,7 +47,7 @@ name: HostPoolName
       expirationTime: dateTimeAdd(Timestamp, 'PT2H')
       registrationTokenOperation: 'Update'
     }
-    preferredAppGroupType: AppGroupType
+    preferredAppGroupType: AppGroupType == 'RemoteApp' ? 'RailApplications' : AppGroupType
     customRdpProperty: CustomRdpProperty
     personalDesktopAssignmentType: contains(HostPoolType, 'Personal') ? split(HostPoolType, ' ')[1] : null
     startVMOnConnect: StartVmOnConnect // https://docs.microsoft.com/en-us/azure/virtual-desktop/start-virtual-machine-connect
